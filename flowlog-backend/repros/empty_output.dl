@@ -1,0 +1,8 @@
+// An .output relation with no rules: does it still produce a table?
+.decl R(a: number)
+R(1).
+.decl O(a: number)
+.output O(IO="sqlite", filename="out.db")
+O(a) :- R(a).
+.decl Empty(a: number)
+.output Empty(IO="sqlite", filename="out.db")

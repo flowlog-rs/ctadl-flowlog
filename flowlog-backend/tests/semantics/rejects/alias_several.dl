@@ -1,0 +1,7 @@
+// A variable equated to two expressions: Souffle keeps one of them, chosen
+// by the order of the equalities, and types its copies where they land.
+.decl U(u: unsigned)
+U(3).
+.decl A(s: symbol)
+.output A
+A("shr") :- U(u), x = 1 bshl 63, u < x, y = x bshr 62, y = 0 - 2.

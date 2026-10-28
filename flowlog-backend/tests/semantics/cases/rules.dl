@@ -1,0 +1,134 @@
+// Rule forms: recursion, negation (also over computed values), inline
+// relations, disjunction, repeated variables, constants, multi-head rules,
+// true/false, components (nested, parameterized, scoping of nested names),
+// records and subtypes.
+.decl E(a: symbol, b: symbol)
+E("a", "b"). E("b", "c"). E("c", "a"). E("c", "d"). E("d", "d"). E("e", "f").
+.decl Path(a: symbol, b: symbol)
+.output Path
+Path(a, b) :- E(a, b).
+Path(a, c) :- Path(a, b), E(b, c).
+
+.decl SelfLoop(a: symbol)
+.output SelfLoop
+SelfLoop(a) :- E(a, a).
+.decl Mutual(a: symbol, b: symbol)
+.output Mutual
+Mutual(a, b) :- Path(a, b), Path(b, a), a < b.
+
+.decl NotPath(a: symbol, b: symbol)
+.output NotPath
+NotPath(a, b) :- E(a, _), E(_, b), !Path(a, b).
+.decl NegCat(a: symbol)
+.output NegCat
+NegCat(a) :- E(a, _), !E(cat(a, ""), "d").
+.decl NegConst(a: symbol)
+.output NegConst
+NegConst(a) :- E(_, a), !E(a, "a"), !SelfLoop(a).
+
+.decl Two(a: symbol, c: symbol) inline
+Two(a, c) :- E(a, b), E(b, c).
+.decl ViaTwo(a: symbol, c: symbol)
+.output ViaTwo
+ViaTwo(a, c) :- Two(a, c), a != c.
+ViaTwo(a, "loop") :- Two(a, a).
+
+.decl Dis(a: symbol, b: symbol)
+.output Dis
+Dis(a, b) :- E(a, b), (b = "b" ; b = "d" ; a = "e").
+Dis(a, "x") :- (E(a, "a") ; E("a", a)), !SelfLoop(a).
+
+.decl H1(a: symbol)
+.decl H2(a: symbol, b: symbol)
+.output H1, H2
+H1(a), H2(a, b) :- E(a, b), b = "a".
+
+.decl TF(a: symbol)
+.output TF
+TF(a) :- E(a, _), true.
+TF("never") :- false.
+TF("never2") :- E(a, _), a = "a", false.
+TF("always") :- true.
+
+// Components: nested, parameterized by a type; an `.init` sees the
+// components nested in its own and in the enclosing components, nearest
+// first.
+.comp Graph<T> {
+  .decl edge(a: T, b: T)
+  .decl reach(a: T, b: T)
+  reach(a, b) :- edge(a, b).
+  reach(a, c) :- reach(a, b), edge(b, c).
+  .decl size(n: number)
+  size(n) :- n = count : { reach(_, _) }.
+}
+.init g = Graph<symbol>
+g.edge(a, b) :- E(a, b).
+.init ng = Graph<number>
+ng.edge(3000000000, 3000000001).
+ng.edge(3000000001, 3000000002).
+.init cg = Graph<symbol>
+cg.edge(a, b) :- E(a, b), a != "c".
+.comp Inner {
+  .decl x(a: symbol)
+  x("global Inner").
+}
+.comp Outer {
+  .comp Inner {
+    .decl x(a: symbol)
+    x("inner").
+  }
+  .comp Sibling {
+    .init in = Inner
+    .decl z(a: symbol)
+    z(a) :- in.x(a).
+  }
+  .init in = Inner
+  .init sib = Sibling
+  .decl y(a: symbol)
+  y(a) :- in.x(a).
+  y(a) :- sib.z(a).
+}
+.init o = Outer
+.init gi = Inner
+
+.decl CompOut(name: symbol, a: symbol, b: symbol)
+.output CompOut
+CompOut("g", a, b) :- g.reach(a, b).
+CompOut("cg", a, b) :- cg.reach(a, b).
+CompOut("o", a, a) :- o.y(a).
+CompOut("gi", a, a) :- gi.x(a).
+.decl CompNum(a: number, b: number)
+.output CompNum
+CompNum(a, b) :- ng.reach(a, b).
+CompNum(n, n) :- cg.size(n).
+
+// Records are flattened.
+.type Pair = [x: symbol, y: number]
+.type Nest = [p: Pair, z: number]
+.decl Rec(p: Pair)
+Rec(["a", 1]). Rec(["b", 2]).
+.decl RecN(n: Nest)
+RecN([["c", 3], 4]).
+.decl RecOut(x: symbol, y: number)
+.output RecOut
+RecOut(x, y + 1) :- Rec([x, y]).
+RecOut(x, y * z) :- RecN([[x, y], z]).
+RecOut(x, 0) :- Rec(p), p = [x, _].
+
+// Subtypes and unions of symbol.
+.type Node <: symbol
+.type Label <: symbol
+.type Any = Node | Label
+.decl Lab(n: Node, l: Label)
+Lab("a", "red"). Lab("b", "blue").
+.decl AnyOut(x: Any)
+.output AnyOut
+AnyOut(n) :- Lab(n, _).
+AnyOut(l) :- Lab(_, l).
+
+// Repeated variables and constants in atoms.
+.decl Rep(a: symbol)
+.output Rep
+Rep(a) :- E(a, a).
+Rep(a) :- E(a, b), E(b, a).
+Rep("const") :- E("e", "f").

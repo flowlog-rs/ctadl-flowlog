@@ -1,0 +1,7 @@
+// Bug B13: a comparison that the limits of its type decide fails rustc's
+// unused_comparisons lint in the generated crate.  Souffle: A={3}.
+.decl U(u: unsigned)
+U(3).
+.decl A(u: unsigned)
+.output A
+A(u) :- U(u), u >= 0.

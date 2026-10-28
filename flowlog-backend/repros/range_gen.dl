@@ -1,0 +1,4 @@
+// Souffle's range generator.
+.decl O(i: number)
+.output O
+O(i) :- i = range(0, 3).

@@ -1,0 +1,7 @@
+// Souffle's user-defined functor syntax.
+.functor F(a: symbol): symbol
+.decl R(a: symbol)
+R("x").
+.decl O(a: symbol)
+.output O
+O(b) :- R(a), b = @F(a).

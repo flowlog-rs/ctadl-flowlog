@@ -1,0 +1,9 @@
+// An aggregate whose body binds a computed value (FlowLog syntax; the -t
+// rewrite of agg_computed.dl produces exactly this).
+.decl R(a: symbol)
+R("x").
+.decl S(a: symbol)
+S("xy").
+.decl O(a: symbol, n: number)
+.output O
+O(a, n) :- R(a), n = count : { t = cat(a, "y"), S(t) }.

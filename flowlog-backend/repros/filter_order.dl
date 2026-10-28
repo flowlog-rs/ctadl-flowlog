@@ -1,0 +1,9 @@
+// Bug B8: a rule's filter tests its comparisons before an atom's constants,
+// so the division runs on R("skip", 1, 0), which R("div", a, b) excludes.
+// Souffle: O={6 2}.
+.decl R(k: symbol, a: number, b: number)
+R("div", 6, 2).
+R("skip", 1, 0).
+.decl O(a: number, b: number)
+.output O
+O(a, b) :- R("div", a, b), a / b > 1.

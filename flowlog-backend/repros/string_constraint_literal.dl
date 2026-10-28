@@ -1,0 +1,9 @@
+// Integer literals inside a computed contains/match operand: an internal
+// compiler error in codegen on FlowLog main (84b3a1c), flowlog-rs/flowlog#464;
+// fixed by flowlog-rs/flowlog#477. CTADL's CheckSubstring helper has this shape.
+.decl R(s: symbol, i: number)
+R("x.*y", 1).
+R("abc", 1).
+.decl O(s: symbol)
+.output O
+O(s) :- R(s, i), !contains(".*", substr(s, i, strlen(s) - i + 1)).

@@ -1,0 +1,7 @@
+// An aggregate whose braces name no variable.
+.decl R(a: number, b: number)
+R(1, 2).
+R(3, 4).
+.decl C(n: number)
+.output C
+C(n) :- n = count : { R(_, _) }.

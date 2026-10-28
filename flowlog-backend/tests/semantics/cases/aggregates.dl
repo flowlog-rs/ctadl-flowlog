@@ -1,0 +1,53 @@
+// Aggregates: count, sum, min and max, uncorrelated and correlated, over
+// empty bodies (count and sum give 0, min and max no value), with expression
+// targets, inside comparisons and arithmetic, and in the shapes of FlowLog
+// bugs B2 and B4.
+.decl R(a: number, b: number)
+R(1, 10). R(1, 20). R(2, 5). R(3, -7). R(3, 7).
+.decl K(a: number)
+K(1). K(2). K(3). K(4).
+.decl E(a: number)
+.decl S(s: symbol, k: number)
+S("x", 1). S("y", 1). S("z", 3).
+
+.decl Agg(name: symbol, k: number, v: number)
+.output Agg
+Agg("count", 0, n) :- n = count : { R(_, _) }.
+Agg("sum", 0, n) :- n = sum b : { R(_, b) }.
+Agg("min", 0, n) :- n = min b : { R(_, b) }.
+Agg("max", 0, n) :- n = max b : { R(_, b) }.
+Agg("count empty", 0, n) :- n = count : { E(_) }.
+Agg("sum empty", 0, n) :- n = sum x : { E(x) }.
+Agg("min empty", 0, n) :- n = min x : { E(x) }.
+Agg("max empty", 0, n) :- n = max x : { E(x) }.
+Agg("count k", k, n) :- K(k), n = count : { R(k, _) }.
+Agg("sum k", k, n) :- K(k), n = sum b : { R(k, b) }.
+Agg("min k", k, n) :- K(k), n = min b : { R(k, b) }.
+Agg("max k", k, n) :- K(k), n = max b : { R(k, b) }.
+Agg("sum expr", k, n) :- K(k), n = sum b * 2 + 1 : { R(k, b) }.
+Agg("min neg", k, n) :- K(k), n = min -b : { R(k, b) }.
+Agg("max diff", k, n) :- K(k), n = max b - k : { R(k, b) }.
+Agg("count cmp", k, 1) :- K(k), count : { R(k, _) } > 1.
+Agg("count arith", k, n) :- K(k), n = 100 + count : { R(k, _) }.
+Agg("count filter", k, n) :- K(k), n = count : { R(k, b), b > 6 }.
+Agg("count join", k, n) :- K(k), n = count : { R(k, b), R(_, c), c < b }.
+Agg("count strings", k, n) :- K(k), n = count : { S(_, k) }.
+Agg("sum strings", 0, n) :- n = sum k : { S(s, k), s != "y" }.
+Agg("two aggs", k, n + m) :- K(k), n = count : { R(k, _) }, m = sum b : { R(k, b) }.
+Agg("nested", 0, n) :- n = sum m : { K(k), m = count : { R(k, _) } }.
+
+// B2 shape: the body names only variables bound outside it.
+.decl B2(k: number, n: number)
+.output B2
+B2(k, n) :- K(k), n = count : { E(k) }.
+B2(k + 10, n) :- K(k), n = count : { K(k) }.
+
+// B4 shape: a variable equated to an outside one inside the body.
+.decl B4(k: number, n: number)
+.output B4
+B4(k, n) :- K(k), n = count : { R(t, _), t = k }.
+
+// Aggregate results used as keys.
+.decl Top(k: number, b: number)
+.output Top
+Top(k, b) :- R(k, b), b = max c : { R(k, c) }.

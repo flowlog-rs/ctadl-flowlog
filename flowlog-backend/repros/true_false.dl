@@ -1,0 +1,6 @@
+// Nullary constraints true / false.
+.decl R(a: number)
+R(1).
+.decl O(a: number)
+.output O
+O(a) :- R(a), true.

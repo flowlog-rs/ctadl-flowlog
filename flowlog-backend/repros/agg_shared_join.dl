@@ -1,0 +1,11 @@
+// Two aggregates over the same join, one with a wildcard where the other
+// names the column.
+.decl T(a: number, b: number)
+T(1, 7).
+T(2, 7).
+.decl U(c: number)
+U(7).
+.decl O(name: symbol, v: number)
+.output O
+O("b", n) :- n = count : { T(_, z), U(z) }.
+O("m", n) :- n = count : { T(b, z), U(z) }.

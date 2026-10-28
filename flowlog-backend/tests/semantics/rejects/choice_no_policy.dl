@@ -1,0 +1,4 @@
+// choice-domain needs a policy (see policy.json).
+.decl C(a: number, b: number) choice-domain a
+.output C
+C(1, 2). C(1, 3).

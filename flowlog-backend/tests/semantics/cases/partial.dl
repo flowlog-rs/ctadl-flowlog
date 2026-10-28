@@ -1,0 +1,87 @@
+// Partial functions (to_number, / and %) where Souffle completes: the port's
+// versions return 0 on a failure, and the check rules that reproduce
+// Souffle's stops (souffle2flowlog.py, add_partial_checks) must not fire.
+.decl N(x: number)
+N(0). N(5). N(20).
+.decl M(x: number)
+M(5). M(20).
+.decl S(s: symbol)
+S("12"). S("abc").
+
+// A dead assignment: ResolveAliases drops `y = 100 / x` unevaluated.
+.decl Dead(x: number)
+.output Dead
+Dead(x) :- N(x), y = 100 / x.
+
+// Guarded calls: the filters run before the head's projection (FlowLog
+// evaluates the call first, see FlowLog issue B8).
+.decl Guard(x: number, q: number, r: number)
+.output Guard
+Guard(x, 100 / x, 100 % x) :- N(x), x != 0.
+.decl Parsed(s: symbol, n: number)
+.output Parsed
+Parsed(s, to_number(s)) :- S(s), s != "abc".
+
+// A configuration value, as CTADL reads its options.
+.decl Config(key: symbol, value: symbol)
+Config("K", "3"). Config("L", "x").
+.decl K(k: number)
+.output K
+K(k) :- Config("K", s), k = to_number(s), k > 0.
+
+// No output reads Unused, so Souffle drops it.
+.decl Unused(q: number)
+Unused(100 / x) :- N(x).
+
+// E is read only as E(_), so Souffle reduces it to a nullary relation
+// (ReduceExistentials) whose clause computes no column.
+.decl E(q: number)
+E(100 / x) :- N(x).
+.decl Exists(n: number)
+.output Exists
+Exists(1) :- E(_).
+
+// A negation removing every row: FlowLog's antijoin evaluates the
+// projection on the rows it removes (FlowLog issue B9).
+.decl R(x: number)
+R(x) :- N(x).
+.decl NegAll(q: number)
+.output NegAll
+NegAll(100 / (x - x)) :- N(x), !R(x).
+
+// A copy (Souffle may read Q in its place) of a checked relation.
+.decl Q(x: number, q: number)
+Q(x, 100 / x) :- N(x), x != 0.
+.decl Copy(x: number, q: number)
+.output Copy
+Copy(x, q) :- Q(x, q).
+
+// C is a copy of CE (RemoveRelationCopies reads CE in its place) read as
+// C(_), so CE is reduced too, though C's clause names its column.
+.decl CE(q: number)
+CE(100 / x) :- N(x).
+.decl C(q: number)
+C(q) :- CE(q).
+.decl CopyExists(n: number)
+.output CopyExists
+CopyExists(1) :- C(_).
+
+// Not checked (an aggregate, a recursive clause, a body-only call), and
+// not failing here.
+.decl Sum(n: number)
+.output Sum
+Sum(n) :- n = sum 100 / x : { N(x), x != 0 }.
+.decl Rec(x: number)
+.output Rec
+Rec(x) :- M(x).
+Rec(x + 1000 / x) :- Rec(x), x < 100.
+.decl Body(x: number)
+.output Body
+Body(x) :- M(x), 100 / x > 10.
+
+// unsigned division and remainder.
+.decl UP(a: unsigned, b: unsigned)
+UP(7, 2). UP(7, 0). UP(100, 7). UP(4000000000, 3).
+.decl UDiv(a: unsigned, b: unsigned, q: unsigned, r: unsigned)
+.output UDiv
+UDiv(a, b, a / b, a % b) :- UP(a, b), b != 0.

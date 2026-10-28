@@ -1,0 +1,20 @@
+// B's R is A's R in instance a.b, but the program's R in instance b: the
+// translation keeps one body per component.
+// expect: names different relations in its instances
+.decl R(x: number)
+R(1).
+.comp B {
+  .decl S(x: number)
+  S(x) :- R(x).
+}
+.comp A {
+  .decl R(x: number)
+  R(2).
+  .init b = B
+}
+.init a = A
+.init b = B
+.decl O(i: number, x: number)
+.output O
+O(1, x) :- a.b.S(x).
+O(2, x) :- b.S(x).

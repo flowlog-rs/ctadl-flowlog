@@ -1,0 +1,16 @@
+// A min-lattice read inside its own recursion: rows superseded by a later
+// round stay visible to the loop (no retraction), so Via also holds the
+// first, non-minimal distance of node 2.
+.decl Edge(x: number, y: number, w: number)
+Edge(1, 2, 5).
+Edge(1, 3, 1).
+Edge(3, 4, 1).
+Edge(4, 2, 1).
+.decl Dist(n: number, d: min<int32>)
+.decl Via(n: number, d: number)
+Dist(1, 0).
+Dist(y, d + w) :- Dist(x, d), Edge(x, y, w).
+Via(n, d) :- Dist(n, d).
+Dist(n, d) :- Via(n, d).
+.output Dist
+.output Via

@@ -1,0 +1,7 @@
+// Record types.
+.type P = [a: number, b: number]
+.decl R(p: P)
+R([1, 2]).
+.decl O(a: number)
+.output O
+O(a) :- R([a, _]).

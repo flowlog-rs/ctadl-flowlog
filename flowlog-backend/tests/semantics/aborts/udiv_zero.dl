@@ -1,0 +1,6 @@
+// unsigned division by zero.
+.decl P(a: unsigned, b: unsigned)
+.decl O(n: unsigned)
+.output O
+P(1, 1). P(1, 0).
+O(a / b) :- P(a, b).

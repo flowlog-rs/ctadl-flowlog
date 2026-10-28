@@ -1,0 +1,6 @@
+// Out of the int64 range: std::stoll throws.
+.decl S(s: symbol)
+.decl O(n: number)
+.output O
+O(to_number(s)) :- S(s).
+S("9223372036854775808").

@@ -1,0 +1,8 @@
+// Souffle's alias resolution replaces x by 3 or by u depending on the order
+// of the equalities (cases/aliases.dl), so `x - 10 < 0` is computed on
+// number or on unsigned.
+.decl U(x: unsigned)
+U(3).
+.decl A(s: symbol)
+.output A
+A("u = x, x = 3") :- U(u), u = x, x = 3, x - 10 < 0.

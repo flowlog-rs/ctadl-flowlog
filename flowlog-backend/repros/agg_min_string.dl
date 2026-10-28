@@ -1,0 +1,7 @@
+// `min` aggregate over a string target.
+.decl R(k: number, s: symbol)
+R(1, "b").
+R(1, "a").
+.decl M(k: number, s: symbol)
+.output M
+M(k, m) :- R(k, _), m = min s : { R(k, s) }.

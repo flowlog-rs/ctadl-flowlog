@@ -1,0 +1,14 @@
+// Builtins that FlowLog computes differently from Souffle: strlen and substr
+// count characters (Souffle: bytes), and integer ^ is 0 for every negative
+// exponent (Souffle truncates std::pow).
+.decl K(x: number)
+K(1).
+.decl O(name: symbol, v: number)
+.output O
+O("strlen(é)", strlen("é")) :- K(_).
+O("1^-1", 1 ^ -1) :- K(_).
+O("(-1)^-1", (-1) ^ -1) :- K(_).
+O("2^-1", 2 ^ -1) :- K(_).
+.decl S(name: symbol, v: symbol)
+.output S
+S("substr(aéb,1,2)", substr("aéb", 1, 2)) :- K(_).

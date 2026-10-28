@@ -1,0 +1,6 @@
+// A variable named `fn` (CTADL uses it).
+.decl R(fn: symbol)
+R("f").
+.decl O(fn: symbol)
+.output O
+O(fn) :- R(fn).

@@ -1,0 +1,21 @@
+// No output has a fact, an input or a rule FlowLog keeps: it prunes every
+// relation, and the generated crate does not build (flowlog-rs/flowlog#475), so the
+// translator adds a rule that never fires (souffle2flowlog.py,
+// keep_dataflow).  Souffle writes every output empty.  (A rule reading a
+// relation nothing derives, `C(x) :- B(x).`, is kept.)
+.type T <: number
+.type S <: symbol
+.decl A(t: T, s: S, u: unsigned)
+.output A
+
+// recursive only
+.decl R(x: number)
+.output R
+R(x) :- R(x).
+
+// never satisfied: x is INT64_MIN on number, so the clause is dropped
+.decl U(x: unsigned)
+U(5).
+.decl D(s: symbol)
+.output D
+D("u<x, x>3") :- U(u), x = 1 bshl 63, u < x, x > 3.

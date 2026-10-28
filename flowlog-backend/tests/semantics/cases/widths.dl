@@ -1,0 +1,118 @@
+// Integer literals in FlowLog: it types a literal int32 unless its context
+// pins it, and `as` does not (flowlog-rs/flowlog#474); rustc rejects literal
+// arithmetic that overflows or divides by zero (#473), comparisons whose
+// result the type decides (#476), and grouped call arguments and shift or
+// pow operands (#468).  The translator folds and anchors literals
+// (souffle2flowlog.py: fold_constants, anchor_widths, paren_safe).
+.decl K(x: number)
+K(0).
+
+// Literals that must be 64-bit.
+.decl W(name: symbol)
+.output W
+W("add var") :- K(_), x = 2000000000, x + x > 0.
+W("shl lit") :- K(_), 1 bshl 31 > 0.
+W("shl var") :- K(_), x = 1, x bshl 31 > 0.
+W("shru lit") :- K(_), -1 bshru 1 = 2147483647.
+W("shru var") :- K(_), x = -1, x bshru 1 = 2147483647.
+W("mul var") :- K(_), x = 65536, x * x != 0.
+W("typed ctl") :- K(z), x = z + 1, x bshl 31 > 0.
+W("as lit") :- K(_), as(1, number) bshl 31 > 0.
+W("not as lit") :- K(_), !as(1, number) bshl 31 < 0.
+// over KS, not K: FlowLog's planner fails on an aggregate over a relation
+// twelve other rules read (b6.md)
+.decl KS(x: number)
+KS(1).
+W("sum first") :- K(_), sum(x) : { KS(x) } + 2147483647 + 1 > 0.
+
+// Literal arithmetic that overflows wraps, as in Souffle.
+.decl O(name: symbol, v: number)
+.output O
+O("max+1", 9223372036854775807 + 1) :- K(_).
+O("min-1", -9223372036854775807 - 2) :- K(_).
+O("2^62*2", 4611686018427387904 * 2) :- K(_).
+O("-(min)", -(-9223372036854775807 - 1)) :- K(_).
+O("(max+1)-1", (9223372036854775807 + 1) - 1) :- K(_).
+O("lit min", -9223372036854775808) :- K(_).
+O("x+(max+1)", x + (9223372036854775807 + 1)) :- K(x).
+O("cmp true", 1) :- K(_), 9223372036854775807 + 1 < 0.
+O("eq", x) :- K(_), x = 9223372036854775807 + 1.
+O("fact", 9223372036854775807 + 1).
+.decl UO(name: symbol, v: unsigned)
+.output UO
+UO("0-1", 0 - 1) :- K(_).
+UO("max+1", 9223372036854775807 + 1) :- K(_).
+UO("2^63*2", 9223372036854775808 * 2) :- K(_).
+
+// Unsigned literals, and literals beyond 32 bits converted to strings.
+.decl U(x: unsigned)
+U(5).
+.decl V(x: unsigned)
+.output V
+V(0 - 1).
+V(1 bshl 63).
+V(x) :- x = 0 - 2.
+.decl WN(x: number)
+.output WN
+WN(1 bshl 63).
+WN(x) :- U(_), x = 1 bshl 63, x < 0.
+.decl S(s: symbol)
+.output S
+S(to_string(u)) :- U(u).
+S(to_string(1 bshl 40)).
+S(to_string(x)) :- U(u), x = 1 bshl 63, u < x.
+
+// Shift counts out of range: Souffle masks them to 6 bits.
+.decl P(a: number, b: number)
+P(1, 64). P(1, 65). P(1, -1). P(-1, 64). P(-8, 65). P(5, 63). P(-1, -63). P(3, 127).
+.decl Sh(op: symbol, a: number, b: number, v: number)
+.output Sh
+Sh("bshl", a, b, a bshl b) :- P(a, b).
+Sh("bshr", a, b, a bshr b) :- P(a, b).
+Sh("bshru", a, b, a bshru b) :- P(a, b).
+.decl UP(a: unsigned, b: unsigned)
+UP(1, 64). UP(18446744073709551615, 1). UP(5, 65).
+.decl USh(op: symbol, a: unsigned, b: unsigned, v: unsigned)
+.output USh
+USh("bshl", a, b, a bshl b) :- UP(a, b).
+USh("bshr", a, b, a bshr b) :- UP(a, b).
+USh("bshru", a, b, a bshru b) :- UP(a, b).
+.decl C(name: symbol, v: number)
+.output C
+C("1 bshl 64", 1 bshl 64).
+C("1 bshl -1", 1 bshl -1).
+C("-1 bshru 1", -1 bshru 1).
+
+// Grouped operands: FlowLog inlines `y = x + 1` into its uses.
+.decl KB(x: number)
+KB(3). KB(-7).
+.decl GR(name: symbol, v: number)
+.output GR
+GR("div", z) :- KB(x), y = x + 1, z = y / 2.
+GR("mod", z) :- KB(x), y = x * 3, z = y % 4.
+GR("shl", z) :- KB(x), y = x + 1, z = y bshl 2.
+GR("shl2", z) :- KB(x), z = (x + 1) bshl 2.
+GR("shr count", z) :- KB(x), z = 64 bshr (x + 4).
+GR("pow", z) :- KB(x), y = x + 1, z = y ^ 2.
+GR("pow2", (x + 1) ^ 2) :- KB(x).
+.decl GS(name: symbol, s: symbol)
+.output GS
+GS("to_string var", to_string(y)) :- KB(x), y = x + 1.
+GS("to_string expr", to_string(x + 1)) :- KB(x).
+
+// Comparisons the type decides.
+.decl LU(u: unsigned)
+LU(3). LU(0).
+.decl L(name: symbol, u: unsigned)
+.output L
+L("u>=0", u) :- LU(u), u >= 0.
+L("u<0", u) :- LU(u), u < 0.
+L("0<=u", u) :- LU(u), 0 <= u.
+L("max<u", u) :- LU(u), 18446744073709551615 < u.
+L("u<=max", u) :- LU(u), u <= 18446744073709551615.
+.decl LN(name: symbol, n: number)
+.output LN
+LN("n>=min", n) :- K(n), n >= -9223372036854775807 - 1.
+LN("n<=max", n) :- K(n), n <= 9223372036854775807.
+LN("n>max", n) :- K(n), n > 9223372036854775807.
+LN("min>n", n) :- K(n), -9223372036854775807 - 1 > n.

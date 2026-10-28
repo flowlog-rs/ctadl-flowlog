@@ -1,0 +1,6 @@
+// Remainder by zero: Souffle dies of SIGFPE.
+.decl P(a: number, b: number)
+.decl O(n: number)
+.output O
+P(1, 1). P(1, 0).
+O(a % b) :- P(a, b).
