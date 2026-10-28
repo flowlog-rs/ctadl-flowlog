@@ -1,0 +1,11 @@
+{
+  "choice": {
+    "VirtualAssign": "minchoice",
+    "AliasedBy": "drop",
+    "IntraObjectAliasedBy": "drop",
+    "ReachableVertex": "drop",
+    "ParthianVertex": "minchoice",
+    "ContextObj": "minchoice",
+    "LostAssign": "minchoice"
+  }
+}
