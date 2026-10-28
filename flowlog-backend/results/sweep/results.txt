@@ -1,0 +1,30 @@
+f6 s1 | flowlog: D: CTADLStats W: VirtualAssign=578 | souffle-j32: D: - W: VirtualAssign=761 | model: yes
+f6 s2 | flowlog: D: - W: VirtualAssign=257 | souffle-j32: D: - W: VirtualAssign=25 | model: yes
+f6 s3 | flowlog: D: - W: VirtualAssign=862 | souffle-j32: D: - W: VirtualAssign=266 | model: yes
+f6 s4 | flowlog: D: - W: VirtualAssign=30 | souffle-j32: D: CTADLStats W: VirtualAssign=44 | model: yes
+f6 s5 | flowlog: D: - W: VirtualAssign=82 | souffle-j32: D: - W: VirtualAssign=78 | model: yes
+f6 s6 | flowlog: D: - W: VirtualAssign=27 | souffle-j32: D: - W: VirtualAssign=2 | model: yes
+f8 s1 | flowlog: D: - W: VirtualAssign=1022 | souffle-j32: D: - W: VirtualAssign=930 | model: yes
+f8 s2 | flowlog: D: - W: VirtualAssign=646 | souffle-j32: D: - W: VirtualAssign=630 | model: yes
+f8 s3 | flowlog: D: - W: VirtualAssign=324 | souffle-j32: D: - W: VirtualAssign=248 | model: yes
+f8 s4 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | model: yes
+f8 s5 | flowlog: D: - W: VirtualAssign=273 | souffle-j32: D: - W: VirtualAssign=8 | model: yes
+f8 s6 | flowlog: D: - W: VirtualAssign=574 | souffle-j32: D: - W: VirtualAssign=408 | model: yes
+f10 s1 | flowlog: D: - W: VirtualAssign=141 | souffle-j32: D: - W: VirtualAssign=1529 | model: yes
+f10 s2 | flowlog: D: - W: VirtualAssign=727 | souffle-j32: D: - W: VirtualAssign=255 | model: yes
+f10 s3 | flowlog: D: - W: VirtualAssign=218 | souffle-j32: D: - W: VirtualAssign=297 | model: yes
+f10 s4 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: - W: VirtualAssign=870 | model: yes
+f10 s5 | flowlog: D: - W: VirtualAssign=972 | souffle-j32: D: - W: VirtualAssign=554 | model: yes
+f10 s6 | flowlog: D: - W: VirtualAssign=1338 | souffle-j32: D: - W: VirtualAssign=314 | model: yes
+f12 s1 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: - W: VirtualAssign=1093 | model: yes
+f12 s2 | flowlog: D: - W: VirtualAssign=656 | souffle-j32: D: - W: VirtualAssign=626 | model: yes
+f12 s3 | flowlog: D: - W: VirtualAssign=117 | souffle-j32: D: - W: VirtualAssign=135 | model: yes
+f12 s4 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: - W: VirtualAssign=157 | model: yes
+f12 s5 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: - W: VirtualAssign=173 | model: yes
+f12 s6 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: CTADLStats W: VirtualAssign=1610 | model: yes
+f15 s1 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | model: yes
+f15 s2 | flowlog: D: - W: VirtualAssign=65 | souffle-j32: D: - W: VirtualAssign=233 | model: yes
+f15 s3 | flowlog: D: - W: VirtualAssign=3911 | souffle-j32: D: - W: VirtualAssign=2604 | model: yes
+f15 s4 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | model: yes
+f15 s5 | flowlog: D: CTADLStats W: VirtualAssign=331 | souffle-j32: D: - W: VirtualAssign=445 | model: yes
+f15 s6 | flowlog: D: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign W: - | souffle-j32: D: CTADLStats W: VirtualAssign=1270 | model: yes

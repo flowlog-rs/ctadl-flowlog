@@ -1,0 +1,33 @@
+# compare_db.py --schema index_schema.json FLOWLOG_ALL_OUTPUTS_INDEX FLOWLOG_J1 (syn25; the first is the choice-model check's index, the second the benchmark's database after the query: MISSING = written only with --all-outputs, EXTRA = written by the query)
+MISSING  AccessPathNonEmptySplit: absent from the FlowLog DB, Souffle has 16 rows
+DIFF     CTADLConfig: souffle 16, flowlog 17, souffle-only 1, flowlog-only 2
+           - ('ALL_OUTPUTS', '1')
+           + ('ALL_OUTPUTS', '0')
+           + ('CTADL_Query', '<ctadl>/src/ctadl/souffle-logic/taint-front/taintquery.dl')
+EXTRA    CTADLConfig_Input: only in FlowLog (12 rows)
+DIFF     CTADLStats: souffle 53, flowlog 59, souffle-only 0, flowlog-only 6
+           + ('import-computed-access-path', '26')
+           + ('import-vertex', '3924')
+           + ('import-virtual-assign', '265302')
+           + ('sink vertices', '23')
+           + ('source vertices', '14')
+MISSING  IndirectCallResolvent: absent from the FlowLog DB, Souffle has 283 rows
+MISSING  IndirectCallResolventFunction: absent from the FlowLog DB, Souffle has 283 rows
+EXTRA    LeakingSinkVertex: only in FlowLog (23 rows)
+MISSING  Local: absent from the FlowLog DB, Souffle has 220 rows
+EXTRA    LostAssign: only in FlowLog (163 rows)
+EXTRA    MG_SliceDirection: only in FlowLog (1 rows)
+MISSING  ReadsGlobal: absent from the FlowLog DB, Souffle has 12 rows
+EXTRA    TaintSanitizeEdge: only in FlowLog (2 rows)
+EXTRA    TaintSourceVertex: only in FlowLog (14 rows)
+MISSING  WritesGlobal: absent from the FlowLog DB, Souffle has 13 rows
+MISSING  ctadl_taint_front_phase1.ContextObj: absent from the FlowLog DB, Souffle has 1059 rows
+MISSING  ctadl_taint_front_phase1.LocallyReachable: absent from the FlowLog DB, Souffle has 369247 rows
+MISSING  ctadl_taint_front_phase1.ParthianFlowEdge: absent from the FlowLog DB, Souffle has 261 rows
+MISSING  ctadl_taint_front_phase1.ParthianVertex: absent from the FlowLog DB, Souffle has 108 rows
+EXTRA    flow.ReachableVertex: only in FlowLog (407845 rows)
+EXTRA    forward_flow.ReachableEdge: only in FlowLog (17975571 rows)
+EXTRA    forward_flow.ReachableVertex: only in FlowLog (407845 rows)
+EXTRA    natural_flow.ReachableEdge: only in FlowLog (17975571 rows)
+EXTRA    reverse_flow.ReachableEdge: only in FlowLog (17975571 rows)
+summary: 97 equal, 23 different

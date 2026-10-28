@@ -2,6 +2,18 @@
 
 # CTADL
 
+> **FlowLog port (this fork).** [`flowlog-backend/`](flowlog-backend) runs CTADL's index and
+> query analyses on [FlowLog](https://github.com/flowlog-rs/flowlog) instead of Soufflé. A
+> translator turns CTADL's Soufflé programs into FlowLog, and CTADL's C++ functors are ported as
+> Rust UDFs; CTADL itself is unchanged. Over 435 differential runs with 32 workers, both backends
+> give identical databases and SARIF reports, apart from one valid `choice-domain` witness. On a
+> larger generated program, FlowLog's engine time is close to Soufflé's (index 3–8% slower, query
+> 1.1–1.6× as fast), but it needs more memory, and converting its results into CTADL's sqlite
+> layout makes the query 1.6–1.8× slower end to end. The port needs one FlowLog fix,
+> [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477). Details, the FlowLog
+> issues found and how to reproduce everything:
+> [`flowlog-backend/README.md`](flowlog-backend/README.md).
+
 [CTADL](https://github.com/sandialabs/ctadl) is a static taint analysis tool.
 
 CTADL (pronounced "citadel") takes as input a program, known as a system under test (SUT), and allows you to perform taint analysis across procedures.

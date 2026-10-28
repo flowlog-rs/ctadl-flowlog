@@ -1,0 +1,17 @@
+program    backend          j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+syn10      souffle          1 |    2.43     1.12    1.12     34M |    3.18     0.97    0.97     40M | (reference)
+syn10      souffle         32 |    1.86     0.56    0.56     32M |    2.92     0.77    0.77     36M | summary: 117 equal (2 up to choice-domain witnesses), 3 different
+syn10      souffle-noplan   1 |    5.08     3.72    3.72     37M |    3.26     0.97    0.97     40M | summary: 117 equal (2 up to choice-domain witnesses), 3 different
+syn10      souffle-noplan  32 |    2.19     0.71    0.71     34M |    2.93     0.77    0.77     36M | summary: 116 equal (1 up to choice-domain witnesses), 4 different
+syn10      souffle-strict   1 |    5.03     3.72    3.72     37M |    3.06     0.97    0.97     40M | summary: 117 equal (2 up to choice-domain witnesses), 3 different
+syn10      souffle-strict  32 |    2.06     0.71    0.71     34M |    3.06     0.82    0.82     36M | summary: 116 equal (1 up to choice-domain witnesses), 4 different
+syn10      flowlog          1 |    4.06     2.78    2.59    249M |    4.32     2.22    1.10    146M | summary: 117 equal (2 up to choice-domain witnesses), 3 different
+syn10      flowlog         32 |    3.19     1.91    1.71   2115M |    5.79     3.60    2.50   1444M | summary: 117 equal (2 up to choice-domain witnesses), 3 different
+syn25      souffle          1 |   46.13    44.42   44.42    350M |   89.54    54.82   54.82   1409M | (reference)
+syn25      souffle         32 |   14.80    12.88   12.88    358M |   71.09    36.25   36.25   1353M | summary: 116 equal (1 up to choice-domain witnesses), 4 different
+syn25      souffle-noplan   1 |  124.79   123.00  123.00    340M |   88.45    54.40   54.40   1409M | summary: 111 equal (1 up to choice-domain witnesses), 9 different
+syn25      souffle-noplan  32 |   22.78    21.00   21.00    352M |   70.39    36.08   36.08   1355M | summary: 111 equal (1 up to choice-domain witnesses), 9 different
+syn25      souffle-strict   1 |  125.61   123.81  123.81    339M |   88.66    54.39   54.39   1408M | summary: 111 equal (1 up to choice-domain witnesses), 9 different
+syn25      souffle-strict  32 |   22.53    20.84   20.84    351M |   71.33    36.67   36.67   1350M | summary: 110 equal, 10 different
+syn25      flowlog          1 |   49.86    48.01   45.94   1714M |  139.81   106.53   48.66   2202M | summary: 108 equal, 12 different
+syn25      flowlog         32 |   17.83    16.08   13.97   4083M |  125.29    80.71   22.17   3485M | summary: 108 equal, 12 different

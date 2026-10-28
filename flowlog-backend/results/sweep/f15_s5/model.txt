@@ -1,0 +1,8 @@
+forced   VirtualAssign: 35002 FlowLog witnesses
+forced   AliasedBy: 0 FlowLog witnesses
+forced   IntraObjectAliasedBy: 0 FlowLog witnesses
+forced   ctadl_taint_front_phase1.ParthianVertex: 33 FlowLog witnesses
+forced   ctadl_taint_front_phase1.ContextObj: 125 FlowLog witnesses
+renamed  39 clause heads
+summary: 105 equal, 0 different
+choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database

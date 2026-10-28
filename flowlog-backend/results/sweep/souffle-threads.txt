@@ -1,0 +1,46 @@
+# Souffle thread-count runs on the 9 sweep programs whose FlowLog derived relations differ from
+# Souffle's (-j 2 reference run). Each entry: the outcome of one more Souffle index run.
+#   souffle-ref: derived relations equal the reference; FLOWLOG: equal FlowLog's database;
+#   other: a third database. Choice-domain witnesses (VirtualAssign) vary between all runs.
+f10_s4 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:souffle-ref j32:souffle-ref
+f12_s1 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:souffle-ref j32:souffle-ref
+f12_s4 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:FLOWLOG j32:souffle-ref
+f12_s5 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:souffle-ref j32:souffle-ref
+f12_s6 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:souffle-ref j32:other
+f15_s1 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:other j32:souffle-ref
+f15_s4 | j3:souffle-ref j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:souffle-ref j12:souffle-ref j16a:souffle-ref j16b:souffle-ref j32:souffle-ref
+f15_s6 | j3:other j4:souffle-ref j6:souffle-ref j8a:souffle-ref j8b:other j12:other j16a:other j16b:other j32:souffle-ref
+f8_s4 | j4:souffle-ref j8a:FLOWLOG j8b:FLOWLOG j8c:FLOWLOG j16a:FLOWLOG j16b:FLOWLOG
+
+# Souffle -j 1, -j 2 (s2) and -j 8 on all 30 programs, compared pairwise and with FlowLog (fl):
+#   D: relations that differ, W: relation=keys with another choice-domain witness
+f6 s1 | s2-s1[D: W:VirtualAssign=56] s2-s8[D: W:VirtualAssign=150] s1-s8[D: W:VirtualAssign=152] s1-fl[D:CTADLStats W:VirtualAssign=578] s2-fl[D:CTADLStats W:VirtualAssign=568]
+f6 s2 | s2-s1[D: W:VirtualAssign=15] s2-s8[D: W:VirtualAssign=411] s1-s8[D: W:VirtualAssign=406] s1-fl[D: W:VirtualAssign=257] s2-fl[D: W:VirtualAssign=257]
+f6 s3 | s2-s1[D: W:VirtualAssign=55] s2-s8[D: W:VirtualAssign=87] s1-s8[D: W:VirtualAssign=88] s1-fl[D: W:VirtualAssign=862] s2-fl[D: W:VirtualAssign=845]
+f6 s4 | s2-s1[D: W:VirtualAssign=9] s2-s8[D: W:VirtualAssign=187] s1-s8[D: W:VirtualAssign=188] s1-fl[D: W:VirtualAssign=30] s2-fl[D: W:VirtualAssign=31]
+f6 s5 | s2-s1[D: W:VirtualAssign=69] s2-s8[D: W:VirtualAssign=76] s1-s8[D: W:VirtualAssign=11] s1-fl[D: W:VirtualAssign=82] s2-fl[D: W:VirtualAssign=15]
+f6 s6 | s2-s1[D: W:VirtualAssign=13] s2-s8[D: W:VirtualAssign=26] s1-s8[D: W:VirtualAssign=13] s1-fl[D: W:VirtualAssign=27] s2-fl[D: W:VirtualAssign=38]
+f8 s1 | s2-s1[D: W:VirtualAssign=436] s2-s8[D: W:VirtualAssign=309] s1-s8[D: W:VirtualAssign=581] s1-fl[D: W:VirtualAssign=1022] s2-fl[D: W:VirtualAssign=1280]
+f8 s2 | s2-s1[D: W:VirtualAssign=12] s2-s8[D: W:VirtualAssign=54] s1-s8[D: W:VirtualAssign=56] s1-fl[D: W:VirtualAssign=646] s2-fl[D: W:VirtualAssign=642]
+f8 s3 | s2-s1[D: W:VirtualAssign=92] s2-s8[D: W:VirtualAssign=164] s1-s8[D: W:VirtualAssign=163] s1-fl[D: W:VirtualAssign=324] s2-fl[D: W:VirtualAssign=323]
+f8 s4 | s2-s1[D: W:VirtualAssign=261] s2-s8[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s1-s8[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f8 s5 | s2-s1[D: W:VirtualAssign=4] s2-s8[D: W:VirtualAssign=6] s1-s8[D: W:VirtualAssign=10] s1-fl[D: W:VirtualAssign=273] s2-fl[D: W:VirtualAssign=273]
+f8 s6 | s2-s1[D: W:VirtualAssign=180] s2-s8[D: W:VirtualAssign=289] s1-s8[D: W:VirtualAssign=279] s1-fl[D: W:VirtualAssign=574] s2-fl[D: W:VirtualAssign=608]
+f10 s1 | s2-s1[D: W:VirtualAssign=68] s2-s8[D: W:VirtualAssign=1352] s1-s8[D: W:VirtualAssign=1373] s1-fl[D: W:VirtualAssign=141] s2-fl[D: W:VirtualAssign=125]
+f10 s2 | s2-s1[D: W:VirtualAssign=160] s2-s8[D: W:VirtualAssign=233] s1-s8[D: W:VirtualAssign=215] s1-fl[D: W:VirtualAssign=727] s2-fl[D: W:VirtualAssign=705]
+f10 s3 | s2-s1[D: W:VirtualAssign=89] s2-s8[D: W:VirtualAssign=166] s1-s8[D: W:VirtualAssign=155] s1-fl[D: W:VirtualAssign=218] s2-fl[D: W:VirtualAssign=235]
+f10 s4 | s2-s1[D: W:VirtualAssign=5] s2-s8[D: W:VirtualAssign=688] s1-s8[D: W:VirtualAssign=687] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f10 s5 | s2-s1[D: W:VirtualAssign=518] s2-s8[D: W:VirtualAssign=956] s1-s8[D: W:VirtualAssign=519] s1-fl[D: W:VirtualAssign=972] s2-fl[D: W:VirtualAssign=540]
+f10 s6 | s2-s1[D: W:VirtualAssign=182] s2-s8[D: W:VirtualAssign=1269] s1-s8[D: W:VirtualAssign=1251] s1-fl[D: W:VirtualAssign=1338] s2-fl[D: W:VirtualAssign=1357]
+f12 s1 | s2-s1[D: W:VirtualAssign=272] s2-s8[D: W:VirtualAssign=718] s1-s8[D: W:VirtualAssign=751] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f12 s2 | s2-s1[D: W:VirtualAssign=26] s2-s8[D: W:VirtualAssign=44] s1-s8[D: W:VirtualAssign=40] s1-fl[D: W:VirtualAssign=656] s2-fl[D: W:VirtualAssign=660]
+f12 s3 | s2-s1[D: W:VirtualAssign=113] s2-s8[D: W:VirtualAssign=132] s1-s8[D: W:VirtualAssign=117] s1-fl[D: W:VirtualAssign=117] s2-fl[D: W:VirtualAssign=130]
+f12 s4 | s2-s1[D: W:VirtualAssign=99] s2-s8[D: W:VirtualAssign=155] s1-s8[D: W:VirtualAssign=146] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f12 s5 | s2-s1[D: W:VirtualAssign=18] s2-s8[D: W:VirtualAssign=220] s1-s8[D: W:VirtualAssign=215] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f12 s6 | s2-s1[D: W:VirtualAssign=801] s2-s8[D: W:VirtualAssign=485] s1-s8[D: W:VirtualAssign=998] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f15 s1 | s2-s1[D: W:VirtualAssign=548] s2-s8[D: W:VirtualAssign=2074] s1-s8[D: W:VirtualAssign=2068] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f15 s2 | s2-s1[D: W:VirtualAssign=22] s2-s8[D: W:VirtualAssign=161] s1-s8[D: W:VirtualAssign=161] s1-fl[D: W:VirtualAssign=65] s2-fl[D: W:VirtualAssign=61]
+f15 s3 | s2-s1[D: W:VirtualAssign=520] s2-s8[D: W:VirtualAssign=2027] s1-s8[D: W:VirtualAssign=2033] s1-fl[D: W:VirtualAssign=3911] s2-fl[D: W:VirtualAssign=3947]
+f15 s4 | s2-s1[D: W:VirtualAssign=272] s2-s8[D: W:VirtualAssign=454] s1-s8[D: W:VirtualAssign=452] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]
+f15 s5 | s2-s1[D: W:VirtualAssign=48] s2-s8[D: W:VirtualAssign=74] s1-s8[D: W:VirtualAssign=84] s1-fl[D:CTADLStats W:VirtualAssign=331] s2-fl[D:CTADLStats W:VirtualAssign=335]
+f15 s6 | s2-s1[D: W:VirtualAssign=354] s2-s8[D: W:VirtualAssign=491] s1-s8[D: W:VirtualAssign=428] s1-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:] s2-fl[D:CTADLStats,CallEdge,SummaryAlloc,SummaryFlow,VirtualAlloc,VirtualAssign W:]

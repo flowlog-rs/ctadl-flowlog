@@ -1,0 +1,34 @@
+agg_body_binding: translate FAILED: error: line 9: an aggregate body atom reads `t_ag1`, which is computed from outer variables or constants only (FlowLog fails to compile this shape: bug B4 in README.md)
+agg_computed: translate FAILED: error: line 8: an aggregate body atom has an argument computed from outer variables or constants only (FlowLog fails to compile this shape: bug B4 in README.md)
+agg_computed_lifted: translate FAILED: error: line 9: aggregate atom over a computed value
+agg_many_readers: compile FAILED: bug: internal compiler error at stage `planner`: dedup: map sum[](k) [0x9595e42a78643090], key:(), value:(2.0) reads keyed k [0x26b1e6795edbb53d], key:(), value:(0.0), which only a join or a map built here may read
+agg_min_string: compile FAILED: error: aggregation `Min` requires a numeric input but got `String`
+agg_shared_join: compile FAILED: bug: internal compiler error at stage `planner`: dedup: map count[]((u ⋉[z_ag3] t)) [0xef4df342e2e93560], key:(), value:("m", 2.0) reads keyed (u ⋉[z_ag3] t) [0x68cbe137782dd076], key:(), value:(1.0, 0.0), which only a join or a map built here may read
+antijoin_projection: ok: A={25} FlowlogAbort={}
+cast_literal: translate FAILED: error: unknown type int64
+choice_domain: ok: C={1	3}
+computed_body_only: ok: C={ab}
+computed_fact: ok: C={ab}
+count_all_wild: ok: C={2}
+empty_dataflow: ok: A={}
+empty_output: ok: O={1}
+filter_order: ok: O={6	2}
+functor_decl: ok: O={x}
+inline_rel: ok: O={1}
+keyword_fn: ok: O={f}
+lattice_in_loop: translate FAILED: error: line 9: expected ), got '<'
+lattice_min_string: translate FAILED: error: line 5: expected ), got '<'
+literal_overflow: translate FAILED: error: unknown type int64
+neg_computed: ok: O={}
+neg_computed_lifted: ok: O={z}
+nested_comp: ok: Out={1}
+pragma: ok: O={1}
+range_gen: ok: O={0 1 2}
+record_type: ok: O={1}
+souffle_builtins: ok: O={(-1)^-1	-1 1^-1	1 2^-1	0 strlen(é)	2} S={substr(aéb,1,2)	é}
+string_constraint_literal: ok: O={abc}
+true_false: ok: O={1}
+type_limit_cmp: ok: A={3}
+udf_grouped_arg: translate FAILED: error: line 4: expected id, got '.'
+udf_strlen_arg: translate FAILED: error: line 3: expected id, got '.'
+variadic_cat: ok: O={x-x}

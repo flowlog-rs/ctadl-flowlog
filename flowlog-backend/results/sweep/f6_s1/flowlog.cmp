@@ -1,0 +1,15 @@
+DIFF     CTADLStats: souffle 53, flowlog 53, souffle-only 1, flowlog-only 1
+           - ('ctx', '7')
+           + ('ctx', '6')
+WITNESS  VirtualAssign: 15488 rows, same choice-domain keys, 578 with another witness
+           - ('f0/indirect-call/13', 'f0/t3', '.f1', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/5', 'f0/<globals>', '.g1', 'f0/a', '.f2.f2', 'summary', '')
+           - ('f2/call/2', 'f2/<globals>', '.g0', 'f2/b', '.f3.f1', 'summary', '')
+           - ('f2/call/2', 'f2/<globals>', '.g1', 'f2/b', '', 'summary', '')
+           - ('f2/call/2', 'f2/<globals>', '.g1', 'f2/b', '.f0.f3', 'summary', '')
+           + ('f0/call/0', 'f0/<globals>', '.g1', 'f0/a', '.f2.f2', 'summary', '')
+           + ('f0/indirect-call/5', 'f0/t3', '.f1', 'f0/<globals>', '.g0', 'summary', '')
+           + ('f2/call/0', 'f2/<globals>', '.g0', 'f2/b', '.f0.f0', 'summary', '')
+           + ('f2/call/0', 'f2/<globals>', '.g0', 'f2/b', '.f3.f1', 'summary', '')
+           + ('f2/call/0', 'f2/<globals>', '.g1', 'f2/b', '', 'summary', '')
+summary: 77 equal (1 up to choice-domain witnesses), 1 different

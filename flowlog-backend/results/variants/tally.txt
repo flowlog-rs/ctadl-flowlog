@@ -1,0 +1,11 @@
+allout     equal=32  witness=0   diff=0   checks-failed=0   other-failed=1
+cha        equal=32  witness=0   diff=0   checks-failed=0   other-failed=1
+dynap3     equal=32  witness=0   diff=0   checks-failed=0   other-failed=1
+kctx2      equal=32  witness=0   diff=0   checks-failed=1   other-failed=1
+nohi       equal=32  witness=0   diff=0   checks-failed=5   other-failed=1
+nointer    equal=32  witness=0   diff=0   checks-failed=9   other-failed=1
+objtrack   equal=32  witness=0   diff=0   checks-failed=2   other-failed=1
+parthians  equal=32  witness=0   diff=0   checks-failed=0   other-failed=1
+qall       equal=32  witness=0   diff=0   checks-failed=0   other-failed=1
+star       equal=32  witness=1   diff=0   checks-failed=0   other-failed=1
+unbounded  equal=32  witness=0   diff=0   checks-failed=0   other-failed=1

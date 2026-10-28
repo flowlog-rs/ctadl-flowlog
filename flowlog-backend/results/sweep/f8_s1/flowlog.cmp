@@ -1,0 +1,12 @@
+WITNESS  VirtualAssign: 22836 rows, same choice-domain keys, 1022 with another witness
+           - ('f0/indirect-call/13', 'f0/t3', '.f1.f3', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/13', 'f0/t3', '.f2', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/13', 'f0/t3', '.f3', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/13', 'f0/t3', '.f3.f3', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/5', 'f0/a', '.f0', 'f0/a', '.f1.f3', 'summary', '')
+           + ('f0/call/7', 'f0/a', '.f0', 'f0/a', '.f1.f3', 'summary', '')
+           + ('f0/call/7', 'f0/a', '.f0', 'f0/b', '.f0.f3', 'summary', '')
+           + ('f0/call/7', 'f0/a', '.f0', 'f0/b', '.f1', 'summary', '')
+           + ('f0/call/7', 'f0/a', '.f0', 'f0/b', '.f2.f3', 'summary', '')
+           + ('f0/call/7', 'f0/a', '.f0', 'f0/b', '.f3.f3', 'summary', '')
+summary: 78 equal (1 up to choice-domain witnesses), 0 different

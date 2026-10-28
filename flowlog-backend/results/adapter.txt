@@ -1,0 +1,7 @@
+  ok   the translator marks Call unread when no rule reads it
+  ok   and read when a rule does
+  ok   Souffle's DB: the unread Call is created empty
+  ok   and Name is converted
+  ok   Souffle's DB: reading Call's records fails: Call: $TMPDIR/tmp.XXXXXXXXXX/db.sqlite does not store record contents (it has no __FlowLogRecord; Souffle writes record columns as ids that are only meaningful to the process that wrote them)
+  ok   the port's DB: Call's records round-trip
+adapter exit=0
