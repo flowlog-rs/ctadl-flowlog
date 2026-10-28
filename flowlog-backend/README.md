@@ -70,13 +70,14 @@ FlowLog does not accept CTADL's program as is. It took four things:
    - a fact-file converter.
 
 **Performance:** on the larger generated program, FlowLog's engine time is close to Soufflé's as
-CTADL runs it: the index is 3–8% slower, and the query 1.1× as fast with 1 worker and 1.6× with 32.
+CTADL runs it: the index is 3–11% slower, and the query 1.1× as fast with 1 worker and 1.8× with 32.
 CTADL gives Soufflé hand-written join orders (`.plan`: 67 in the index, 6 in the query), which the
 translation drops. Without them both engines join in the order the rules are written (FlowLog has
 no SIPS), and FlowLog's index is 2.7× as fast as Soufflé's with 1 worker and 1.5× with 32
-([Join order](#join-order)). FlowLog's index needs 5–11× Soufflé's memory. The port's conversion
-of results into CTADL's sqlite layout makes the query phase 1.6–1.8× slower end to end. Compiling
-takes 1.2–1.8× as long, and the binaries are 19–28× larger ([Performance](#performance)).
+([Join order](#join-order)). FlowLog's index needs 5–11× Soufflé's memory. End to end, FlowLog's
+query phase takes 1.1–1.2× as long as Soufflé's: the port converts its results into CTADL's
+sqlite layout, which takes 18–19 s. Compiling takes 1.2–1.8× as long, and the binaries are 19–28×
+larger ([Performance](#performance)).
 
 **FlowLog bugs:** the port found thirteen (B1–B13), each with a minimal repro in `repros/`. Each is
 filed on FlowLog, with a fix PR ([FlowLog findings](#flowlog-findings)). CTADL's program needs the
@@ -217,6 +218,10 @@ CTADL's own command-line driver does all the work except running the Datalog ana
      outputs to Soufflé's layout (a `__SymbolTable`, shadow tables `_R` holding ids, and views
      `R`) and appends them to CTADL's database. CTADL's Python tooling and SQL views therefore
      work unchanged.
+
+   Both conversions are `INSERT ... SELECT` statements that SQLite runs on the two databases,
+   attached to one connection. They intern the symbols with `INSERT OR IGNORE`, then fill each
+   table through lookups in the symbol table's unique index; no rows pass through Python.
 
 <a id="translation"></a>
 ### Translation
@@ -547,7 +552,8 @@ Other checks:
   (`results/choice_mini.txt`).
 - `tests/adapter/run.sh` checks the sqlite conversion of record columns. Soufflé writes a DB in
   which they are only ids. An input no rule reads is created empty, and one a rule reads is
-  refused with an explanation. Records the port writes still round-trip (`results/adapter.txt`).
+  refused with an explanation. Records the port writes still round-trip, a nil record id is
+  refused, and without FlowLog's output DB every output is created empty (`results/adapter.txt`).
 - The benchmark runs each program with several backends and worker counts and diffs all runs
   against the first.
 
@@ -566,17 +572,18 @@ Results are in `results/sweep/results.txt`:
 
 | Compared with Soufflé `-j 1` | FlowLog | Soufflé `-j 32` |
 |---|---|---|
-| Derived relations equal, some `VirtualAssign` witnesses differ | 19 | 24 |
-| Only the context count in `CTADLStats` differs | 2 | 3 |
-| Downstream relations differ (`CallEdge`, `SummaryFlow`, `VirtualAlloc`, `VirtualAssign`, …) | 9 | 3 |
+| Derived relations equal, some `VirtualAssign` witnesses differ | 19 | 23 |
+| Only the context count in `CTADLStats` differs | 2 | 1 |
+| Downstream relations differ (`CallEdge`, `SummaryFlow`, `VirtualAlloc`, `VirtualAssign`, …) | 9 | 6 |
 | Valid choice model (`check_choice_model.py`) | 30 | |
 
 Where FlowLog's `VirtualAssign` has Soufflé's keys (21 programs), 27 to 3,911 of them have another
-witness. Between Soufflé's own `-j 32` and `-j 1` runs, 2 to 2,604 keys do in 27 programs. In the
-other 3 (f8_s4, f15_s1, f15_s4), downstream relations differ as well, as they do for FlowLog: with
-several threads, Soufflé's first insertion depends on scheduling. FlowLog's results do not depend
-on the worker count: its comparisons are identical to those of an earlier sweep with 2 workers.
-In that sweep, Soufflé `-j 8` differed from `-j 1` only in `VirtualAssign` witnesses.
+witness. Between Soufflé's own `-j 32` and `-j 1` runs, 15 to 3,293 keys do in 24 programs. In the
+other 6 (f8_s4, f12_s4, f12_s6, f15_s1, f15_s4, f15_s6), downstream relations differ as well, as
+they do for FlowLog: with several threads, Soufflé's first insertion depends on scheduling, and an
+earlier sweep had 3 such programs instead. FlowLog's results do not depend on the worker count or
+the run: its comparisons are identical to those of two earlier sweeps, with 2 and 32 workers.
+In the 2-worker sweep, Soufflé `-j 8` differed from `-j 1` only in `VirtualAssign` witnesses.
 
 Where downstream relations differ, `ContextObj` also has different witnesses. Its dependent column
 is a call-string context, and a different context for an object changes which indirect calls are
@@ -631,31 +638,54 @@ are in seconds:
 - **wall:** the whole `ctadl` command;
 - **engine:** Soufflé's compiled analysis, or FlowLog's binary;
 - **conv.:** FlowLog only, the port's conversion between CTADL's sqlite layout and FlowLog's, for
-  the query's inputs and results (the index's takes 0.2–2.1 s);
+  the query's inputs and results (the index's takes 0.1–1.2 s);
 - **RSS:** the engine's peak memory.
 
 Soufflé as CTADL runs it, and FlowLog:
 
 | Program | Backend | Workers | Index wall | Index engine | Index RSS | Query wall | Query engine | Query conv. | Query RSS |
 |---|---|---|---|---|---|---|---|---|---|
-| syn10 | Soufflé | 1 | 2.4 | 1.1 | 34 MB | 3.2 | 1.0 | | 40 MB |
-| syn10 | Soufflé | 32 | 1.9 | 0.6 | 32 MB | 2.9 | 0.8 | | 36 MB |
-| syn10 | FlowLog | 1 | 4.1 | 2.6 | 249 MB | 4.3 | 1.1 | 1.1 | 146 MB |
-| syn10 | FlowLog | 32 | 3.2 | 1.7 | 2.1 GB | 5.8 | 2.5 | 1.1 | 1.4 GB |
-| syn25 | Soufflé | 1 | 46.1 | 44.4 | 350 MB | 89.5 | 54.8 | | 1.4 GB |
-| syn25 | Soufflé | 32 | 14.8 | 12.9 | 358 MB | 71.1 | 36.3 | | 1.3 GB |
-| syn25 | FlowLog | 1 | 49.9 | 45.9 | 1.7 GB | 139.8 | 48.7 | 57.9 | 2.2 GB |
-| syn25 | FlowLog | 32 | 17.8 | 14.0 | 4.0 GB | 125.3 | 22.2 | 58.5 | 3.4 GB |
+| syn10 | Soufflé | 1 | 2.8 | 1.1 | 34 MB | 3.4 | 1.0 | | 40 MB |
+| syn10 | Soufflé | 32 | 2.3 | 0.6 | 32 MB | 3.3 | 0.8 | | 36 MB |
+| syn10 | FlowLog | 1 | 4.3 | 2.6 | 248 MB | 4.4 | 1.1 | 0.3 | 146 MB |
+| syn10 | FlowLog | 32 | 3.5 | 1.6 | 2.1 GB | 5.4 | 2.5 | 0.3 | 1.4 GB |
+| syn25 | Soufflé | 1 | 46.6 | 44.5 | 350 MB | 90.3 | 55.5 | | 1.4 GB |
+| syn25 | Soufflé | 32 | 15.0 | 12.9 | 357 MB | 71.7 | 36.8 | | 1.3 GB |
+| syn25 | FlowLog | 1 | 49.2 | 45.8 | 1.7 GB | 102.7 | 48.8 | 18.5 | 2.2 GB |
+| syn25 | FlowLog | 32 | 17.7 | 14.3 | 4.0 GB | 84.3 | 20.2 | 19.3 | 3.4 GB |
 
-- **Engine time** is similar on syn25. FlowLog's index takes 3–8% longer than Soufflé's. Its query
-  is 1.1× as fast with 1 worker and 1.6× with 32, though Soufflé's time includes writing its
-  sqlite output. On syn10, a small input, FlowLog's index takes 1.2–1.5 s longer, and its query
-  takes 2.5 s with 32 workers against 1.1 s with 1: there the workers cost more than they gain.
-- **Conversion** makes FlowLog's query phase slower overall: 1.6× Soufflé's wall time with 1 worker
-  and 1.8× with 32. FlowLog writes plain sqlite tables. CTADL's tools read Soufflé's layout, a
-  symbol table plus views, and `fl_db_adapter.py` rewrites the tables row by row in Python. For
-  syn25's 1 GB database the conversion takes 58–59 s, 56 s of it for the results. Converting in
-  SQL instead of Python, or a FlowLog output in Soufflé's layout, would remove most of it.
+- **Engine time** is similar on syn25. FlowLog's index takes 3–11% longer than Soufflé's. Its query
+  is 1.1× as fast with 1 worker and 1.8× with 32. Both times include writing the results to sqlite.
+  On syn10, a small input, FlowLog's index takes 1.0–1.5 s longer, and its query takes 2.5 s with
+  32 workers against 1.1 s with 1: there the workers cost more than they gain.
+- **End to end**, FlowLog's query phase takes 1.1× Soufflé's wall time with 1 worker and 1.2× with
+  32. syn25's query phase, step by step (`bench.py` logs each step's time):
+
+  | Step (seconds) | Soufflé, 1 | FlowLog, 1 | Soufflé, 32 | FlowLog, 32 |
+  |---|---|---|---|---|
+  | Convert the inputs to FlowLog's layout | | 0.4 | | 0.5 |
+  | Engine: load the inputs and compute | 55.5 | 37.5 | 36.8 | 10.6 |
+  | Engine: write the results to sqlite | (above) | 11.3 | (above) | 9.5 |
+  | Convert the results to Soufflé's layout | | 18.0 | | 18.8 |
+  | CTADL indexes the results (`after_query`) | 20.5 | 21.9 | 20.3 | 25.0 |
+  | CTADL writes the report | 12.9 | 11.9 | 13.1 | 18.3 |
+  | Rest (startup, CTADL's setup) | 1.4 | 1.6 | 1.4 | 1.6 |
+  | **Wall** | 90.3 | 102.7 | 71.7 | 84.3 |
+
+- **Conversion:** FlowLog writes plain sqlite tables. CTADL's tools read Soufflé's layout, a
+  symbol table plus views, and `fl_db_adapter.py` converts between the two inside SQLite
+  ([Pipeline](#pipeline)). syn25's query writes 18.4 million rows, 18.0 million of them in
+  `forward_flow.ReachableEdge`, and converting them takes 18–19 s on one thread. (The port's
+  first version converted them row by row in Python, in 56 s.) With 1 worker, the conversion
+  accounts for the difference: FlowLog's engine takes 6.7 s less than Soufflé's, and the
+  conversion 18.5 s. With 32, FlowLog's engine takes 16.6 s less, but the conversion and CTADL's
+  slower steps on its database (next item) take 29 s more. FlowLog writing Soufflé's layout
+  itself would save most of the conversion ([Suggestions](#suggestions)).
+- **Row order:** with 32 workers, FlowLog writes a relation's rows in another order than with 1.
+  In `forward_flow.ReachableEdge`, the rows that share a value of the first column, one of the
+  three columns that CTADL indexes, form 8.5 million runs for 407,832 values. Soufflé's databases
+  and FlowLog's with 1 worker have one run per value. FlowLog's databases with 1 and 32 workers
+  have the same contents, but CTADL's indexing and report take 9.5 s longer on the second.
 - **Memory:** FlowLog's index uses 4.9× Soufflé's peak memory with 1 worker and 11× with 32. Its
   query uses 1.6× and 2.6×. FlowLog's memory grows with the worker count; Soufflé's does not.
 - **Results:** FlowLog's databases with 1 and 32 workers are identical, on both programs. CTADL's
@@ -663,7 +693,7 @@ Soufflé as CTADL runs it, and FlowLog:
   backend, hint variant and worker count. The databases differ from Soufflé `-j 1`'s, as do
   Soufflé's own with 32 workers or without the hints ([Join order](#join-order)). The comparisons
   are in `results/bench/`:
-  - **Soufflé `-j 32`:** 3 relations differ on syn10 and 4 on syn25. With several workers,
+  - **Soufflé `-j 32`:** 4 relations differ on each program. With several workers,
     Soufflé's result varies between runs ([Larger programs](#larger-programs)).
   - **FlowLog on syn10:** some `choice-domain` witnesses and the query's three `ReachableEdge`
     relations differ.
@@ -716,17 +746,17 @@ Engine times in seconds, with 1 / 32 workers:
 
 | Program | Phase | Soufflé, CTADL's hints | Soufflé, no hints | Soufflé, strict | FlowLog |
 |---|---|---|---|---|---|
-| syn10 | index | 1.1 / 0.6 | 3.7 / 0.7 | 3.7 / 0.7 | 2.6 / 1.7 |
+| syn10 | index | 1.1 / 0.6 | 3.7 / 0.7 | 3.7 / 0.7 | 2.6 / 1.6 |
 | syn10 | query | 1.0 / 0.8 | 1.0 / 0.8 | 1.0 / 0.8 | 1.1 / 2.5 |
-| syn25 | index | 44.4 / 12.9 | 123.0 / 21.0 | 123.8 / 20.8 | 45.9 / 14.0 |
-| syn25 | query | 54.8 / 36.3 | 54.4 / 36.1 | 54.4 / 36.7 | 48.7 / 22.2 |
+| syn25 | index | 44.5 / 12.9 | 120.9 / 20.9 | 122.9 / 20.9 | 45.8 / 14.3 |
+| syn25 | query | 55.5 / 36.8 | 54.4 / 36.3 | 54.0 / 37.1 | 48.8 / 20.2 |
 
-- **The hints matter for the index only.** Without them, Soufflé's index takes 2.8× as long on
+- **The hints matter for the index only.** Without them, Soufflé's index takes 2.7–2.8× as long on
   syn25 with 1 worker and 1.6× with 32. The query's 6 hints make no difference, and peak memory
   does not change.
 - **On the same join orders**, FlowLog's index is 2.7× as fast as Soufflé's on syn25 with 1
-  worker and 1.5× with 32. Its query engine is 1.1× as fast with 1 worker and 1.6–1.7× with 32.
-  On syn10, FlowLog's index is 1.4× as fast with 1 worker and 2.4× slower with 32, a fixed cost
+  worker and 1.5× with 32. Its query engine is 1.1× as fast with 1 worker and 1.8× with 32.
+  On syn10, FlowLog's index is 1.4× as fast with 1 worker and 2.3× slower with 32, a fixed cost
   of its 32 workers on a small input.
 - **The same join order is not the same evaluation.** Soufflé runs each version of a recursive rule
   as nested loops over indexes, with the version's delta relation at its written position. When
@@ -739,7 +769,7 @@ Engine times in seconds, with 1 / 32 workers:
   extra memory goes.
 - **Results:** a `.plan` changes only the evaluation order. But for each `choice-domain` key,
   Soufflé keeps the first candidate it derives, so its result depends on that order. Without the
-  hints, 9–10 relations differ on syn25 and 3–4 on syn10. Compared with 1 worker, where both
+  hints, 9–12 relations differ on syn25 and 3–4 on syn10. Compared with 1 worker, where both
   engines are deterministic:
 
   | Program | Soufflé with hints, against `strict` | FlowLog, against Soufflé `strict` |
@@ -905,6 +935,7 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
   exposes superseded rows to the loop. The minimal `Dist` is right, but `Via` also holds node 2's
   first distance (`2 5`). This is what makes `choice-domain` inside recursion hard.
 
+<a id="suggestions"></a>
 ### Suggestions for FlowLog, by value to a CTADL port
 
 1. **Native `choice-domain`**, or an aggregate that picks one witness per key and never revises it
@@ -921,10 +952,13 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
    `range`; variadic `cat`; expression arguments of atoms; negation and aggregation over computed
    values; computed facts and bodies; `true`/`false`; ignoring unknown `.pragma`s;
    `.functor`/`@F` mapping to `.extern fn`.
-5. **Output parity:** create empty tables/files for output relations that have no rules. An
-   option to write Soufflé's sqlite layout (a symbol table plus views) would also help: the port's
-   Python conversion into it takes longer than FlowLog's query itself on syn25 (58 s against 49 s
-   with 1 worker, and 59 s against 22 s with 32).
+5. **Output parity:** create empty tables/files for output relations that have no rules. Writing
+   Soufflé's sqlite layout (a symbol table, shadow tables of ids, and views) as an option would
+   remove most of the port's conversion. On syn25 with 32 workers, FlowLog computes the query's
+   results in 10.6 s, then takes 9.5 s to write them as plain tables, and the port 18.8 s to
+   convert them. With several workers, FlowLog should also write each relation in the order it
+   uses with 1 worker: CTADL's indexing and report take 9.5 s longer on the 32-worker database
+   ([Performance](#performance)).
 6. **Compile time and binary size.** CTADL's index and query take 3 min 8 s and 2 min 3 s to
    compile, against Soufflé's 2 min 43 s and 1 min 10 s. The binaries are 19–28× larger (168 and
    116 MB). Both engines cache the binary, so this cost is paid once per version of the analysis,

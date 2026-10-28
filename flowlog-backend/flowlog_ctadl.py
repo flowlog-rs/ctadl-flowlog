@@ -177,6 +177,10 @@ class FlowLogAnalysis:
                 cli.error(f"FlowLog analysis failed with exit code {res.returncode}")
                 sys.exit(1)
             t0 = timing("FlowLog run", t0)
+            if TIMING and quiet:
+                # "<elapsed>: Dataflow executed": the rest of the run writes the results
+                for line in res.stdout.splitlines():
+                    print(f"[flowlog]   {line}", file=sys.stderr)
             for fname, rels in group_by_file(self.schema.get("outputs", [])).items():
                 fl_db_adapter.to_souffle(str(outdir / fname), fname, {"outputs": rels}, append=True)
             timing("write results", t0)

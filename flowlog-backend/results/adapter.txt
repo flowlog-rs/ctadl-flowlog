@@ -4,4 +4,8 @@
   ok   and Name is converted
   ok   Souffle's DB: reading Call's records fails: Call: $TMPDIR/tmp.XXXXXXXXXX/db.sqlite does not store record contents (it has no __FlowLogRecord; Souffle writes record columns as ids that are only meaningful to the process that wrote them)
   ok   the port's DB: Call's records round-trip
+  ok   a nil record id fails: Call: record id 0 is nil or unknown in $TMPDIR/tmp.XXXXXXXXXX/port.sqlite (nil records are not supported)
+  ok   without FlowLog's DB, every output is created empty
+  ok   an empty record relation is converted (with no record table)
+  ok   and read back empty
 adapter exit=0

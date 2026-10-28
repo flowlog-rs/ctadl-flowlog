@@ -1,6 +1,12 @@
-WITNESS  VirtualAssign: 857 rows, same choice-domain keys, 2 with another witness
+WITNESS  VirtualAssign: 857 rows, same choice-domain keys, 25 with another witness
            - ('f0/indirect-call/11', 'f0/a', '.f0.f2', 'f0/a', '.f2', 'summary', '')
            - ('f0/indirect-call/11', 'f0/a', '.f2.f0', 'f0/a', '.f2', 'summary', '')
+           - ('f0/indirect-call/8', 'f0/t1', '.f0.f1', 'f0/t1', '.f1', 'summary', '')
+           - ('f0/indirect-call/8', 'f0/t1', '.f0.f2', 'f0/t1', '.f2', 'summary', '')
+           - ('f0/indirect-call/8', 'f0/t1', '.f0.f2', 'f0/t1', '.f2.f2', 'summary', '')
            + ('f0/call/5', 'f0/a', '.f0.f2', 'f0/a', '.f2', 'summary', '')
            + ('f0/call/5', 'f0/a', '.f2.f0', 'f0/a', '.f2', 'summary', '')
+           + ('f0/indirect-call/11', 'f0/t1', '.f0.f1', 'f0/t1', '.f1', 'summary', '')
+           + ('f0/indirect-call/11', 'f0/t1', '.f0.f2', 'f0/t1', '.f2', 'summary', '')
+           + ('f0/indirect-call/11', 'f0/t1', '.f0.f2', 'f0/t1', '.f2.f2', 'summary', '')
 summary: 78 equal (1 up to choice-domain witnesses), 0 different

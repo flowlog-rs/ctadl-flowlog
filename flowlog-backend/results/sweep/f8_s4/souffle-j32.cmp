@@ -37,15 +37,15 @@ DIFF     VirtualAlloc: souffle 99, flowlog 99, souffle-only 6, flowlog-only 6
            + ('f2/t1', '.func', 'f4', 'f1#')
            + ('f2/t1', '.func', 'f7', 'f1#')
            + ('f5/a', '.func', 'f4', 'f2#f1#')
-DIFF     VirtualAssign: souffle 18005, flowlog 18005, souffle-only 1639, flowlog-only 1639 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=18005 flowlog=18005]
-           - ('f0/call/2', 'f0/<globals>', '.g0', 'f0/a', '.f0.f3', 'summary', '')
-           - ('f0/call/2', 'f0/<globals>', '.g1', 'f0/a', '.f1', 'summary', '')
+DIFF     VirtualAssign: souffle 18005, flowlog 18005, souffle-only 1844, flowlog-only 1844 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=18005 flowlog=18005]
+           - ('f0/call/2', 'f0/<globals>', '.g1', 'f0/a', '.f0.f3', 'summary', '')
+           - ('f0/call/2', 'f0/<globals>', '.g1', 'f0/a', '.f2.f2', 'summary', '')
            - ('f0/call/2', 'f0/a', '.f0', 'f0/a', '.f1.f3', 'summary', '')
            - ('f0/call/2', 'f0/a', '.f0.f0', 'f0/<globals>', '.g0', 'summary', '')
-           - ('f0/call/2', 'f0/a', '.f0.f0', 'f0/a', '.f1.f3', 'summary', '')
+           - ('f0/call/2', 'f0/a', '.f0.f1', 'f0/a', '.f0.f3', 'summary', '')
            + ('f0/call/2', 'f0/<globals>', '.g0', 'f0/a', '.f2.f2', 'summary', '')
            + ('f0/call/2', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'summary', '')
            + ('f0/call/2', 'f0/a', '.f0', 'f0/a', '.f1.f0', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g1', 'f0/a', '.f0.f3', 'summary', '')
            + ('f0/call/7', 'f0/a', '.f0.f0', 'f0/<globals>', '.g0', 'summary', '')
-           + ('f0/call/7', 'f0/a', '.f2.f3', 'f0/a', '.f0.f1', 'summary', '')
 summary: 72 equal, 6 different

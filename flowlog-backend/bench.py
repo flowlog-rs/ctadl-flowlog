@@ -83,6 +83,15 @@ def shim(backend: str, argv: list) -> None:
         return r
 
     cls.analyze = analyze
+    # CTADL's own steps around the analysis (the rest of the wall time)
+    for step in ("after_index", "after_query", "visualize_query_results"):
+        def timed(*a, _f=getattr(cli, step), _step=step, **kw):
+            t0 = time.time()
+            r = _f(*a, **kw)
+            print(f"[bench] {_step}={time.time() - t0:.3f}", file=sys.stderr, flush=True)
+            return r
+
+        setattr(cli, step, timed)
     sys.argv = ["ctadl"] + argv  # the CLI's argparse reads sys.argv
     cli.main(sys.argv)
 

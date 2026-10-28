@@ -1,15 +1,48 @@
-DIFF     CTADLStats: souffle 53, flowlog 53, souffle-only 1, flowlog-only 1
-           - ('ctx', '30')
-           + ('ctx', '29')
-WITNESS  VirtualAssign: 124238 rows, same choice-domain keys, 1610 with another witness
+DIFF     CTADLStats: souffle 53, flowlog 53, souffle-only 5, flowlog-only 5
+           - ('LocallyReachable-ctx', '134150')
+           - ('ParthianFlowEdge', '165')
+           - ('summary-flow-ctx', '56205')
+           - ('virtual-alloc-ctx', '254')
+           - ('virtual-assign-ctx', '66591')
+           + ('LocallyReachable-ctx', '141039')
+           + ('ParthianFlowEdge', '166')
+           + ('summary-flow-ctx', '58982')
+           + ('virtual-alloc-ctx', '266')
+           + ('virtual-assign-ctx', '68506')
+DIFF     CallEdge: souffle 114, flowlog 114, souffle-only 1, flowlog-only 1
+           - ('f9/indirect-call/6', 'f9', 'f11#f8#')
+           + ('f9/indirect-call/6', 'f9', 'f7#f4#f11#f8#')
+DIFF     SummaryAlloc: souffle 281, flowlog 293, souffle-only 0, flowlog-only 12
+           + ('f9', '-1', '.func', 'f10', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '.func', 'f11', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '.func', 'f7', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '.func', 'f8', 'f7#f4#f11#f8#')
+           + ('f9', '0', '.func', 'f10', 'f7#f4#f11#f8#')
+DIFF     SummaryFlow: souffle 81440, flowlog 84217, souffle-only 0, flowlog-only 2777
+           + ('f9', '-1', '', 'f9', '-3', '.g0', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '', 'f9', '-3', '.g1', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '', 'f9', '0', '', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '', 'f9', '0', '.f0', 'f7#f4#f11#f8#')
+           + ('f9', '-1', '', 'f9', '0', '.f0.f0', 'f7#f4#f11#f8#')
+DIFF     VirtualAlloc: souffle 526, flowlog 538, souffle-only 4, flowlog-only 16
+           - ('f9/t3', '.func', 'f10', 'f11#f8#')
+           - ('f9/t3', '.func', 'f11', 'f11#f8#')
+           - ('f9/t3', '.func', 'f7', 'f11#f8#')
+           - ('f9/t3', '.func', 'f8', 'f11#f8#')
+           + ('f7/a', '.func', 'f10', 'f4#f11#f8#')
+           + ('f7/a', '.func', 'f11', 'f4#f11#f8#')
+           + ('f7/a', '.func', 'f7', 'f4#f11#f8#')
+           + ('f7/a', '.func', 'f8', 'f4#f11#f8#')
+           + ('f9/b', '.func', 'f10', 'f7#f4#f11#f8#')
+DIFF     VirtualAssign: souffle 124238, flowlog 126153, souffle-only 2633, flowlog-only 4548 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=124238 flowlog=126153]
+           - ('Main/call/29', 'Main/<globals>', '.g1', 'Main/<globals>', '.g0', 'summary', '')
            - ('f0/call/14', 'f0/t0', '.f0', 'f0/<globals>', '.g0', 'summary', '')
-           - ('f0/call/14', 'f0/t0', '.f0', 'f0/<globals>', '.g1', 'summary', '')
-           - ('f0/call/14', 'f0/t0', '.f1', 'f0/<globals>', '.g0', 'summary', '')
            - ('f0/call/14', 'f0/t0', '.f1.f0', 'f0/<globals>', '.g0', 'summary', '')
            - ('f0/call/14', 'f0/t0', '.f2', 'f0/<globals>', '.g0', 'summary', '')
-           + ('f0/call/14', 'f0/t0', '.f1', 'f0/<globals>', '.g1', 'summary', '')
+           - ('f0/call/14', 'f0/t0', '.f3.f0', 'f0/<globals>', '.g1', 'summary', '')
+           + ('Main/call/5', 'Main/<globals>', '.g1', 'Main/<globals>', '.g0', 'summary', '')
            + ('f0/call/14', 'f0/t0', '.f1.f0', 'f0/<globals>', '.g1', 'summary', '')
            + ('f0/call/14', 'f0/t0', '.f2', 'f0/<globals>', '.g1', 'summary', '')
-           + ('f0/call/14', 'f0/t0', '.f3.f0', 'f0/<globals>', '.g0', 'summary', '')
            + ('f0/call/14', 'f0/t0', '.f3.f2', 'f0/<globals>', '.g1', 'summary', '')
-summary: 77 equal (1 up to choice-domain witnesses), 1 different
+           + ('f0/call/5', 'f0/<globals>', '.g2', 'f0/a', '.f0.f0', 'summary', '')
+summary: 72 equal, 6 different
