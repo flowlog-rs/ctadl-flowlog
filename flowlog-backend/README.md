@@ -37,7 +37,7 @@ analyses run on FlowLog and produce the same results as Soufflé:
   Soufflé breaks such ties by thread scheduling and the port by a hash. In 9 programs this changes
   downstream relations. Every FlowLog result is a valid choice model of the program. Soufflé's
   own results also vary: with 32 threads, its downstream relations differ from its 1-thread
-  results in 3 of the 30 programs ([Larger programs](#larger-programs)).
+  results in 6 of the 30 programs, 3 in an earlier sweep ([Larger programs](#larger-programs)).
 
 FlowLog does not accept CTADL's program as is. It took four things:
 
@@ -637,8 +637,9 @@ are in seconds:
 
 - **wall:** the whole `ctadl` command;
 - **engine:** Soufflé's compiled analysis, or FlowLog's binary;
-- **conv.:** FlowLog only, the port's conversion between CTADL's sqlite layout and FlowLog's, for
-  the query's inputs and results (the index's takes 0.1–1.2 s);
+- **conv.:** FlowLog only, the analysis's time outside FlowLog's binary: the port's conversion
+  between CTADL's sqlite layout and FlowLog's, for the query's inputs and results, plus up to 0.1 s
+  of other work (the index's takes 0.1–1.2 s);
 - **RSS:** the engine's peak memory.
 
 Soufflé as CTADL runs it, and FlowLog:
