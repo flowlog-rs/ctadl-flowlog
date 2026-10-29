@@ -43,12 +43,16 @@ def read_record(text: str, fmt: str, kinds: list) -> list[str]:
             pos += 1
         if token != "{}":
             if not text.startswith(token, pos):
-                raise ValueError(f"expected '{token}' at offset {pos} of record {text!r}")
+                raise ValueError(
+                    f"expected '{token}' at offset {pos} of record {text!r}"
+                )
             pos += 1
         elif next(kinds_left) != "symbol":
             m = NUMBER.match(text, pos)
             if not m:
-                raise ValueError(f"expected a number at offset {pos} of record {text!r}")
+                raise ValueError(
+                    f"expected a number at offset {pos} of record {text!r}"
+                )
             fields.append(m.group())
             pos = m.end()
         elif text.startswith('"', pos):
@@ -58,7 +62,10 @@ def read_record(text: str, fmt: str, kinds: list) -> list[str]:
             fields.append(ESCAPE.sub(r"\1", m.group(1)))
             pos = m.end()
         else:
-            end = min((i for i in (text.find(",", pos), text.find("]", pos)) if i >= 0), default=-1)
+            end = min(
+                (i for i in (text.find(",", pos), text.find("]", pos)) if i >= 0),
+                default=-1,
+            )
             if end < 0:
                 raise ValueError(f"unterminated record {text!r}")
             fields.append(text[pos:end])
@@ -78,7 +85,11 @@ def flat_line(line: str, columns: list) -> str:
         raise ValueError(f"expected {len(columns)} columns, got {len(texts)}: {line!r}")
     out: list[str] = []
     for text, col in zip(texts, columns):
-        out.extend(read_record(text, col["format"], col["fl_kinds"]) if col["kind"] == "record" else [text])
+        out.extend(
+            read_record(text, col["format"], col["fl_kinds"])
+            if col["kind"] == "record"
+            else [text]
+        )
     return "\t".join(out)
 
 
@@ -92,7 +103,9 @@ def souffle_line(line: str, columns: list) -> str:
     out: list[str] = []
     for col in columns:
         n = len(col["fl"])
-        out.append(col["format"].format(*fields[:n]) if col["kind"] == "record" else fields[0])
+        out.append(
+            col["format"].format(*fields[:n]) if col["kind"] == "record" else fields[0]
+        )
         fields = fields[n:]
     return "\t".join(out)
 
@@ -121,7 +134,9 @@ def convert(inputs: list, src_dir: Path, dst_dir: Path) -> None:
     for rel in inputs:
         fname = rel["file"]
         if Path(fname).is_absolute():
-            raise ValueError(f"{rel['name']}: absolute fact file names are not supported: '{fname}'")
+            raise ValueError(
+                f"{rel['name']}: absolute fact file names are not supported: '{fname}'"
+            )
         src, dst = src_dir / fname, dst_dir / fname
         dst.parent.mkdir(parents=True, exist_ok=True)
         if dst.exists() or dst.is_symlink():
@@ -162,13 +177,23 @@ def place_outputs(outputs: list, out_dir: Path) -> None:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("schema", type=Path, help="schema manifest written by souffle2flowlog.py --schema")
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "schema",
+        type=Path,
+        help="schema manifest written by souffle2flowlog.py --schema",
+    )
     ap.add_argument("src", type=Path, help="Souffle fact directory")
     ap.add_argument("dst", type=Path, help="FlowLog fact directory")
     args = ap.parse_args()
     try:
-        convert(json.loads(args.schema.read_text()).get("files", {}).get("inputs", []), args.src, args.dst)
+        convert(
+            json.loads(args.schema.read_text()).get("files", {}).get("inputs", []),
+            args.src,
+            args.dst,
+        )
     except ValueError as e:
         print(e, file=sys.stderr)
         return 1

@@ -87,9 +87,22 @@ class TranslateError(Exception):
 # ============================================================================
 
 DIRECTIVES = {
-    ".decl", ".type", ".input", ".output", ".printsize", ".limitsize", ".comp",
-    ".init", ".override", ".pragma", ".functor", ".plan", ".include", ".once",
-    ".number_type", ".symbol_type",
+    ".decl",
+    ".type",
+    ".input",
+    ".output",
+    ".printsize",
+    ".limitsize",
+    ".comp",
+    ".init",
+    ".override",
+    ".pragma",
+    ".functor",
+    ".plan",
+    ".include",
+    ".once",
+    ".number_type",
+    ".symbol_type",
 }
 PUNCT2 = [":-", "<:", "!=", "<=", ">="]
 PUNCT1 = "()[]{},;.:=<>!+-*/%^@|&"
@@ -148,10 +161,22 @@ def lex(src: str) -> list[Tok]:
                 if ch == "\\":
                     nx = src[j + 1] if j + 1 < n else ""
                     # Souffle's escapes; it rejects any other
-                    esc = {'"': '"', "'": "'", "\\": "\\", "a": "\a", "b": "\b", "f": "\f",
-                           "n": "\n", "r": "\r", "t": "\t", "v": "\v"}
+                    esc = {
+                        '"': '"',
+                        "'": "'",
+                        "\\": "\\",
+                        "a": "\a",
+                        "b": "\b",
+                        "f": "\f",
+                        "n": "\n",
+                        "r": "\r",
+                        "t": "\t",
+                        "v": "\v",
+                    }
                     if nx not in esc:
-                        raise TranslateError(f"line {line}: unknown escape sequence \\{nx}")
+                        raise TranslateError(
+                            f"line {line}: unknown escape sequence \\{nx}"
+                        )
                     buf.append(esc[nx])
                     j += 2
                     continue
@@ -194,7 +219,7 @@ def lex(src: str) -> list[Tok]:
             toks.append(Tok("num", v, line))
             i = m.end()
             continue
-        two = src[i:i + 2]
+        two = src[i : i + 2]
         if two in PUNCT2:
             toks.append(Tok("p", two, line))
             i += 2
@@ -204,7 +229,9 @@ def lex(src: str) -> list[Tok]:
             i += 1
             continue
         if c == "$":
-            raise TranslateError(f"line {line}: algebraic data type constructors are not supported")
+            raise TranslateError(
+                f"line {line}: algebraic data type constructors are not supported"
+            )
         raise TranslateError(f"line {line}: unexpected character {c!r}")
     toks.append(Tok("eof", None, line))
     return toks
@@ -213,6 +240,7 @@ def lex(src: str) -> list[Tok]:
 # ============================================================================
 # AST
 # ============================================================================
+
 
 @dataclass
 class Var:
@@ -374,6 +402,7 @@ class Plan:
     """A Souffle `.plan`: a join order (1-based positions among the positive
     atoms) per rule version, and the names of the positive atoms it orders
     (note_plan_atoms; None if the rule's clauses differ in them)."""
+
     orders: dict
     atoms: tuple | None
 
@@ -403,15 +432,39 @@ class Raw:
 # ============================================================================
 
 BUILTIN_FUNCS = {
-    "cat", "ord", "strlen", "substr", "to_string", "to_number", "to_unsigned",
-    "to_float", "range", "min", "max", "lnot", "bnot", "autoinc",
+    "cat",
+    "ord",
+    "strlen",
+    "substr",
+    "to_string",
+    "to_number",
+    "to_unsigned",
+    "to_float",
+    "range",
+    "min",
+    "max",
+    "lnot",
+    "bnot",
+    "autoinc",
 }
 AGG_KINDS = {"count", "sum", "min", "max", "mean"}
 CMP_OPS = {"=", "!=", "<", "<=", ">", ">="}
 BIN_PREC = {
-    "lor": 1, "lxor": 2, "land": 3, "bor": 4, "bxor": 5, "band": 6,
-    "bshl": 7, "bshr": 7, "bshru": 7,
-    "+": 10, "-": 10, "*": 20, "/": 20, "%": 20, "^": 30,
+    "lor": 1,
+    "lxor": 2,
+    "land": 3,
+    "bor": 4,
+    "bxor": 5,
+    "band": 6,
+    "bshl": 7,
+    "bshr": 7,
+    "bshru": 7,
+    "+": 10,
+    "-": 10,
+    "*": 20,
+    "/": 20,
+    "%": 20,
+    "^": 30,
 }
 RIGHT_ASSOC = {"^"}
 
@@ -487,7 +540,11 @@ class Parser:
                     items.append(self.parse_functor())
                 elif d == ".plan":
                     orders = self.parse_plan()
-                    if items and isinstance(items[-1], Rule) and items[-1].body is not None:
+                    if (
+                        items
+                        and isinstance(items[-1], Rule)
+                        and items[-1].body is not None
+                    ):
                         items[-1] = replace(items[-1], plan=Plan(orders, None))
                 else:
                     raise TranslateError(f"line {t.line}: unsupported directive {d}")
@@ -515,9 +572,19 @@ class Parser:
         self.expect_p(")")
         quals = []
         while self.at("id") and self.peek().val in (
-            "inline", "no_inline", "magic", "no_magic", "brie", "btree",
-            "btree_delete", "eqrel", "overridable", "input", "output",
-            "printsize", "override",
+            "inline",
+            "no_inline",
+            "magic",
+            "no_magic",
+            "brie",
+            "btree",
+            "btree_delete",
+            "eqrel",
+            "overridable",
+            "input",
+            "output",
+            "printsize",
+            "override",
         ):
             quals.append(self.next().val)
         choice = []
@@ -534,16 +601,30 @@ class Parser:
                 else:
                     grp = [self.expect("id").val]
                 choice.append(grp)
-                if self.at_p(",") and (self.at_p("(", 1) or (self.at("id", None, 1) and not self.at_p("(", 2) and not self.at_p(".", 2))):
+                if self.at_p(",") and (
+                    self.at_p("(", 1)
+                    or (
+                        self.at("id", None, 1)
+                        and not self.at_p("(", 2)
+                        and not self.at_p(".", 2)
+                    )
+                ):
                     self.next()
                     continue
                 break
         if "eqrel" in quals:
             raise TranslateError(f"eqrel relation {names} is not supported")
-        decls: list = [RelDecl(nm, list(attrs), list(quals), [list(c) for c in choice]) for nm in names]
+        decls: list = [
+            RelDecl(nm, list(attrs), list(quals), [list(c) for c in choice])
+            for nm in names
+        ]
         # the deprecated qualifiers stand for directives with default parameters
-        return decls + [IODecl("." + q, nm, []) for q in ("input", "output", "printsize")
-                        if q in quals for nm in names]
+        return decls + [
+            IODecl("." + q, nm, [])
+            for q in ("input", "output", "printsize")
+            if q in quals
+            for nm in names
+        ]
 
     def parse_type(self) -> TypeDecl:
         self.expect("dir", ".type")
@@ -568,7 +649,9 @@ class Parser:
             return TypeDecl(name, t.val, ("record", fields))
         first = self.expect("id").val
         if self.at_p("{"):
-            raise TranslateError(f".type {name}: algebraic data types are not supported")
+            raise TranslateError(
+                f".type {name}: algebraic data types are not supported"
+            )
         if self.at_p("|"):
             alts = [first]
             while self.at_p("|"):
@@ -755,7 +838,9 @@ class Parser:
                 self.expect_p(")")
                 if len(d) == 1 and len(d[0]) == 1:
                     return negate(d[0][0])
-                raise TranslateError(f"line {t.line}: negation of a compound body is not supported")
+                raise TranslateError(
+                    f"line {t.line}: negation of a compound body is not supported"
+                )
             lit = self.parse_lit()
             return negate(lit)
         if t.kind == "id" and t.val in ("true", "false") and not self.at_p("(", 1):
@@ -936,6 +1021,7 @@ def negate(lit: Any) -> Any:
 # Generic traversal helpers
 # ============================================================================
 
+
 def expr_children(e: Any) -> list:
     if isinstance(e, Bin):
         return [e.l, e.r]
@@ -1024,10 +1110,14 @@ def map_lit_exprs(lit: Any, f) -> Any:
 def deep_map_expr(e: Any, f) -> Any:
     """Bottom-up rewrite of an expression, aggregate bodies (at any depth)
     included."""
+
     def g(x):
         if isinstance(x, Agg):
-            x = Agg(x.kind, x.target, [[deep_map_lit(l2, f) for l2 in c] for c in x.body])
+            x = Agg(
+                x.kind, x.target, [[deep_map_lit(l2, f) for l2 in c] for c in x.body]
+            )
         return f(x)
+
     return map_expr(e, g)
 
 
@@ -1037,11 +1127,15 @@ def deep_map_lit(lit: Any, f) -> Any:
 
 def subst_expr(e: Any, sub: dict) -> Any:
     """Replace the variables named in `sub` everywhere in an expression."""
-    return deep_map_expr(e, lambda x: sub[x.name] if isinstance(x, Var) and x.name in sub else x)
+    return deep_map_expr(
+        e, lambda x: sub[x.name] if isinstance(x, Var) and x.name in sub else x
+    )
 
 
 def subst_lit(lit: Any, sub: dict) -> Any:
-    return deep_map_lit(lit, lambda x: sub[x.name] if isinstance(x, Var) and x.name in sub else x)
+    return deep_map_lit(
+        lit, lambda x: sub[x.name] if isinstance(x, Var) and x.name in sub else x
+    )
 
 
 def map_outer_aggs(e: Any, f) -> Any:
@@ -1069,6 +1163,7 @@ def has_agg(x: Any) -> bool:
         if isinstance(e, Agg):
             found.append(e)
         return e
+
     if isinstance(x, (Atom, Neg, Cmp, Pred, Group)):
         map_lit_exprs(x, probe)
     else:
@@ -1106,13 +1201,24 @@ def rule_vars(r: Rule) -> set:
     return out
 
 
-CMP_FNS = {"<": lambda a, b: a < b, "<=": lambda a, b: a <= b, ">": lambda a, b: a > b,
-           ">=": lambda a, b: a >= b, "=": lambda a, b: a == b, "!=": lambda a, b: a != b}
+CMP_FNS = {
+    "<": lambda a, b: a < b,
+    "<=": lambda a, b: a <= b,
+    ">": lambda a, b: a > b,
+    ">=": lambda a, b: a >= b,
+    "=": lambda a, b: a == b,
+    "!=": lambda a, b: a != b,
+}
 
 
 def fold_cmp(op: str, l: Any, r: Any) -> Any:
     """`l op r`, or its truth value when both sides are integer literals."""
-    if isinstance(l, Num) and isinstance(r, Num) and isinstance(l.val, int) and isinstance(r.val, int):
+    if (
+        isinstance(l, Num)
+        and isinstance(r, Num)
+        and isinstance(l.val, int)
+        and isinstance(r.val, int)
+    ):
         return CMP_FNS[op](l.val, r.val)
     return Cmp(op, l, r)
 
@@ -1122,10 +1228,17 @@ INT_RANGES = {"int64": (-(1 << 63), (1 << 63) - 1), "uint64": (0, (1 << 64) - 1)
 INT32_RANGE = (-(1 << 31), (1 << 31) - 1)
 # The operators FlowLog evaluates itself (the others call SOUFFLE_UDFS); it
 # writes the shifts as calls of runtime functions.
-INT_OPS = {"+": lambda a, b: a + b, "-": lambda a, b: a - b, "*": lambda a, b: a * b,
-           "band": lambda a, b: a & b, "bor": lambda a, b: a | b, "bxor": lambda a, b: a ^ b,
-           "bshl": lambda a, b: a << (b & 63), "bshr": lambda a, b: a >> (b & 63),
-           "bshru": lambda a, b: (a & ((1 << 64) - 1)) >> (b & 63)}
+INT_OPS = {
+    "+": lambda a, b: a + b,
+    "-": lambda a, b: a - b,
+    "*": lambda a, b: a * b,
+    "band": lambda a, b: a & b,
+    "bor": lambda a, b: a | b,
+    "bxor": lambda a, b: a ^ b,
+    "bshl": lambda a, b: a << (b & 63),
+    "bshr": lambda a, b: a >> (b & 63),
+    "bshru": lambda a, b: (a & ((1 << 64) - 1)) >> (b & 63),
+}
 SHIFT_OPS = ("bshl", "bshr", "bshru")
 # The operators Souffle types by their operands (so a constant expression of
 # them takes its type from where it is used), and those of them (and the
@@ -1189,7 +1302,12 @@ def grounded_vars(conj: list) -> set:
             for a in lit.args:
                 if isinstance(a, Var):
                     g.add(a.name)
-        elif isinstance(lit, Cmp) and lit.op == "=" and isinstance(lit.l, Var) and isinstance(lit.r, Agg):
+        elif (
+            isinstance(lit, Cmp)
+            and lit.op == "="
+            and isinstance(lit.l, Var)
+            and isinstance(lit.r, Agg)
+        ):
             g.add(lit.l.name)
     changed = True
     while changed:
@@ -1197,7 +1315,11 @@ def grounded_vars(conj: list) -> set:
         for lit in conj:
             if isinstance(lit, Cmp) and lit.op == "=":
                 for x, e in ((lit.l, lit.r), (lit.r, lit.l)):
-                    if isinstance(x, Var) and x.name not in g and expr_vars(e, set()) <= g:
+                    if (
+                        isinstance(x, Var)
+                        and x.name not in g
+                        and expr_vars(e, set()) <= g
+                    ):
                         g.add(x.name)
                         changed = True
     return g
@@ -1208,6 +1330,7 @@ def all_aggs_in_lit(lit: Any, out: list) -> list:
         if isinstance(e, Agg):
             out.append(e)
         return e
+
     map_lit_exprs(lit, visit)
     return out
 
@@ -1252,7 +1375,11 @@ def prune_conj(conj: list) -> list | None:
     for lit in conj:
         if isinstance(lit, Cmp) and lit.op in ("=", "!="):
             l, r = lit.l, lit.r
-            if isinstance(l, (Str, Num)) and isinstance(r, (Str, Num)) and type(l) is type(r):
+            if (
+                isinstance(l, (Str, Num))
+                and isinstance(r, (Str, Num))
+                and type(l) is type(r)
+            ):
                 if (l.val == r.val) == (lit.op == "="):
                     continue
                 return None
@@ -1385,8 +1512,14 @@ def flowlog_clauses(body: list) -> list:
 def plan_atoms(clauses: list) -> tuple | None:
     """The names of the positive atoms a `.plan` orders, if every clause has
     the same ones, else None. A min-choice read `R_choice` stands for `R`."""
-    seqs = {tuple(lit.name[: -len("_choice")] if lit.name.endswith("_choice") else lit.name
-                  for lit in c if isinstance(lit, Atom)) for c in clauses}
+    seqs = {
+        tuple(
+            lit.name[: -len("_choice")] if lit.name.endswith("_choice") else lit.name
+            for lit in c
+            if isinstance(lit, Atom)
+        )
+        for c in clauses
+    }
     return seqs.pop() if len(seqs) == 1 else None
 
 
@@ -1398,7 +1531,11 @@ def sx_materialized(a: Agg) -> bool:
     omits wildcards); any other ranges over the tuples of its single atom."""
     lits = [lit for conj in a.body for lit in conj]
     atoms = [lit for lit in lits if isinstance(lit, Atom)]
-    if len(atoms) > 1 or any(has_agg(lit) for lit in lits) or (a.target is not None and has_agg(a.target)):
+    if (
+        len(atoms) > 1
+        or any(has_agg(lit) for lit in lits)
+        or (a.target is not None and has_agg(a.target))
+    ):
         return True
     ranges: list = []
     names: list = []
@@ -1412,6 +1549,7 @@ def sx_materialized(a: Agg) -> bool:
         if isinstance(e, Var):
             names.append(e.name)
         return e
+
     for lit in lits:
         map_lit_exprs(lit, probe_range)
     if a.target is not None:
@@ -1470,7 +1608,9 @@ def sx_eq_maps(l: Any, r: Any, grounded: set) -> bool:
         return False
     if isinstance(r, Var):
         return True
-    if isinstance(r, Agg) or (isinstance(r, Call) and not r.functor and r.name in SX_GENERATORS):
+    if isinstance(r, Agg) or (
+        isinstance(r, Call) and not r.functor and r.name in SX_GENERATORS
+    ):
         return False
     if l.name in expr_vars(r, set()):
         return False
@@ -1493,9 +1633,14 @@ def sx_resolve_aliases_changes(conj: list) -> bool:
         if isinstance(lit, Atom):
             for a in lit.args:
                 if isinstance(a, (Bin, Un, Cast)) or (
-                        isinstance(a, Call) and (a.functor or a.name not in SX_GENERATORS)):
+                    isinstance(a, Call) and (a.functor or a.name not in SX_GENERATORS)
+                ):
                     return True
-                if any(isinstance(x, (Bin, Un, Call)) for rec in sx_records(a, []) for x in rec.elems):
+                if any(
+                    isinstance(x, (Bin, Un, Call))
+                    for rec in sx_records(a, [])
+                    for x in rec.elems
+                ):
                     return True
         if isinstance(lit, Cmp) and lit.op == "=" and lit.l == lit.r:
             return True
@@ -1506,9 +1651,18 @@ def sx_record_constraint(conj: list) -> bool:
     """A `[..] = [..]` / `[..] != [..]` between record literals anywhere in
     the clause: FoldAnonymousRecords rewrites it."""
     for lit in conj:
-        if isinstance(lit, Cmp) and lit.op in ("=", "!=") and isinstance(lit.l, Rec) and isinstance(lit.r, Rec):
+        if (
+            isinstance(lit, Cmp)
+            and lit.op in ("=", "!=")
+            and isinstance(lit.l, Rec)
+            and isinstance(lit.r, Rec)
+        ):
             return True
-        if any(sx_record_constraint(c) for agg in all_aggs_in_lit(lit, []) for c in agg.body):
+        if any(
+            sx_record_constraint(c)
+            for agg in all_aggs_in_lit(lit, [])
+            for c in agg.body
+        ):
             return True
     return False
 
@@ -1516,8 +1670,13 @@ def sx_record_constraint(conj: list) -> bool:
 def sx_const_constraint(conj: list) -> bool:
     """A `c1 = c2` / `c1 != c2` over constants: SimplifyConstantBinary-
     Constraints and RemoveBooleanConstraints rewrite the clause."""
-    return any(isinstance(lit, Cmp) and lit.op in ("=", "!=") and sx_const(lit.l) and sx_const(lit.r)
-               for lit in conj)
+    return any(
+        isinstance(lit, Cmp)
+        and lit.op in ("=", "!=")
+        and sx_const(lit.l)
+        and sx_const(lit.r)
+        for lit in conj
+    )
 
 
 def sx_partitioned(head: Atom, conj: list) -> bool:
@@ -1530,6 +1689,7 @@ def sx_partitioned(head: Atom, conj: list) -> bool:
             parent[x] = parent[parent[x]]
             x = parent[x]
         return x
+
     fresh = iter(range(1 << 30))
 
     def names(lit: Any) -> list:
@@ -1550,9 +1710,11 @@ def sx_partitioned(head: Atom, conj: list) -> bool:
             else:
                 for c in expr_children(e):
                     ev(c)
+
         for e in sx_lit_exprs(lit):
             ev(e)
         return out
+
     body_vars: list = []
     for lit in [head] + conj:
         vs = names(lit)
@@ -1573,19 +1735,23 @@ def sx_partitioned(head: Atom, conj: list) -> bool:
 # Partial functions (see Translator.add_partial_checks)
 # ============================================================================
 
+
 def is_partial_call(e: Any) -> bool:
     """A call Souffle stops the program on for some arguments."""
-    return ((isinstance(e, Call) and not e.functor and e.name == "to_number")
-            or (isinstance(e, Bin) and e.op in ("/", "%")))
+    return (isinstance(e, Call) and not e.functor and e.name == "to_number") or (
+        isinstance(e, Bin) and e.op in ("/", "%")
+    )
 
 
 def collect_exprs(x: Any, pred, out: list) -> list:
     """The distinct subexpressions of an expression or literal (aggregate
     bodies included) satisfying `pred`."""
+
     def probe(e):
         if pred(e) and e not in out:
             out.append(e)
         return e
+
     if isinstance(x, (Atom, Neg, Cmp, Pred, Group)):
         deep_map_lit(x, probe)
     else:
@@ -1601,19 +1767,23 @@ def literal_div_fails(c: Bin) -> bool | None:
     """Whether the `/` or `%` of literals c fails in Souffle (a zero divisor,
     or INT64_MIN / -1 on number), when that does not depend on whether its
     context types it number or unsigned; else None."""
+
     def neg(x):
         if isinstance(x, Un) and x.op == "-":
             return Bin("-", Num(0), x.e)
         if isinstance(x, Num) and isinstance(x.val, int) and x.val < 0:
             return Bin("-", Num(0), Num(-x.val))
         return x
+
     l, r = map_expr(c.l, neg), map_expr(c.r, neg)
     fails = set()
     for prim in INT_RANGES:
         a, b = eval_const(l, prim, {}), eval_const(r, prim, {})
         if a is None or b is None:
             return None
-        fails.add(b == 0 or (prim == "int64" and a == INT_RANGES["int64"][0] and b == -1))
+        fails.add(
+            b == 0 or (prim == "int64" and a == INT_RANGES["int64"][0] and b == -1)
+        )
     return fails.pop() if len(fails) == 1 else None
 
 
@@ -1679,6 +1849,7 @@ def sx_resolve_aliases(head: Atom, body: list, tmp_names) -> tuple:
         for k in sub:
             sub[k] = subst_expr(sub[k], one)
         sub.setdefault(v, t)
+
     while eqs:
         l, r = eqs.pop()
         if l == r or (not isinstance(l, Var) and not isinstance(r, Var)):
@@ -1690,8 +1861,11 @@ def sx_resolve_aliases(head: Atom, body: list, tmp_names) -> tuple:
         elif l.name not in expr_vars(r, set()) and l.name not in base:
             new_mapping(l.name, r)
     head = subst_lit(head, sub)
-    body = [lit for lit in (subst_lit(x, sub) for x in body)
-            if not (isinstance(lit, Cmp) and lit.op == "=" and lit.l == lit.r)]
+    body = [
+        lit
+        for lit in (subst_lit(x, sub) for x in body)
+        if not (isinstance(lit, Cmp) and lit.op == "=" and lit.l == lit.r)
+    ]
     terms: list = []
     for lit in body:
         if isinstance(lit, Atom):
@@ -1699,8 +1873,14 @@ def sx_resolve_aliases(head: Atom, body: list, tmp_names) -> tuple:
                 if isinstance(a, (Bin, Un, Call, Cast)) and a not in terms:
                     terms.append(a)
     pairs = [(t, Var(next(tmp_names))) for t in terms]
-    body = [Atom(lit.name, [replace_terms(a, pairs) for a in lit.args]) if isinstance(lit, Atom) else lit
-            for lit in body]
+    body = [
+        (
+            Atom(lit.name, [replace_terms(a, pairs) for a in lit.args])
+            if isinstance(lit, Atom)
+            else lit
+        )
+        for lit in body
+    ]
     return head, body + [Cmp("=", v, t) for t, v in pairs]
 
 
@@ -1712,6 +1892,7 @@ def var_occurrences(lit: Any) -> list:
         if isinstance(e, Var):
             out.append(e.name)
         return e
+
     deep_map_lit(lit, probe)
     return out
 
@@ -1722,6 +1903,7 @@ def is_ord(e: Any) -> bool:
 
 def sx_text(e: Any) -> str:
     """An expression as text, for messages."""
+
     def g(x):
         if isinstance(x, Cast):
             return Call("as", [x.e, Var(x.ty)])
@@ -1730,6 +1912,7 @@ def sx_text(e: Any) -> str:
         if isinstance(x, Bin) and x.op not in FL_PREC:
             return Call(x.op, [x.l, x.r])
         return x
+
     try:
         return pe(deep_map_expr(e, g))
     except TranslateError:
@@ -1739,6 +1922,7 @@ def sx_text(e: Any) -> str:
 @dataclass
 class SxClause:
     """A clause of the instantiated program (see Translator.sx_clauses)."""
+
     head: Atom
     body: list
     line: int
@@ -1771,8 +1955,19 @@ def sx_simulate(head: Atom, body: list, tmp_names) -> tuple:
 # ============================================================================
 
 FLOWLOG_KEYWORDS = {
-    "as", "fn", "overridable", "static", "append", "mutable", "True", "False",
-    "count", "sum", "min", "max", "mean",
+    "as",
+    "fn",
+    "overridable",
+    "static",
+    "append",
+    "mutable",
+    "True",
+    "False",
+    "count",
+    "sum",
+    "min",
+    "max",
+    "mean",
 }
 _FL_IDENT = re.compile(r"^_?[A-Za-z]+[A-Za-z0-9_]*$")
 
@@ -1824,8 +2019,11 @@ SOUFFLE_UDFS = {
 PARTIAL_UDFS = ("to_number", "/", "%", "u/", "u%")
 PARTIAL_BY_PORT = {SOUFFLE_UDFS[k][0]: k for k in PARTIAL_UDFS}
 # Parameter types of the ports and of their `_error` companions, by name.
-PORT_PARAMS = {n + sfx: [p.split(":")[1].strip() for p in ps.split(",")]
-               for n, ps, _ in SOUFFLE_UDFS.values() for sfx in ("", "_error")}
+PORT_PARAMS = {
+    n + sfx: [p.split(":")[1].strip() for p in ps.split(",")]
+    for n, ps, _ in SOUFFLE_UDFS.values()
+    for sfx in ("", "_error")
+}
 UDF_RESULT = {"string": "symbol", "int64": "number", "uint64": "unsigned"}
 # The check rules' relation and pseudo-function (`m = flowlog_error_of(c)`,
 # rewritten to the `_error` companion of the partial call c), and the
@@ -1887,7 +2085,9 @@ class Translator:
         self.range_counter = 0
         self.warnings: list[str] = []
         self.dropped_rels: set[str] = set()
-        self.read_rels: set[str] | None = None  # set by run(); None: every relation counts as read
+        self.read_rels: set[str] | None = (
+            None  # set by run(); None: every relation counts as read
+        )
         self.schema: dict[str, Any] = {}
         self.decl_comp: dict[int, str] = {}  # id(decl) -> declaring component
         self.instances: dict[str, list] = {}  # component -> instance paths
@@ -1895,12 +2095,16 @@ class Translator:
         self.ci_comps: set[str] = set()  # components needing ChoiceInstance
         self.claim_arities: set[int] = set()
         self.souffle_udfs: set[str] = set()  # keys of SOUFFLE_UDFS in use
-        self.error_udfs: set[str] = set()  # keys of PARTIAL_UDFS whose `_error` is in use
+        self.error_udfs: set[str] = (
+            set()
+        )  # keys of PARTIAL_UDFS whose `_error` is in use
         self.check_vars: list[str] = []  # see check_var
         self.need_choice_number = False
         self.tparams: set[str] = set()  # component type parameters
         self.comp_tparams: dict[str, list] = {}  # component -> its type parameters
-        self.init_targs: dict[tuple, list] = {}  # (component or None, instance) -> type arguments
+        self.init_targs: dict[tuple, list] = (
+            {}
+        )  # (component or None, instance) -> type arguments
         self.need_unit = False
         self.need_range = False
         self.output_copies = 0  # see split_outputs
@@ -1937,7 +2141,9 @@ class Translator:
     def collect(self, items: list, comp: str | None = None) -> None:
         for it in items:
             if isinstance(it, RelDecl) and RESERVED_REL.match(it.name):
-                raise TranslateError(f"relation name {it.name} is reserved by the translation")
+                raise TranslateError(
+                    f"relation name {it.name} is reserved by the translation"
+                )
             if isinstance(it, TypeDecl):
                 self.types[it.name] = it
             elif isinstance(it, Functor):
@@ -2000,7 +2206,9 @@ class Translator:
             if self.is_record_type(at):
                 name = self.base_type(at)[1]
                 if name in stack:
-                    raise TranslateError(f"recursive record type {name} is not supported")
+                    raise TranslateError(
+                        f"recursive record type {name} is not supported"
+                    )
                 for fn_, ft in self.flat_attrs(self.record_fields(at), stack + (name,)):
                     out.append((f"{an}_{fn_}", ft))
             else:
@@ -2013,14 +2221,25 @@ class Translator:
     def record_format(self, t: str) -> str:
         """How Souffle writes a record of type t, with `{}` for each flattened
         field: `[[{}, {}], {}]`."""
-        return "[" + ", ".join(self.record_format(ft) if self.is_record_type(ft) else "{}"
-                               for _, ft in self.record_fields(t)) + "]"
+        return (
+            "["
+            + ", ".join(
+                self.record_format(ft) if self.is_record_type(ft) else "{}"
+                for _, ft in self.record_fields(t)
+            )
+            + "]"
+        )
 
     def choice_keys(self, d: RelDecl) -> set:
         """The flattened attribute names of d's choice-domain key: a record
         attribute contributes all of its fields."""
         keys = d.choice[0]
-        return {fa for an, at in d.attrs if an in keys for fa, _ in self.flat_attrs([(an, at)])}
+        return {
+            fa
+            for an, at in d.attrs
+            if an in keys
+            for fa, _ in self.flat_attrs([(an, at)])
+        }
 
     # ------------------------------------------------------------- top level
     def run(self) -> list:
@@ -2029,7 +2248,9 @@ class Translator:
         clash = sorted(self.tparams & set(self.types))
         if clash:
             # the types are resolved globally, so the parameter would read as the type
-            raise TranslateError(f"component type parameter {clash[0]} has the name of a type")
+            raise TranslateError(
+                f"component type parameter {clash[0]} has the name of a type"
+            )
         items = self.split_outputs(items)
         self.instances = self.comp_instances()
         self.check_relations(items)
@@ -2044,28 +2265,46 @@ class Translator:
         items = self.dedupe_io(items)
         items = self.add_choice_instances(items)
         if self.need_unit:
-            items += [Raw(f".decl {UNIT_REL}(u: int32)"), Rule([Atom(UNIT_REL, [Num(0)])], None)]
+            items += [
+                Raw(f".decl {UNIT_REL}(u: int32)"),
+                Rule([Atom(UNIT_REL, [Num(0)])], None),
+            ]
         if self.need_range:
             items += self.range_table()
         if self.error_udfs:
             # FlowlogError is a relation, so the messages are consolidated
             # (rows a negation retracts cancel out) before souffle_raise sees them
-            items += [Raw(f".decl {ABORT_REL}(n: int64)"), Raw(f".output {ABORT_REL}"),
-                      Raw(f"{ABORT_REL}(n) :- {ERROR_REL}(m), n = souffle_raise(m).")]
+            items += [
+                Raw(f".decl {ABORT_REL}(n: int64)"),
+                Raw(f".output {ABORT_REL}"),
+                Raw(f"{ABORT_REL}(n) :- {ERROR_REL}(m), n = souffle_raise(m)."),
+            ]
         externs: list = []
         if any(self.is_minchoice(n) for n, d in self.decls.items() if d.choice):
             externs = [
                 Raw(".extern fn choice_key1(prio: int32, a: string) -> int64"),
-                Raw(".extern fn choice_key2(prio: int32, a: string, b: string) -> int64"),
-                Raw(".extern fn choice_key3(prio: int32, a: string, b: string, c: string) -> int64"),
-                Raw(".extern fn choice_key4(prio: int32, a: string, b: string, c: string, d: string) -> int64"),
+                Raw(
+                    ".extern fn choice_key2(prio: int32, a: string, b: string) -> int64"
+                ),
+                Raw(
+                    ".extern fn choice_key3(prio: int32, a: string, b: string, c: string) -> int64"
+                ),
+                Raw(
+                    ".extern fn choice_key4(prio: int32, a: string, b: string, c: string, d: string) -> int64"
+                ),
                 Raw(".extern fn choice_field(ck: int64, i: int32) -> string"),
             ]
         if self.need_choice_number:
-            externs.append(Raw(".extern fn choice_number(ck: int64, i: int32) -> int64"))
+            externs.append(
+                Raw(".extern fn choice_number(ck: int64, i: int32) -> int64")
+            )
         for n in sorted(self.claim_arities):
             ks = ", ".join(f"k{i}: string" for i in range(1, n + 1))
-            externs.append(Raw(f".extern fn choice_claim{n}(inst: int32, rel: int32, ck: int64, {ks}) -> int64"))
+            externs.append(
+                Raw(
+                    f".extern fn choice_claim{n}(inst: int32, rel: int32, ck: int64, {ks}) -> int64"
+                )
+            )
         for k in sorted(self.souffle_udfs):
             name, params, ret = SOUFFLE_UDFS[k]
             externs.append(Raw(f".extern fn {name}({params}) -> {ret}"))
@@ -2083,7 +2322,12 @@ class Translator:
         out: list = []
         for it in items:
             if isinstance(it, Comp) and it.name in self.ci_comps:
-                it = Comp(it.name, it.tparams, it.supers, [Raw(".decl ChoiceInstance(t: int32)")] + it.items)
+                it = Comp(
+                    it.name,
+                    it.tparams,
+                    it.supers,
+                    [Raw(".decl ChoiceInstance(t: int32)")] + it.items,
+                )
             out.append(it)
         n = 0
         for comp in sorted(self.ci_comps):
@@ -2119,8 +2363,11 @@ class Translator:
         call of literals only (as `(0-1)/2`) that fails or not depending on
         its type: the check computes it on number, Souffle in the type of
         its context (type_context_partials)."""
-        if not any(collect_exprs(lit, is_partial_call, []) for _, r in iter_rules(items)
-                   for lit in r.heads + [l for c in r.body or [] for l in c]):
+        if not any(
+            collect_exprs(lit, is_partial_call, [])
+            for _, r in iter_rules(items)
+            for lit in r.heads + [l for c in r.body or [] for l in c]
+        ):
             return items
 
         def pragmas(its: list):
@@ -2129,10 +2376,17 @@ class Translator:
                     yield it
                 elif isinstance(it, Comp):
                     yield from pragmas(it.items)
-        bad = [p.args[0] for p in pragmas(items) if p.args and p.args[0] in SX_PIPELINE_PRAGMAS]
+
+        bad = [
+            p.args[0]
+            for p in pragmas(items)
+            if p.args and p.args[0] in SX_PIPELINE_PRAGMAS
+        ]
         if bad:
-            self.warn(f".pragma {bad[0]}: partial calls are not checked (Souffle may stop on them "
-                      "where the translation completes)")
+            self.warn(
+                f".pragma {bad[0]}: partial calls are not checked (Souffle may stop on them "
+                "where the translation completes)"
+            )
             return items
         clauses = self.sx_clauses(items)
         an = self.sx_analysis(items, clauses)
@@ -2140,20 +2394,33 @@ class Translator:
         checked: dict = {}  # (line, call) -> checked in every clause
         for cl in clauses:
             calls: list = []
-            for lit in [cl.sim[0]] + cl.sim[1] if cl.sim is not None else [cl.head] + cl.body:
+            for lit in (
+                [cl.sim[0]] + cl.sim[1] if cl.sim is not None else [cl.head] + cl.body
+            ):
                 collect_exprs(lit, is_partial_call, calls)
-            in_head = collect_exprs(cl.sim[0], is_partial_call, []) if cl.sim is not None else []
+            in_head = (
+                collect_exprs(cl.sim[0], is_partial_call, [])
+                if cl.sim is not None
+                else []
+            )
             for c in calls:
                 rule = self.partial_check(cl, c, an) if c in in_head else None
                 key = (cl.line, sx_text(c))
-                whole = rule is not None and not any(contains_term(lit, c) for lit in cl.sim[1])
+                whole = rule is not None and not any(
+                    contains_term(lit, c) for lit in cl.sim[1]
+                )
                 checked[key] = checked.get(key, True) and whole
-                if rule is not None and not any(r.heads == rule.heads and r.body == rule.body for r in checks):
+                if rule is not None and not any(
+                    r.heads == rule.heads and r.body == rule.body for r in checks
+                ):
                     checks.append(rule)
         left = sorted(k for k, ok in checked.items() if not ok)
         if left:
-            self.warn(f"{len(left)} of {len(checked)} partial calls are not fully checked (Souffle may stop on "
-                      "them where the translation completes): " + "; ".join(f"line {n}: {t}" for n, t in left))
+            self.warn(
+                f"{len(left)} of {len(checked)} partial calls are not fully checked (Souffle may stop on "
+                "them where the translation completes): "
+                + "; ".join(f"line {n}: {t}" for n, t in left)
+            )
         if not checks:
             return items
         d = RelDecl(ERROR_REL, [("msg", "symbol")], [], [])
@@ -2165,9 +2432,16 @@ class Translator:
         add_partial_checks), or None when it is not sound."""
         head, body = cl.sim
         d = self.resolve_decl(head.name)
-        if not (cl.top and cl.kept and d is not None and not d.choice and "inline" not in d.quals
-                and head.name in an["live"] and head.name in an["irreducible"]
-                and head.name not in an["recursive"]):
+        if not (
+            cl.top
+            and cl.kept
+            and d is not None
+            and not d.choice
+            and "inline" not in d.quals
+            and head.name in an["live"]
+            and head.name in an["irreducible"]
+            and head.name not in an["recursive"]
+        ):
             return None
         if any(isinstance(lit, Atom) and contains_term(lit, c) for lit in body):
             return None
@@ -2176,9 +2450,14 @@ class Translator:
         if literal_expr(c) and literal_div_fails(c) is None:
             return None
         rest = [lit for lit in body if not contains_term(lit, c)]
-        if any(a.name in an["tainted"] for a in body_atoms([rest])) or collect_exprs(c, is_ord, []):
+        if any(a.name in an["tainted"] for a in body_atoms([rest])) or collect_exprs(
+            c, is_ord, []
+        ):
             return None
-        if any(collect_exprs(lit, lambda e: is_ord(e) or is_partial_call(e), []) for lit in rest):
+        if any(
+            collect_exprs(lit, lambda e: is_ord(e) or is_partial_call(e), [])
+            for lit in rest
+        ):
             return None
         vs = expr_vars(c, set())
         for lit in rest:
@@ -2191,7 +2470,9 @@ class Translator:
         for lit in lits:
             for v in var_occurrences(lit):
                 occ[v] = occ.get(v, 0) + 1
-        in_atoms = {v for lit in lits if isinstance(lit, Atom) for v in var_occurrences(lit)}
+        in_atoms = {
+            v for lit in lits if isinstance(lit, Atom) for v in var_occurrences(lit)
+        }
         sub: dict = {}
         k = 0
         for v, n in occ.items():
@@ -2208,7 +2489,9 @@ class Translator:
         message), then `tmp`, `tmp_1`, ... (for Souffle's temporaries), each
         one no rule spells."""
         while len(self.check_vars) <= i:
-            self.check_vars.append(self.fresh_var("msg" if not self.check_vars else "tmp"))
+            self.check_vars.append(
+                self.fresh_var("msg" if not self.check_vars else "tmp")
+            )
         return self.check_vars[i]
 
     def fresh_var(self, base: str) -> str:
@@ -2240,10 +2523,15 @@ class Translator:
             while True:
                 n += 1
                 yield f" _tmp_{n}"  # no program spells it, as in Souffle
+
         tmp = tmp_names()
 
         def odd(e):
-            return isinstance(e, (Agg, Rec, Nil)) or isinstance(e, Call) and e.name in SX_GENERATORS
+            return (
+                isinstance(e, (Agg, Rec, Nil))
+                or isinstance(e, Call)
+                and e.name in SX_GENERATORS
+            )
 
         def modelled(cl: SxClause) -> bool:
             for lit in [cl.head] + cl.body:
@@ -2255,6 +2543,7 @@ class Translator:
                     if d is None or "inline" in d.quals:
                         return False
             return True
+
         out: list = []
         for scope, r in iter_rules(items):
             comp = scope[-1] if scope else None
@@ -2269,7 +2558,13 @@ class Translator:
                     names = {a.name: res(a.name) for a in body_atoms([conj])}
                     conj = [rename_atoms(lit, names) for lit in conj]
                     for h in r.heads:
-                        cl = SxClause(Atom(res(h.name), h.args), conj, r.line, comp is None, set(names.values()))
+                        cl = SxClause(
+                            Atom(res(h.name), h.args),
+                            conj,
+                            r.line,
+                            comp is None,
+                            set(names.values()),
+                        )
                         if modelled(cl):
                             cl.sim = sx_simulate(cl.head, cl.body, tmp)
                         out.append(cl)
@@ -2303,9 +2598,12 @@ class Translator:
             for it in its:
                 if isinstance(it, IODecl):
                     for p in paths:
-                        io.setdefault(self.sx_resolver(comp, p)(it.name), set()).add(it.kind)
+                        io.setdefault(self.sx_resolver(comp, p)(it.name), set()).add(
+                            it.kind
+                        )
                 elif isinstance(it, Comp):
                     walk(it.items, it.name, self.instances.get(it.name, []))
+
         walk(items, None, [None])
         inputs = {n for n, k in io.items() if ".input" in k}
         outputs = {n for n, k in io.items() if k & {".output", ".printsize"}}
@@ -2313,6 +2611,7 @@ class Translator:
 
         def positive(body: list) -> list:
             return [lit for lit in body if isinstance(lit, Atom)]
+
         edges: dict = {}
         for cl in clauses:
             edges.setdefault(cl.head.name, set()).update(cl.deps)
@@ -2327,17 +2626,31 @@ class Translator:
             # MinimiseProgram drops `R(..) :- .., R(..), ..`, also once
             # RemoveRelationCopies renames a copy of R in the body to R (the
             # copy is then in R's cycle)
-            return (pruned is not None
-                    and not any(isinstance(l, Cmp) and sx_const(l.l) and sx_const(l.r) for l in pruned)
-                    and not any(isinstance(l, Atom) and l.args == head.args
-                                and scc.get(l.name) == scc[head.name] for l in body))
+            return (
+                pruned is not None
+                and not any(
+                    isinstance(l, Cmp) and sx_const(l.l) and sx_const(l.r)
+                    for l in pruned
+                )
+                and not any(
+                    isinstance(l, Atom)
+                    and l.args == head.args
+                    and scc.get(l.name) == scc[head.name]
+                    for l in body
+                )
+            )
+
         k0 = [kept0(cl) for cl in clauses]
         nonempty = set(inputs)
         grew = True
         while grew:
             grew = False
             for cl, ok in zip(clauses, k0):
-                if ok and cl.head.name not in nonempty and all(a.name in nonempty for a in positive(cl.sim[1])):
+                if (
+                    ok
+                    and cl.head.name not in nonempty
+                    and all(a.name in nonempty for a in positive(cl.sim[1]))
+                ):
                     nonempty.add(cl.head.name)
                     grew = True
         for cl, ok in zip(clauses, k0):
@@ -2346,26 +2659,41 @@ class Translator:
         def may_recurse(cl: SxClause) -> bool:
             # its head may be in its body once copies are replaced
             h = cl.head.name
-            return ((scc[h] in rec and any(scc[d] == scc[h] for d in cl.deps))
-                    or (h not in is_io and any(d not in is_io and scc[d] in rec for d in cl.deps)))
+            return (scc[h] in rec and any(scc[d] == scc[h] for d in cl.deps)) or (
+                h not in is_io
+                and any(d not in is_io and scc[d] in rec for d in cl.deps)
+            )
+
         passes: dict = {}  # relation -> relations its irreducibility makes irreducible
-        copies: set = set()  # clauses RemoveRelationCopies may drop, renaming their head
+        copies: set = (
+            set()
+        )  # clauses RemoveRelationCopies may drop, renaming their head
         for i, cl in enumerate(clauses):
             if cl.sim is None or cl.head.name in is_io:
                 continue
             head, body = cl.sim
             d = self.resolve_decl(head.name)
             names = {a.name for a in head.args if isinstance(a, Var)}
-            if (d is not None and not d.choice and len(body) == 1 and isinstance(body[0], Atom)
-                    and body[0].name != head.name and body[0].args == head.args
-                    and len(names) == len(head.args)):
+            if (
+                d is not None
+                and not d.choice
+                and len(body) == 1
+                and isinstance(body[0], Atom)
+                and body[0].name != head.name
+                and body[0].args == head.args
+                and len(names) == len(head.args)
+            ):
                 passes.setdefault(head.name, set()).add(body[0].name)
                 copies.add(i)
 
         def named_atoms(cl: SxClause) -> list:
             # the atoms ReduceExistentials sees with an argument other than `_`
             head, body = cl.sim
-            body = [l for l in body if not (isinstance(l, Neg) and l.atom.name not in nonempty)]
+            body = [
+                l
+                for l in body
+                if not (isinstance(l, Neg) and l.atom.name not in nonempty)
+            ]
             occ: dict = {}
             for lit in [head] + body:
                 for v in var_occurrences(lit):
@@ -2373,8 +2701,12 @@ class Translator:
             out = []
             for lit in body:
                 a = lit.atom if isinstance(lit, Neg) else lit
-                if isinstance(a, Atom) and any(not isinstance(x, (Var, Wild)) or isinstance(x, Var)
-                                               and occ[x.name] > 1 for x in a.args):
+                if isinstance(a, Atom) and any(
+                    not isinstance(x, (Var, Wild))
+                    or isinstance(x, Var)
+                    and occ[x.name] > 1
+                    for x in a.args
+                ):
                     out.append(a)
             return out
 
@@ -2386,6 +2718,7 @@ class Translator:
                         seen.add(y)
                         stack.append(y)
             return seen
+
         live = set(outputs)
         marks = set(is_io)
         done: set = set()
@@ -2402,7 +2735,11 @@ class Translator:
                 done.add(i)
                 progress = True
                 for lit in cl.sim[1]:
-                    if isinstance(lit, Atom) or isinstance(lit, Neg) and lit.atom.name in nonempty:
+                    if (
+                        isinstance(lit, Atom)
+                        or isinstance(lit, Neg)
+                        and lit.atom.name in nonempty
+                    ):
                         live.add(lit.name if isinstance(lit, Atom) else lit.atom.name)
                 if i in copies:
                     continue  # its body relation may take the head's place: passes
@@ -2414,10 +2751,16 @@ class Translator:
                             marks.add(a.name)
             if not progress:
                 break
-        tainted = {n for n in set(edges) | {d for ds in edges.values() for d in ds}
-                   if (d := self.resolve_decl(n)) is not None and d.choice}
-        tainted |= {cl.head.name for cl in clauses
-                    if any(collect_exprs(lit, is_ord, []) for lit in [cl.head] + cl.body)}
+        tainted = {
+            n
+            for n in set(edges) | {d for ds in edges.values() for d in ds}
+            if (d := self.resolve_decl(n)) is not None and d.choice
+        }
+        tainted |= {
+            cl.head.name
+            for cl in clauses
+            if any(collect_exprs(lit, is_ord, []) for lit in [cl.head] + cl.body)
+        }
         grew = True
         while grew:
             grew = False
@@ -2425,8 +2768,12 @@ class Translator:
                 if cl.head.name not in tainted and cl.deps & tainted:
                     tainted.add(cl.head.name)
                     grew = True
-        return {"live": live, "irreducible": irreducible, "tainted": tainted,
-                "recursive": {n for n in edges if scc[n] in rec}}
+        return {
+            "live": live,
+            "irreducible": irreducible,
+            "tainted": tainted,
+            "recursive": {n for n in edges if scc[n] in rec},
+        }
 
     # ------------------------------------------------------- comp hoisting
     def hoist_comps(self, items: list) -> list:
@@ -2445,17 +2792,25 @@ class Translator:
         names = [it.name for it in out if isinstance(it, Comp)]
         dup = sorted({n for n in names if names.count(n) > 1})
         if dup:
-            raise TranslateError(f"component name {dup[0]} is ambiguous once nested components are hoisted")
+            raise TranslateError(
+                f"component name {dup[0]} is ambiguous once nested components are hoisted"
+            )
         return out
 
     def _hoist(self, comp: Comp, prefix: str, outer: dict):
         if comp.supers:
-            raise TranslateError(f"component inheritance ({comp.name} : "
-                                 f"{', '.join(s for s, _ in comp.supers)}) is not supported")
-        nested = {it.name: f"{prefix}_{it.name}" for it in comp.items if isinstance(it, Comp)}
+            raise TranslateError(
+                f"component inheritance ({comp.name} : "
+                f"{', '.join(s for s, _ in comp.supers)}) is not supported"
+            )
+        nested = {
+            it.name: f"{prefix}_{it.name}" for it in comp.items if isinstance(it, Comp)
+        }
         if nested and comp.tparams:
-            raise TranslateError(f"component {comp.name} has type parameters and nested components "
-                                 "(not supported)")
+            raise TranslateError(
+                f"component {comp.name} has type parameters and nested components "
+                "(not supported)"
+            )
         renames = {**outer, **nested}
         hoisted: list = []
         new_items: list = []
@@ -2463,9 +2818,13 @@ class Translator:
             if isinstance(it, Comp):
                 sub_hoisted, sub = self._hoist(it, nested[it.name], renames)
                 hoisted.extend(sub_hoisted)
-                hoisted.append(Comp(nested[it.name], sub.tparams, sub.supers, sub.items))
+                hoisted.append(
+                    Comp(nested[it.name], sub.tparams, sub.supers, sub.items)
+                )
             elif isinstance(it, Override):
-                raise TranslateError(f".override {it.name} in component {comp.name} is not supported")
+                raise TranslateError(
+                    f".override {it.name} in component {comp.name} is not supported"
+                )
             elif isinstance(it, Init) and it.comp in renames:
                 new_items.append(Init(it.name, renames[it.comp], it.targs))
             else:
@@ -2486,31 +2845,48 @@ class Translator:
             out: list = []
             for it in its:
                 if isinstance(it, Comp):
-                    it = Comp(it.name, it.tparams, it.supers, fix(it.items, scope + (it.name,)))
+                    it = Comp(
+                        it.name,
+                        it.tparams,
+                        it.supers,
+                        fix(it.items, scope + (it.name,)),
+                    )
                 elif isinstance(it, Rule) and any(
-                        d is not None and d.choice and self.is_minchoice(d.name)
-                        for d in (self.resolve_decl(h.name, scope) for h in it.heads)):
+                    d is not None and d.choice and self.is_minchoice(d.name)
+                    for d in (self.resolve_decl(h.name, scope) for h in it.heads)
+                ):
                     seq += 1
                     if it.body is None:
-                        out.append(Rule(it.heads, None, it.line, (seq, 0), None, it.plan))
+                        out.append(
+                            Rule(it.heads, None, it.line, (seq, 0), None, it.plan)
+                        )
                         continue
                     for i, conj in enumerate(souffle_dnf(it.body)):
-                        sx = {"farc": sx_record_constraint(conj),
-                              "ra1": sx_resolve_aliases_changes(conj),
-                              "rbc1": any(isinstance(lit, BoolLit) for lit in conj),
-                              "scbc": sx_const_constraint(conj)}
-                        out.append(Rule(it.heads, [conj], it.line, (seq, i), sx, it.plan))
+                        sx = {
+                            "farc": sx_record_constraint(conj),
+                            "ra1": sx_resolve_aliases_changes(conj),
+                            "rbc1": any(isinstance(lit, BoolLit) for lit in conj),
+                            "scbc": sx_const_constraint(conj),
+                        }
+                        out.append(
+                            Rule(it.heads, [conj], it.line, (seq, i), sx, it.plan)
+                        )
                     continue
                 out.append(it)
             return out
+
         return fix(items, ())
 
     def collect_read_rels(self, items: list) -> set:
         """Base names of the relations whose contents can reach a result:
         those a rule body reads, and those an .output or .printsize names.
         Base names over-approximate across components, which is safe."""
-        read = {a.name.split(".")[-1] for _, r in iter_rules(items) if r.body is not None
-                for a in body_atoms(r.body)}
+        read = {
+            a.name.split(".")[-1]
+            for _, r in iter_rules(items)
+            if r.body is not None
+            for a in body_atoms(r.body)
+        }
 
         def scan(its: list) -> None:
             for it in its:
@@ -2518,6 +2894,7 @@ class Translator:
                     read.add(it.name.split(".")[-1])
                 elif isinstance(it, Comp):
                     scan(it.items)
+
         scan(items)
         return read
 
@@ -2537,6 +2914,7 @@ class Translator:
                     (inline if "inline" in it.quals else plain).add(it.name)
                 elif isinstance(it, Comp):
                     scan(it.items)
+
         scan(items)
         drop = inline - plain - used
         for n in sorted(drop):
@@ -2548,7 +2926,9 @@ class Translator:
             for it in its:
                 if isinstance(it, RelDecl) and it.name in drop:
                     continue
-                if isinstance(it, Rule) and any(h.name.split(".")[-1] in drop for h in it.heads):
+                if isinstance(it, Rule) and any(
+                    h.name.split(".")[-1] in drop for h in it.heads
+                ):
                     heads = [h for h in it.heads if h.name.split(".")[-1] not in drop]
                     if not heads:
                         continue
@@ -2557,6 +2937,7 @@ class Translator:
                     it = Comp(it.name, it.tparams, it.supers, filt(it.items))
                 res.append(it)
             return res
+
         return filt(items)
 
     def inline_relations(self, items: list) -> list:
@@ -2582,6 +2963,7 @@ class Translator:
                     decls[id(it)] = it
                 elif isinstance(it, Comp):
                     walk(it.items, scope + (it.name,))
+
         walk(items, ())
         if not decls:
             return items
@@ -2606,15 +2988,23 @@ class Translator:
                 if d is None or id(d) not in decls:
                     continue
                 if kind == "inside an aggregate":
-                    raise TranslateError(f"inline relation {a.name} is used inside an aggregate "
-                                         "(Souffle rejects this too)")
+                    raise TranslateError(
+                        f"inline relation {a.name} is used inside an aggregate "
+                        "(Souffle rejects this too)"
+                    )
                 if kind != "positive":
                     bad.setdefault(id(d), f"it is used {kind}")
-                elif self.inline_names(scopes[id(d)], defs[id(d)], a.name, scope) is None:
-                    bad.setdefault(id(d), "its clauses resolve differently at a use site")
+                elif (
+                    self.inline_names(scopes[id(d)], defs[id(d)], a.name, scope) is None
+                ):
+                    bad.setdefault(
+                        id(d), "its clauses resolve differently at a use site"
+                    )
         for k in sorted(bad, key=lambda k: decls[k].name):
-            self.warn(f"inline relation {decls[k].name} is materialised ({bad[k]}); inside "
-                      "recursion its consumers see it one iteration later than in Souffle")
+            self.warn(
+                f"inline relation {decls[k].name} is materialised ({bad[k]}); inside "
+                "recursion its consumers see it one iteration later than in Souffle"
+            )
         ok = {k for k in decls if k not in bad}
         if not ok:
             return items
@@ -2626,7 +3016,12 @@ class Translator:
                 if isinstance(it, RelDecl) and id(it) in ok:
                     continue
                 if isinstance(it, Comp):
-                    it = Comp(it.name, it.tparams, it.supers, fix(it.items, scope + (it.name,)))
+                    it = Comp(
+                        it.name,
+                        it.tparams,
+                        it.supers,
+                        fix(it.items, scope + (it.name,)),
+                    )
                 elif isinstance(it, Rule):
                     ds = [self.resolve_decl(h.name, scope) for h in it.heads]
                     if any(d is not None and id(d) in ok for d in ds):
@@ -2635,20 +3030,34 @@ class Translator:
                         exp = self.expand_inline_paths(it.body[0], scope, ctx, 0)
                         if exp is not None:
                             if not exp:
-                                self.warn(f"line {it.line}: rule unsatisfiable after inlining; dropped")
+                                self.warn(
+                                    f"line {it.line}: rule unsatisfiable after inlining; dropped"
+                                )
                             for conj, path, rounds, ceq in exp:
                                 sx = dict(it.sx, k=rounds, scbc=it.sx["scbc"] or ceq)
-                                out.append(Rule(it.heads, [conj], it.line, it.sub + (path,), sx, it.plan))
+                                out.append(
+                                    Rule(
+                                        it.heads,
+                                        [conj],
+                                        it.line,
+                                        it.sub + (path,),
+                                        sx,
+                                        it.plan,
+                                    )
+                                )
                             continue
                     elif it.body is not None:
                         body = self.expand_inline(it.body, scope, ctx, 0)
                         if body is not it.body:
                             if not body:
-                                self.warn(f"line {it.line}: rule unsatisfiable after inlining; dropped")
+                                self.warn(
+                                    f"line {it.line}: rule unsatisfiable after inlining; dropped"
+                                )
                                 continue
                             it = Rule(it.heads, body, it.line, plan=it.plan)
                 out.append(it)
             return out
+
         return fix(items, ())
 
     def atom_uses(self, body: list):
@@ -2666,7 +3075,9 @@ class Translator:
                     for a in body_atoms(agg.body):
                         yield "inside an aggregate", a
 
-    def inline_names(self, dscope: tuple, rules: list, use_name: str, uscope: tuple) -> dict | None:
+    def inline_names(
+        self, dscope: tuple, rules: list, use_name: str, uscope: tuple
+    ) -> dict | None:
         """How the atoms of an inline relation's clauses (declared in scope
         `dscope`) are spelled at a use `use_name` in scope `uscope`: names
         local to the declaring component take the use's instance prefix.
@@ -2676,7 +3087,9 @@ class Translator:
         comp = dscope[-1] if dscope else None
         local: set = set()
         if comp is not None:
-            local = set(self.comp_decls.get(comp, {})) | set(self.comp_inits.get(comp, {}))
+            local = set(self.comp_decls.get(comp, {})) | set(
+                self.comp_inits.get(comp, {})
+            )
         names: dict = {}
         for r in rules:
             for a in body_atoms(r.body or []):
@@ -2703,10 +3116,14 @@ class Translator:
                 out.extend(res)
         return out if changed else body
 
-    def expand_inline_conj(self, conj: list, scope: tuple, ctx: tuple, depth: int) -> list | None:
+    def expand_inline_conj(
+        self, conj: list, scope: tuple, ctx: tuple, depth: int
+    ) -> list | None:
         ok, scopes, defs = ctx
         if depth > 64:
-            raise TranslateError("inline relations nest too deeply (a recursive inline relation?)")
+            raise TranslateError(
+                "inline relations nest too deeply (a recursive inline relation?)"
+            )
         for k, lit in enumerate(conj):
             if isinstance(lit, Atom):
                 d = self.resolve_decl(lit.name, scope)
@@ -2717,7 +3134,7 @@ class Translator:
                     raise TranslateError(f"cannot inline {lit.name} here")
                 res: list = []
                 for alt in self.inline_atom(lit, defs[id(d)], names):
-                    c = prune_conj(conj[:k] + alt + conj[k + 1:])
+                    c = prune_conj(conj[:k] + alt + conj[k + 1 :])
                     if c is not None:
                         sub = self.expand_inline_conj(c, scope, ctx, depth + 1)
                         res.extend([c] if sub is None else sub)
@@ -2728,12 +3145,14 @@ class Translator:
                     continue
                 if not disj:
                     return []
-                c = conj[:k] + [Group(disj)] + conj[k + 1:]
+                c = conj[:k] + [Group(disj)] + conj[k + 1 :]
                 sub = self.expand_inline_conj(c, scope, ctx, depth + 1)
                 return [c] if sub is None else sub
         return None
 
-    def expand_inline_paths(self, conj: list, scope: tuple, ctx: tuple, depth: int) -> list | None:
+    def expand_inline_paths(
+        self, conj: list, scope: tuple, ctx: tuple, depth: int
+    ) -> list | None:
         """Expand the inline atoms of one Souffle clause (a DNF conjunct of a
         min-choice rule) the way InlineRelationsTransformer does: every round
         replaces each clause by one version per clause of the relation of its
@@ -2743,7 +3162,9 @@ class Translator:
         between constants; None when the clause has no inline atom."""
         ok, scopes, defs = ctx
         if depth > 64:
-            raise TranslateError("inline relations nest too deeply (a recursive inline relation?)")
+            raise TranslateError(
+                "inline relations nest too deeply (a recursive inline relation?)"
+            )
         for k, lit in enumerate(conj):
             if not isinstance(lit, Atom):
                 continue
@@ -2754,8 +3175,10 @@ class Translator:
             if names is None:
                 raise TranslateError(f"cannot inline {lit.name} here")
             res: list = []
-            for j, alt in enumerate(self.inline_atom(lit, defs[id(d)], names, dnf=True)):
-                raw = conj[:k] + alt + conj[k + 1:]
+            for j, alt in enumerate(
+                self.inline_atom(lit, defs[id(d)], names, dnf=True)
+            ):
+                raw = conj[:k] + alt + conj[k + 1 :]
                 ceq = sx_const_constraint(raw)
                 c = prune_conj(raw)
                 if c is None:
@@ -2778,7 +3201,10 @@ class Translator:
             if r.body is None:
                 clauses.append((False, r, []))
             elif dnf:
-                clauses += [(any(isinstance(x, BoolLit) for x in c), r, c) for c in souffle_dnf(r.body)]
+                clauses += [
+                    (any(isinstance(x, BoolLit) for x in c), r, c)
+                    for c in souffle_dnf(r.body)
+                ]
             else:
                 clauses += [(False, r, c) for c in r.body]
         if dnf:
@@ -2792,7 +3218,9 @@ class Translator:
             eqs: list = []
             for hp, arg in zip(h.args, a.args):
                 if isinstance(hp, Var) and hp.name not in sub:
-                    sub[hp.name] = Var(self.fresh("inl_")) if isinstance(arg, Wild) else arg
+                    sub[hp.name] = (
+                        Var(self.fresh("inl_")) if isinstance(arg, Wild) else arg
+                    )
                 elif not isinstance(hp, Wild) and not isinstance(arg, Wild):
                     eqs.append((hp, arg))
             local: set = set()
@@ -2803,6 +3231,7 @@ class Translator:
 
             def f(e: Any) -> Any:
                 return sub.get(e.name, e) if isinstance(e, Var) else e
+
             pre = [Cmp("=", map_expr(hp, f), arg) for hp, arg in eqs]
             alts.append(pre + [rename_atoms(map_lit_exprs(lit, f), names) for lit in c])
         return alts
@@ -2821,20 +3250,38 @@ class Translator:
         edges: dict[int, set] = {}
         rules = []
         for scope, r in iter_rules(items):
-            hs = [(h, d) for h in r.heads for d in [self.resolve_decl(h.name, scope)] if d is not None]
+            hs = [
+                (h, d)
+                for h in r.heads
+                for d in [self.resolve_decl(h.name, scope)]
+                if d is not None
+            ]
             if not any(d.choice for _, d in hs):
                 pos: list = []
             else:
-                pos = [d for d in (self.resolve_decl(a.name, scope) for a in self.positive_atoms(r.body))
-                       if d is not None]
-            deps = [d for d in (self.resolve_decl(a.name, scope) for a in body_atoms(r.body or []))
-                    if d is not None]
+                pos = [
+                    d
+                    for d in (
+                        self.resolve_decl(a.name, scope)
+                        for a in self.positive_atoms(r.body)
+                    )
+                    if d is not None
+                ]
+            deps = [
+                d
+                for d in (
+                    self.resolve_decl(a.name, scope) for a in body_atoms(r.body or [])
+                )
+                if d is not None
+            ]
             for _, d in hs:
                 edges.setdefault(id(d), set()).update(id(x) for x in deps)
             rules.append((scope, r, hs, pos))
         scc = tarjan_scc(edges)
         self.scc = scc
-        self.rec_sccs = {scc[n] for n, ds in edges.items() for d in ds if scc.get(d) == scc[n]}
+        self.rec_sccs = {
+            scc[n] for n, ds in edges.items() for d in ds if scc.get(d) == scc[n]
+        }
         empty = self.souffle_empty_passes(items)
         groups: dict = {}
         for idx, (scope, r, hs, pos) in enumerate(rules):
@@ -2847,10 +3294,14 @@ class Translator:
         for (k, rec), lst in groups.items():
             lst.sort(key=lambda x: x[0])
             for n, (_, r) in enumerate(lst):
-                self.choice_prio[(r.line, r.sub, k)] = (REC_PRIO if rec else 0) + min(n, REC_PRIO - 1)
+                self.choice_prio[(r.line, r.sub, k)] = (REC_PRIO if rec else 0) + min(
+                    n, REC_PRIO - 1
+                )
                 if n >= REC_PRIO:
-                    self.warn(f"line {r.line}: more than {REC_PRIO} clauses derive a min-choice relation; "
-                              "the later ones share a priority")
+                    self.warn(
+                        f"line {r.line}: more than {REC_PRIO} clauses derive a min-choice relation; "
+                        "the later ones share a priority"
+                    )
 
     def souffle_order_key(self, r: Rule, h: Atom, scope: tuple, empty: dict) -> tuple:
         """Sort key of a clause in Souffle's final clause order of its head
@@ -2869,19 +3320,54 @@ class Translator:
 
         def decl_of(a: Atom) -> RelDecl | None:
             return self.resolve_decl(a.name, scope)
-        deleted = any(isinstance(l, Atom) and (d := decl_of(l)) is not None and id(d) in empty for l in conj)
-        neg_pass = {empty.get(id(d)) for l in conj if isinstance(l, Neg) and (d := decl_of(l.atom)) is not None}
-        kept = [l for l in conj if not (isinstance(l, Neg) and (d := decl_of(l.atom)) is not None
-                                         and empty.get(id(d)) == 1)]
+
+        deleted = any(
+            isinstance(l, Atom) and (d := decl_of(l)) is not None and id(d) in empty
+            for l in conj
+        )
+        neg_pass = {
+            empty.get(id(d))
+            for l in conj
+            if isinstance(l, Neg) and (d := decl_of(l.atom)) is not None
+        }
+        kept = [
+            l
+            for l in conj
+            if not (
+                isinstance(l, Neg)
+                and (d := decl_of(l.atom)) is not None
+                and empty.get(id(d)) == 1
+            )
+        ]
         rounds = sx.get("k", 0)
         for lit in conj:
-            atoms = [lit] if isinstance(lit, Atom) else [lit.atom] if isinstance(lit, Neg) else []
+            atoms = (
+                [lit]
+                if isinstance(lit, Atom)
+                else [lit.atom] if isinstance(lit, Neg) else []
+            )
             for agg in all_aggs_in_lit(lit, []):
                 atoms += list(body_atoms(agg.body))
-            rounds += sum(1 for a in atoms if (d := decl_of(a)) is not None and "inline" in d.quals)
-        return (deleted, 5 in neg_pass, 4 in neg_pass, 3 in neg_pass, 2 in neg_pass,
-                sx_partitioned(h, kept), 1 in neg_pass, bool(sx.get("scbc")), rounds,
-                bool(sx.get("rbc1")), bool(sx.get("ra1")), bool(sx.get("farc")), bool(scope))
+            rounds += sum(
+                1
+                for a in atoms
+                if (d := decl_of(a)) is not None and "inline" in d.quals
+            )
+        return (
+            deleted,
+            5 in neg_pass,
+            4 in neg_pass,
+            3 in neg_pass,
+            2 in neg_pass,
+            sx_partitioned(h, kept),
+            1 in neg_pass,
+            bool(sx.get("scbc")),
+            rounds,
+            bool(sx.get("rbc1")),
+            bool(sx.get("ra1")),
+            bool(sx.get("farc")),
+            bool(scope),
+        )
 
     def souffle_empty_passes(self, items: list) -> dict:
         """id(decl) -> the RemoveEmptyRelations pass (1-5) of Souffle's
@@ -2904,17 +3390,34 @@ class Translator:
                     decls[id(it)] = it
                 elif isinstance(it, Comp):
                     walk(it.items, scope + (it.name,))
+
         walk(items, ())
         clauses: list = []
         for scope, r in iter_rules(items):
-            hs = {id(d) for d in (self.resolve_decl(h.name, scope) for h in r.heads) if d is not None}
+            hs = {
+                id(d)
+                for d in (self.resolve_decl(h.name, scope) for h in r.heads)
+                if d is not None
+            }
             if r.body is None:
                 clauses.append((hs, set()))
                 continue
             body = self.simplify_bools(r.body)
             for conj in souffle_dnf(body) if body is not None else []:
-                clauses.append((hs, {id(d) for d in (self.resolve_decl(l.name, scope) for l in conj
-                                                     if isinstance(l, Atom)) if d is not None}))
+                clauses.append(
+                    (
+                        hs,
+                        {
+                            id(d)
+                            for d in (
+                                self.resolve_decl(l.name, scope)
+                                for l in conj
+                                if isinstance(l, Atom)
+                            )
+                            if d is not None
+                        },
+                    )
+                )
         empty: dict = {}
         alive = clauses
         for p in range(1, 6):
@@ -2946,11 +3449,19 @@ class Translator:
         it ever after.  All reads of a key agree, so the loop computes over a
         single witness per key, as Souffle's choice-domain does; R itself is
         decoded after the loop through the same claims."""
-        return (d is not None and bool(d.choice) and self.is_minchoice(d.name)
-                and self.scc.get(id(d)) in self.rec_sccs)
+        return (
+            d is not None
+            and bool(d.choice)
+            and self.is_minchoice(d.name)
+            and self.scc.get(id(d)) in self.rec_sccs
+        )
 
     def head_sccs(self, heads: list, scope: tuple) -> set:
-        return {self.scc.get(id(d)) for d in (self.resolve_decl(h.name, scope) for h in heads) if d is not None}
+        return {
+            self.scc.get(id(d))
+            for d in (self.resolve_decl(h.name, scope) for h in heads)
+            if d is not None
+        }
 
     def rel_id(self, d: RelDecl) -> int:
         return self.rel_ids.setdefault(id(d), len(self.rel_ids) + 1)
@@ -2965,6 +3476,7 @@ class Translator:
             out.setdefault(comp, []).append(path)
             for sub, c2 in self.comp_inits.get(comp, {}).items():
                 walk(c2, f"{path}.{sub}", depth + 1)
+
         for name, comp in self.global_inits.items():
             walk(comp, name, 0)
         return out
@@ -2982,16 +3494,26 @@ class Translator:
 
     def claim_call(self, d: RelDecl, ck: Any, keys: list) -> Any:
         """`keys` pairs each choice-key argument with its column type."""
-        strs = [Call("to_string", [e]) if self.base_type(t) in NUMERIC_PRIMS else e for e, t in keys]
+        strs = [
+            Call("to_string", [e]) if self.base_type(t) in NUMERIC_PRIMS else e
+            for e, t in keys
+        ]
         n = len(strs)
         if not 1 <= n <= MAX_CLAIM_KEYS:
-            raise TranslateError(f"{d.name}: choice-domain of {n} columns (claims support 1..{MAX_CLAIM_KEYS})")
+            raise TranslateError(
+                f"{d.name}: choice-domain of {n} columns (claims support 1..{MAX_CLAIM_KEYS})"
+            )
         self.claim_arities.add(n)
         return ("claim", n, ck, strs)
 
-    def decode_witness(self, d: RelDecl, inst: Any, claim: tuple, i: int, t: str) -> Any:
+    def decode_witness(
+        self, d: RelDecl, inst: Any, claim: tuple, i: int, t: str
+    ) -> Any:
         _, n, ck, strs = claim
-        e = Call("choice_field", [Call(f"choice_claim{n}", [inst, Num(self.rel_id(d)), ck] + strs), Num(i)])
+        e = Call(
+            "choice_field",
+            [Call(f"choice_claim{n}", [inst, Num(self.rel_id(d)), ck] + strs), Num(i)],
+        )
         return self.decode_field(e, t)
 
     def decode_field(self, e: Any, t: str) -> Any:
@@ -3002,7 +3524,9 @@ class Translator:
             self.need_choice_number = True
             return Call("choice_number", e.args)
         if b in NUMERIC_PRIMS:
-            raise TranslateError(f"choice-domain over a column of type {t} is not supported")
+            raise TranslateError(
+                f"choice-domain over a column of type {t} is not supported"
+            )
         return e
 
     def rewrite_loop_reads(self, r: Rule, scope: tuple) -> Rule:
@@ -3024,6 +3548,7 @@ class Translator:
                         walk(c)
                 else:
                     note(lit)
+
         for h in r.heads:
             note(h)
         for c in r.body:
@@ -3035,12 +3560,22 @@ class Translator:
                 if isinstance(lit, Group):
                     out.append(Group([fix_conj(c) for c in lit.disj]))
                     continue
-                d = self.resolve_decl(lit.name, scope) if isinstance(lit, Atom) else None
-                if isinstance(lit, Atom) and d is not None and self.loop_choice(d) and self.scc.get(id(d)) in hs:
+                d = (
+                    self.resolve_decl(lit.name, scope)
+                    if isinstance(lit, Atom)
+                    else None
+                )
+                if (
+                    isinstance(lit, Atom)
+                    and d is not None
+                    and self.loop_choice(d)
+                    and self.scc.get(id(d)) in hs
+                ):
                     out.extend(self.loop_read(lit, d, occ))
                 else:
                     out.append(lit)
             return out
+
         return Rule(r.heads, [fix_conj(c) for c in r.body], r.line, r.sub, r.sx, r.plan)
 
     def loop_read(self, a: Atom, d: RelDecl, occ: dict) -> list:
@@ -3052,9 +3587,16 @@ class Translator:
         kargs = [(e, t) for (an, t), e in zip(attrs, a.args) if an in keys]
         wits = [(e, t) for (an, t), e in zip(attrs, a.args) if an not in keys]
         mult = [x.name for x in a.args if isinstance(x, Var)]
-        used = [(e, t, i) for i, (e, t) in enumerate(wits)
-                if not isinstance(e, Wild)
-                and not (isinstance(e, Var) and occ.get(e.name, 0) <= 1 and mult.count(e.name) == 1)]
+        used = [
+            (e, t, i)
+            for i, (e, t) in enumerate(wits)
+            if not isinstance(e, Wild)
+            and not (
+                isinstance(e, Var)
+                and occ.get(e.name, 0) <= 1
+                and mult.count(e.name) == 1
+            )
+        ]
         pre: list = []
         new_k: list = []
         for e, t in kargs:
@@ -3097,8 +3639,12 @@ class Translator:
                     continue  # a record is flattened away
                 out.append(Raw(f".type {it.name} = {self.fl_type(it.rhs)}"))
             elif isinstance(it, Functor):
-                params = ", ".join(f"{fl_name(pn)}: {self.fl_prim(pt)}" for pn, pt in it.params)
-                out.append(Raw(f".extern fn {it.name}({params}) -> {self.fl_prim(it.ret)}"))
+                params = ", ".join(
+                    f"{fl_name(pn)}: {self.fl_prim(pt)}" for pn, pt in it.params
+                )
+                out.append(
+                    Raw(f".extern fn {it.name}({params}) -> {self.fl_prim(it.ret)}")
+                )
             elif isinstance(it, RelDecl):
                 out.extend(self.transform_decl(it, scope))
             elif isinstance(it, IODecl):
@@ -3108,13 +3654,22 @@ class Translator:
                     out.append(r)
             elif isinstance(it, Comp):
                 supers = [(sn, [self.fl_type(a) for a in sa]) for sn, sa in it.supers]
-                out.append(Comp(it.name, it.tparams, supers, self.transform_items(it.items, scope + (it.name,))))
+                out.append(
+                    Comp(
+                        it.name,
+                        it.tparams,
+                        supers,
+                        self.transform_items(it.items, scope + (it.name,)),
+                    )
+                )
             elif isinstance(it, Init):
                 rec = [a for a in it.targs if self.is_record_type(a)]
                 if rec:
                     # FlowLog instantiates the component, so its attributes
                     # of that type could not be flattened
-                    raise TranslateError(f".init {it.name}: record type argument {rec[0]} is not supported")
+                    raise TranslateError(
+                        f".init {it.name}: record type argument {rec[0]} is not supported"
+                    )
                 out.append(Init(it.name, it.comp, [self.fl_type(a) for a in it.targs]))
             elif isinstance(it, Override):
                 out.append(it)
@@ -3144,14 +3699,23 @@ class Translator:
         to a file (sqlite; at most one), else the first, stays on it,
         and each other one writes a copy of the relation, `FlowlogOutputN`,
         to the file Souffle writes. Two outputs to one file are refused."""
+
         def file(io: IODecl) -> str | None:
             ps = dict(io.params)
-            return ps.get("filename", io.name + ".csv") if ps.get("IO", "file") == "file" else None
+            return (
+                ps.get("filename", io.name + ".csv")
+                if ps.get("IO", "file") == "file"
+                else None
+            )
 
         outs: dict[str, list] = {}  # relation -> its distinct outputs
         for it in items:
             # check_relations reports the outputs of undeclared relations
-            if isinstance(it, IODecl) and it.kind == ".output" and it.name in self.global_decls:
+            if (
+                isinstance(it, IODecl)
+                and it.kind == ".output"
+                and it.name in self.global_decls
+            ):
                 ios = outs.setdefault(it.name, [])
                 if all(sorted(o.params) != sorted(it.params) for o in ios):
                     ios.append(it)
@@ -3159,24 +3723,40 @@ class Translator:
         for name, ios in outs.items():
             files = [file(o) for o in ios]
             if files.count(None) > 1:
-                raise TranslateError(f".output {name}: two outputs of the relation are not to a file")
+                raise TranslateError(
+                    f".output {name}: two outputs of the relation are not to a file"
+                )
             dup = [f for f in files if f is not None and files.count(f) > 1]
             if dup:
-                raise TranslateError(f".output {name}: two outputs of the relation write '{dup[0]}'")
+                raise TranslateError(
+                    f".output {name}: two outputs of the relation write '{dup[0]}'"
+                )
             keep[name] = ios[files.index(None) if None in files else 0]
         out: list = []
         for it in items:
-            if not (isinstance(it, IODecl) and it.kind == ".output" and it.name in outs) or it is keep[it.name]:
+            if (
+                not (
+                    isinstance(it, IODecl) and it.kind == ".output" and it.name in outs
+                )
+                or it is keep[it.name]
+            ):
                 out.append(it)
             elif any(it is o for o in outs[it.name]):
                 attrs = self.global_decls[it.name].attrs
                 self.output_copies += 1
                 copy = f"FlowlogOutput{self.output_copies}"
-                self.decls[copy] = self.global_decls[copy] = RelDecl(copy, list(attrs), [], [])
+                self.decls[copy] = self.global_decls[copy] = RelDecl(
+                    copy, list(attrs), [], []
+                )
                 vs = [Var(self.fresh("out")) for _ in attrs]
-                params = [(k, v) for k, v in it.params if k != "filename"] + [("filename", file(it))]
-                out += [self.decls[copy], Rule([Atom(copy, vs)], [[Atom(it.name, list(vs))]]),
-                        IODecl(".output", copy, params)]
+                params = [(k, v) for k, v in it.params if k != "filename"] + [
+                    ("filename", file(it))
+                ]
+                out += [
+                    self.decls[copy],
+                    Rule([Atom(copy, vs)], [[Atom(it.name, list(vs))]]),
+                    IODecl(".output", copy, params),
+                ]
             # else it repeats an output of the relation: dropped
         return out
 
@@ -3184,7 +3764,9 @@ class Translator:
         seen = set()
         out = []
         for it in items:
-            if isinstance(it, Raw) and it.text.startswith((".input", ".output", ".printsize")):
+            if isinstance(it, Raw) and it.text.startswith(
+                (".input", ".output", ".printsize")
+            ):
                 if it.text in seen:
                     continue
                 seen.add(it.text)
@@ -3215,39 +3797,69 @@ class Translator:
             raise TranslateError(f"{io.kind} of undeclared relation {io.name}")
         names = [io.name]
         if scope:
-            names = list(dict.fromkeys(self.resolve_at(io.name, p)[1] for p in self.instances[scope[-1]]))
+            names = list(
+                dict.fromkeys(
+                    self.resolve_at(io.name, p)[1] for p in self.instances[scope[-1]]
+                )
+            )
         cols = []
         kind = lambda t: SOUFFLE_KIND.get(self.base_type(t), self.base_type(t))
         for an, at in d.attrs:
             if self.is_record_type(at):
                 flat = self.flat_attrs([(an, at)])
-                cols.append({"attr": an, "kind": "record",
-                             "fl": [fl_name(a) for a, _ in flat],
-                             "fl_kinds": [kind(t) for _, t in flat],
-                             "format": self.record_format(at)})
+                cols.append(
+                    {
+                        "attr": an,
+                        "kind": "record",
+                        "fl": [fl_name(a) for a, _ in flat],
+                        "fl_kinds": [kind(t) for _, t in flat],
+                        "format": self.record_format(at),
+                    }
+                )
             else:
                 cols.append({"attr": an, "kind": kind(at), "fl": [fl_name(an)]})
-        if io_kind == "file" and params.get("delimiter", "\t") != "\t" and any(c["kind"] == "record" for c in cols):
-            raise TranslateError(f"{io.kind} {io.name}: record columns in a file need the tab delimiter")
+        if (
+            io_kind == "file"
+            and params.get("delimiter", "\t") != "\t"
+            and any(c["kind"] == "record" for c in cols)
+        ):
+            raise TranslateError(
+                f"{io.kind} {io.name}: record columns in a file need the tab delimiter"
+            )
         key = "outputs" if io.kind == ".output" else "inputs"
-        lst = (self.schema if io_kind == "sqlite" else self.schema.setdefault("files", {})).setdefault(key, [])
-        suffix = ".sqlite" if io_kind == "sqlite" else ".csv" if key == "outputs" else ".facts"
+        lst = (
+            self.schema if io_kind == "sqlite" else self.schema.setdefault("files", {})
+        ).setdefault(key, [])
+        suffix = (
+            ".sqlite"
+            if io_kind == "sqlite"
+            else ".csv" if key == "outputs" else ".facts"
+        )
         # An input nothing reads cannot affect the results, so the engine
         # creates it empty (Souffle does not load it). CTADL's query declares
         # such inputs with record columns, which a DB written by Souffle
         # cannot supply.
-        unread = (key == "inputs" and self.read_rels is not None
-                  and io.name.split(".")[-1] not in self.read_rels)
+        unread = (
+            key == "inputs"
+            and self.read_rels is not None
+            and io.name.split(".")[-1] not in self.read_rels
+        )
         for name in names:
             if all(e["name"] != name for e in lst):
-                entry = {"name": name, "file": params.get("filename", name + suffix), "columns": cols}
+                entry = {
+                    "name": name,
+                    "file": params.get("filename", name + suffix),
+                    "columns": cols,
+                }
                 if unread:
                     entry["read"] = False
                 lst.append(entry)
 
     def transform_io(self, io: IODecl) -> Raw | None:
         if io.kind == ".limitsize":
-            raise TranslateError(f".limitsize {io.name} is not supported (it truncates the relation)")
+            raise TranslateError(
+                f".limitsize {io.name} is not supported (it truncates the relation)"
+            )
         if io.name.split(".")[-1] in self.dropped_rels:
             return None
         if io.kind == ".printsize":
@@ -3269,7 +3881,9 @@ class Translator:
             return [Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}")]
         pol = self.choice_pol(d.name)
         if len(d.choice) != 1:
-            raise TranslateError(f"relation {d.name}: multiple choice-domains not supported")
+            raise TranslateError(
+                f"relation {d.name}: multiple choice-domains not supported"
+            )
         if pol == "drop":
             self.warn(f"{d.name}: choice-domain dropped (policy=drop)")
             return [Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}")]
@@ -3278,23 +3892,35 @@ class Translator:
             keys = self.choice_keys(d)
             deps = [a for a, _ in attrs if a not in keys]
             if deps != [col] or attrs[-1][0] != col:
-                raise TranslateError(f"{d.name}: min policy needs the single dependent column last")
+                raise TranslateError(
+                    f"{d.name}: min policy needs the single dependent column last"
+                )
             base = self.base_type(attrs[-1][1])
             if base not in NUMERIC_PRIMS:
-                raise TranslateError(f"{d.name}: min policy needs a numeric dependent column")
+                raise TranslateError(
+                    f"{d.name}: min policy needs a numeric dependent column"
+                )
             new_attrs = [(a, t) if a != col else (a, f"min<{base}>") for a, t in attrs]
-            self.warn(f"{d.name}: choice-domain replaced by min<{attrs[-1][1]}> lattice on {col}")
+            self.warn(
+                f"{d.name}: choice-domain replaced by min<{attrs[-1][1]}> lattice on {col}"
+            )
             return [Raw(f".decl {d.name}({self.fmt_attrs(new_attrs)}){qtxt}")]
         if pol in MINCHOICE_POLICIES:
             keys = self.choice_keys(d)
             key_attrs = [(a, t) for a, t in attrs if a in keys]
             dep_attrs = [(a, t) for a, t in attrs if a not in keys]
             if not 1 <= len(dep_attrs) <= 4:
-                raise TranslateError(f"{d.name}: minchoice supports 1..4 dependent columns")
-            self.warn(f"{d.name}: choice-domain encoded as min-choice over {[a for a, _ in dep_attrs]}")
+                raise TranslateError(
+                    f"{d.name}: minchoice supports 1..4 dependent columns"
+                )
+            self.warn(
+                f"{d.name}: choice-domain encoded as min-choice over {[a for a, _ in dep_attrs]}"
+            )
             cname = f"{d.name}_choice"
             if self.resolve_decl(cname, scope) is not None:
-                raise TranslateError(f"relation name {cname} is reserved for the choice-domain of {d.name}")
+                raise TranslateError(
+                    f"relation name {cname} is reserved for the choice-domain of {d.name}"
+                )
             # the decode rule's variables are the attribute names, and `ck`
             attr_names = {fl_name(a) for a, _ in attrs}
             self.taken |= attr_names
@@ -3304,7 +3930,9 @@ class Translator:
             ck_var = Var(ck_name)
             out: list = [
                 Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}"),
-                Raw(f".decl {cname}({self.fmt_attrs(key_attrs + [(ck_name, 'min<int64>')])})"),
+                Raw(
+                    f".decl {cname}({self.fmt_attrs(key_attrs + [(ck_name, 'min<int64>')])})"
+                ),
             ]
             # decode rule; a relation read inside its own loop decodes the
             # witnesses its reads claimed there (see loop_choice)
@@ -3314,7 +3942,9 @@ class Translator:
             if self.loop_choice(d):
                 inst, extra = self.claim_tag(d, "")
                 body += extra
-                claim = self.claim_call(d, ck_var, [(Var(fl_name(a)), t) for a, t in key_attrs])
+                claim = self.claim_call(
+                    d, ck_var, [(Var(fl_name(a)), t) for a, t in key_attrs]
+                )
             head_args = []
             dep_idx = 0
             for a, t in attrs:
@@ -3324,7 +3954,9 @@ class Translator:
                 if self.loop_choice(d):
                     getter = self.decode_witness(d, inst, claim, dep_idx, t)
                 else:
-                    getter = self.decode_field(Call("choice_field", [ck_var, Num(dep_idx)]), t)
+                    getter = self.decode_field(
+                        Call("choice_field", [ck_var, Num(dep_idx)]), t
+                    )
                 dep_idx += 1
                 head_args.append(getter)
             out.append(Rule([Atom(d.name, head_args)], [body]))
@@ -3334,8 +3966,20 @@ class Translator:
                 # reads it; the claimed key is already a candidate, so this
                 # never changes the lattice
                 _, n, ck, strs = claim
-                forced = Call(f"choice_claim{n}", [inst, Num(self.rel_id(d)), ck] + strs)
-                out.append(Rule([Atom(cname, [Var(fl_name(a)) for a, _ in key_attrs] + [forced])], [body]))
+                forced = Call(
+                    f"choice_claim{n}", [inst, Num(self.rel_id(d)), ck] + strs
+                )
+                out.append(
+                    Rule(
+                        [
+                            Atom(
+                                cname,
+                                [Var(fl_name(a)) for a, _ in key_attrs] + [forced],
+                            )
+                        ],
+                        [body],
+                    )
+                )
             return out
         raise TranslateError(f"{d.name}: unknown choice policy {pol!r}")
 
@@ -3343,8 +3987,10 @@ class Translator:
         names = [fl_name(a) for a, _ in attrs]
         dup = sorted({n for n in names if names.count(n) > 1})
         if dup:
-            raise TranslateError(f"two attributes are both spelled `{dup[0]}` once records are flattened "
-                                 "and names are spelled for FlowLog")
+            raise TranslateError(
+                f"two attributes are both spelled `{dup[0]}` once records are flattened "
+                "and names are spelled for FlowLog"
+            )
         res = []
         for a, t in attrs:
             if t.startswith("min<") or t.startswith("max<"):
@@ -3359,8 +4005,14 @@ class Translator:
         program): one it declares, or one reached through its `.init`s."""
         parts = name.split(".")
         if len(parts) == 1:
-            return (self.comp_decls.get(owner, {}) if owner is not None else self.global_decls).get(name)
-        cur = (self.comp_inits.get(owner, {}) if owner is not None else self.global_inits).get(parts[0])
+            return (
+                self.comp_decls.get(owner, {})
+                if owner is not None
+                else self.global_decls
+            ).get(name)
+        cur = (
+            self.comp_inits.get(owner, {}) if owner is not None else self.global_inits
+        ).get(parts[0])
         for inst in parts[1:-1]:
             if cur is None:
                 return None
@@ -3403,12 +4055,18 @@ class Translator:
         if any(x is None for x in ds):
             return None
         if any(x is not d for x in ds):
-            raise TranslateError(f"{name} in component {comp} names different relations in its instances "
-                                 "(not supported)")
-        if d is not self.resolve_in(name, None) and (d.choice or any(at in self.tparams for _, at in d.attrs)):
+            raise TranslateError(
+                f"{name} in component {comp} names different relations in its instances "
+                "(not supported)"
+            )
+        if d is not self.resolve_in(name, None) and (
+            d.choice or any(at in self.tparams for _, at in d.attrs)
+        ):
             # the claims and the type arguments follow the owning instance
-            raise TranslateError(f"{name} in component {comp} names a relation of an enclosing instance "
-                                 "with a choice-domain or a type parameter (not supported)")
+            raise TranslateError(
+                f"{name} in component {comp} names a relation of an enclosing instance "
+                "with a choice-domain or a type parameter (not supported)"
+            )
         return d
 
     def check_relations(self, items: list) -> None:
@@ -3416,13 +4074,16 @@ class Translator:
         an atom of the wrong arity.  So does the translation, before passes
         that drop clauses could hide one from FlowLog.  Uninstantiated
         components are skipped, as Souffle never resolves their names."""
+
         def check(a: Atom, scope: tuple, line: int) -> None:
             d = self.resolve_decl(a.name, scope)
             if d is None:
                 raise TranslateError(f"line {line}: undefined relation {a.name}")
             if len(a.args) != len(d.attrs):
-                raise TranslateError(f"line {line}: mismatching arity of relation {a.name} "
-                                     f"(expected {len(d.attrs)}, got {len(a.args)})")
+                raise TranslateError(
+                    f"line {line}: mismatching arity of relation {a.name} "
+                    f"(expected {len(d.attrs)}, got {len(a.args)})"
+                )
 
         def walk(its: list, scope: tuple) -> None:
             for it in its:
@@ -3435,8 +4096,11 @@ class Translator:
                             check(a, scope, it.line)
                     for a in body_atoms(it.body or []):
                         check(a, scope, it.line)
-                elif isinstance(it, IODecl) and self.resolve_decl(it.name, scope) is None:
+                elif (
+                    isinstance(it, IODecl) and self.resolve_decl(it.name, scope) is None
+                ):
                     raise TranslateError(f"{it.kind} of undefined relation {it.name}")
+
         walk(items, ())
 
     def decl_attr_types(self, d: RelDecl, name: str, scope: tuple) -> list:
@@ -3447,10 +4111,18 @@ class Translator:
         parameters; inside a component its own parameters stay unknown."""
         parts = name.split(".")
         comp = scope[-1] if scope else None
-        owner = comp if comp is not None and parts[0] in self.comp_inits.get(comp, {}) else None
+        owner = (
+            comp
+            if comp is not None and parts[0] in self.comp_inits.get(comp, {})
+            else None
+        )
         sub: dict = {}
         for inst in parts[:-1]:
-            target = (self.comp_inits.get(owner, {}) if owner is not None else self.global_inits).get(inst)
+            target = (
+                self.comp_inits.get(owner, {})
+                if owner is not None
+                else self.global_inits
+            ).get(inst)
             if target is None:
                 return list(d.attrs)
             targs = [sub.get(a, a) for a in self.init_targs.get((owner, inst), [])]
@@ -3469,10 +4141,16 @@ class Translator:
             split = self.alias_constants(heads, body, scope, r.line)
             if split is not None:
                 if r.sub is not None and len(split) > 1:
-                    raise TranslateError(f"line {r.line}: a choice clause with a disjunction is not supported here")
+                    raise TranslateError(
+                        f"line {r.line}: a choice clause with a disjunction is not supported here"
+                    )
                 out: list = []
                 for hs, conj in split:
-                    out.extend(self.transform_rule(Rule(hs, [conj], r.line, r.sub, r.sx, r.plan), scope)[0])
+                    out.extend(
+                        self.transform_rule(
+                            Rule(hs, [conj], r.line, r.sub, r.sx, r.plan), scope
+                        )[0]
+                    )
                 return out, []
         types = self.decl_var_types(heads, body or [], scope, r.line)
         self.check_casts(heads + [lit for c in body or [] for lit in c], types, r.line)
@@ -3502,8 +4180,10 @@ class Translator:
             for lit in c:
                 lit_vars(lit, left)
         if recs & left:
-            raise TranslateError(f"line {r.line}: record variable `{sorted(recs & left)[0]}` is used "
-                                 "other than as an atom argument or in a record equality")
+            raise TranslateError(
+                f"line {r.line}: record variable `{sorted(recs & left)[0]}` is used "
+                "other than as an atom argument or in a record equality"
+            )
         if body is not None:
             body = self.drop_self_eq(body)
             body, helpers = self.rewrite_ranges(body, scope, types)
@@ -3513,9 +4193,14 @@ class Translator:
 
         def no_range(e):
             if isinstance(e, Call) and e.name == "range":
-                raise TranslateError(f"line {r.line}: range is supported only as `v = range(lo, hi)` in a rule body")
+                raise TranslateError(
+                    f"line {r.line}: range is supported only as `v = range(lo, hi)` in a rule body"
+                )
             return e
-        rules = [Rule(heads, body, r.line, r.sub, r.sx, r.plan)] + [h for h in helpers if isinstance(h, Rule)]
+
+        rules = [Rule(heads, body, r.line, r.sub, r.sx, r.plan)] + [
+            h for h in helpers if isinstance(h, Rule)
+        ]
         for x in rules:
             for h in x.heads:
                 deep_map_lit(h, no_range)
@@ -3536,7 +4221,9 @@ class Translator:
         if body is not None:
             body = self.scope_aggregates(body, r.heads, r.line)
             body = self.lift_atom_args(body)
-        items = self.split_computed_negations(Rule(r.heads, body, r.line, r.sub, r.sx, r.plan), scope)
+        items = self.split_computed_negations(
+            Rule(r.heads, body, r.line, r.sub, r.sx, r.plan), scope
+        )
         out: list = []
         for it in items:
             if not isinstance(it, Rule):
@@ -3556,7 +4243,9 @@ class Translator:
                     body = [[Atom(UNIT_REL, [Wild()])]]
             else:
                 # FlowLog rejects a conjunction reading no relation
-                anchored = [c if has_source(c) else [Atom(UNIT_REL, [Wild()])] + c for c in body]
+                anchored = [
+                    c if has_source(c) else [Atom(UNIT_REL, [Wild()])] + c for c in body
+                ]
                 self.need_unit |= anchored != body
                 body = anchored
             sub = self.spell_vars(heads, body)
@@ -3564,7 +4253,9 @@ class Translator:
                 heads = [subst_lit(h, sub) for h in heads]
                 if body is not None:
                     body = [[subst_lit(l, sub) for l in c] for c in body]
-            out.append(Rule(heads, body, it.line, it.sub, it.sx, self.flowlog_plan(it, body)))
+            out.append(
+                Rule(heads, body, it.line, it.sub, it.sx, self.flowlog_plan(it, body))
+            )
         return out
 
     def note_plan_atoms(self, items: list) -> None:
@@ -3587,11 +4278,15 @@ class Translator:
             return None
         atoms = plan_atoms(flowlog_clauses(body)) if body is not None else None
         if atoms is None or p.atoms is None or atoms != p.atoms:
-            self.warn(f"line {r.line}: .plan dropped (the translated rule reads other atoms)")
+            self.warn(
+                f"line {r.line}: .plan dropped (the translated rule reads other atoms)"
+            )
             return None
         order = p.orders[0]
         if sorted(order) != list(range(1, len(atoms) + 1)):
-            self.warn(f"line {r.line}: .plan dropped (version 0 does not order the rule's {len(atoms)} atoms)")
+            self.warn(
+                f"line {r.line}: .plan dropped (version 0 does not order the rule's {len(atoms)} atoms)"
+            )
             return None
         return order
 
@@ -3679,21 +4374,29 @@ class Translator:
                     for c2 in lit.disj:
                         for l2 in c2:
                             if isinstance(l2, Neg) and any(
-                                isinstance(a, Var) and kind.get(a.name) == "computed" for a in l2.atom.args
+                                isinstance(a, Var) and kind.get(a.name) == "computed"
+                                for a in l2.atom.args
                             ):
-                                raise TranslateError(f"line {r.line}: negation over a computed value inside a disjunction")
+                                raise TranslateError(
+                                    f"line {r.line}: negation over a computed value inside a disjunction"
+                                )
             for agg in [a for lit in conj for a in all_aggs_in_lit(lit, [])]:
                 for l2 in agg.body[0]:
                     if isinstance(l2, Atom) and any(
-                        isinstance(a, Var) and kind.get(a.name) == "computed" for a in l2.args
+                        isinstance(a, Var) and kind.get(a.name) == "computed"
+                        for a in l2.args
                     ):
-                        raise TranslateError(f"line {r.line}: aggregate atom over a computed value")
+                        raise TranslateError(
+                            f"line {r.line}: aggregate atom over a computed value"
+                        )
             (split if bad else keep).append((conj, bad))
         if not split:
             return [r]
         items: list = []
         if keep:
-            items.append(Rule(r.heads, [c for c, _ in keep], r.line, r.sub, r.sx, r.plan))
+            items.append(
+                Rule(r.heads, [c for c, _ in keep], r.line, r.sub, r.sx, r.plan)
+            )
         for conj, bad in split:
             pre = [lit for i, lit in enumerate(conj) if i not in bad]
             negs = [conj[i] for i in bad]
@@ -3714,13 +4417,27 @@ class Translator:
             types = self.infer_var_types(pre, scope)
             missing = [v for v in need if v not in types]
             if missing:
-                raise TranslateError(f"line {r.line}: cannot infer the type of {missing}")
+                raise TranslateError(
+                    f"line {r.line}: cannot infer the type of {missing}"
+                )
             name = f"NegPre{self.fresh('')}"
-            attrs = ", ".join(f"c{i}: {self.fl_type(types[v])}" for i, v in enumerate(need))
+            attrs = ", ".join(
+                f"c{i}: {self.fl_type(types[v])}" for i, v in enumerate(need)
+            )
             items.append(Raw(f".decl {name}({attrs})"))
             # the positive part keeps the source's atoms, and so its `.plan`
-            items.append(Rule([Atom(name, [Var(v) for v in need])], [pre], r.line, plan=r.plan))
-            items.append(Rule(r.heads, [[Atom(name, [Var(v) for v in need])] + negs], r.line, r.sub, r.sx))
+            items.append(
+                Rule([Atom(name, [Var(v) for v in need])], [pre], r.line, plan=r.plan)
+            )
+            items.append(
+                Rule(
+                    r.heads,
+                    [[Atom(name, [Var(v) for v in need])] + negs],
+                    r.line,
+                    r.sub,
+                    r.sx,
+                )
+            )
         return items
 
     def infer_var_types(self, conj: list, scope: tuple) -> dict:
@@ -3770,7 +4487,9 @@ class Translator:
             d = self.resolve_decl(name[: -len("_choice")], scope)
             if d is not None and d.choice and self.is_minchoice(d.name):
                 keys = self.choice_keys(d)
-                attrs = self.flat_attrs(self.decl_attr_types(d, name[: -len("_choice")], scope))
+                attrs = self.flat_attrs(
+                    self.decl_attr_types(d, name[: -len("_choice")], scope)
+                )
                 return [t for a, t in attrs if a in keys] + ["int64"]
         return []
 
@@ -3782,7 +4501,9 @@ class Translator:
         if isinstance(e, Str):
             return "symbol"
         if isinstance(e, Num):
-            return None if not lit else "float" if isinstance(e.val, float) else "number"
+            return (
+                None if not lit else "float" if isinstance(e.val, float) else "number"
+            )
         if isinstance(e, Cast):
             return e.ty
         if isinstance(e, Un):
@@ -3790,7 +4511,9 @@ class Translator:
         if isinstance(e, Agg):
             if e.kind == "count":
                 return "number"
-            return self.expr_type(e.target, env, lit) if e.target is not None else "number"
+            return (
+                self.expr_type(e.target, env, lit) if e.target is not None else "number"
+            )
         if isinstance(e, Bin):
             # a literal takes the other operand's type: `u / 2` is unsigned
             for x in sorted((e.l, e.r), key=literal_expr):
@@ -3820,21 +4543,30 @@ class Translator:
             return e.op
         if b == PRIM_TYPES["unsigned"] and e.op in ("/", "%"):
             return "u" + e.op
-        raise TranslateError(f"line {line}: operator {e.op} over type {t} is not supported")
+        raise TranslateError(
+            f"line {line}: operator {e.op} over type {t} is not supported"
+        )
 
-    def type_context_partials(self, heads: list, body: list | None, types: dict, scope: tuple, line: int):
+    def type_context_partials(
+        self, heads: list, body: list | None, types: dict, scope: tuple, line: int
+    ):
         """Souffle types a `/`, `%` or `^` whose operands have no type of
         their own (literals) by its context, as other arithmetic: with u
         unsigned, `u > (0 - 1) / 2` divides unsigned.  partial_port reads the
         operands only, so such an operation in an unsigned context is
         respelled `u/` or `u%` here; in other contexts but number (`^` on
         unsigned, a type parameter) it is rejected, as partial_port does."""
+
         def own(e):
             return self.expr_type(e, types, lit=False)
 
         def needed(e):
             return isinstance(e, Bin) and e.op in ("/", "%", "^") and own(e) is None
-        if not any(collect_exprs(lit, needed, []) for lit in heads + [l1 for c in body or [] for l1 in c]):
+
+        if not any(
+            collect_exprs(lit, needed, [])
+            for lit in heads + [l1 for c in body or [] for l1 in c]
+        ):
             return heads, body
 
         def expr(e, t):
@@ -3849,7 +4581,9 @@ class Translator:
                     if b == PRIM_TYPES["unsigned"] and e.op != "^":
                         return Bin("u" + e.op, expr(e.l, t), expr(e.r, t))
                     if b != NUMBER:
-                        raise TranslateError(f"line {line}: operator {e.op} over type {t} is not supported")
+                        raise TranslateError(
+                            f"line {line}: operator {e.op} over type {t} is not supported"
+                        )
                 return Bin(e.op, expr(e.l, t), expr(e.r, t))
             if isinstance(e, Un):
                 return Un(e.op, expr(e.e, t))
@@ -3861,7 +4595,9 @@ class Translator:
                 else:
                     ts = []
                 ts += [None] * (len(e.args) - len(ts))
-                return Call(e.name, [arg(a, pt) for a, pt in zip(e.args, ts)], e.functor)
+                return Call(
+                    e.name, [arg(a, pt) for a, pt in zip(e.args, ts)], e.functor
+                )
             if isinstance(e, Rec):
                 return Rec([expr(x, None) for x in e.elems])
             if isinstance(e, Cast):
@@ -3873,7 +4609,11 @@ class Translator:
 
         def arg(e, t):
             fields = self.safe_record_fields(t)
-            if isinstance(e, Rec) and fields is not None and len(fields) == len(e.elems):
+            if (
+                isinstance(e, Rec)
+                and fields is not None
+                and len(fields) == len(e.elems)
+            ):
                 return Rec([arg(x, ft) for x, (_, ft) in zip(e.elems, fields)])
             return expr(e, t)
 
@@ -3897,6 +4637,7 @@ class Translator:
             if isinstance(x, Group):
                 return Group([[lit(l2) for l2 in c] for c in x.disj])
             return x
+
         heads = [atom(h) for h in heads]
         if body is not None:
             body = [[lit(l1) for l1 in c] for c in body]
@@ -3926,8 +4667,18 @@ class Translator:
                     t = self.expr_type(e.args[0], types)
                     if t is not None and self.base_type(t) == PRIM_TYPES["symbol"]:
                         return e.args[0]
-                if e.name in ("min", "max", "lnot", "bnot", "to_unsigned", "to_float", "autoinc"):
-                    raise TranslateError(f"builtin {e.name} is not supported by FlowLog")
+                if e.name in (
+                    "min",
+                    "max",
+                    "lnot",
+                    "bnot",
+                    "to_unsigned",
+                    "to_float",
+                    "autoinc",
+                ):
+                    raise TranslateError(
+                        f"builtin {e.name} is not supported by FlowLog"
+                    )
                 if e.name in SOUFFLE_UDFS:
                     self.souffle_udfs.add(e.name)
                     return Call(SOUFFLE_UDFS[e.name][0], e.args)
@@ -3952,9 +4703,20 @@ class Translator:
                 raise TranslateError(f"unary {e.op} not supported")
             if isinstance(e, Nil):
                 raise TranslateError("nil records are not supported")
-            if isinstance(e, Bin) and e.op not in ("+", "-", "*", "band", "bor", "bxor", "bshl", "bshr", "bshru"):
+            if isinstance(e, Bin) and e.op not in (
+                "+",
+                "-",
+                "*",
+                "band",
+                "bor",
+                "bxor",
+                "bshl",
+                "bshr",
+                "bshru",
+            ):
                 raise TranslateError(f"operator {e.op} not supported")
             return e
+
         return f
 
     def map_body(self, body: list, f) -> list:
@@ -3967,6 +4729,7 @@ class Translator:
                 nb = self.rewrite_agg_bodies(nb, f)
                 return Agg(e.kind, e.target, nb)
             return e
+
         return self.map_body(body, lambda lit: map_lit_exprs(lit, g))
 
     def map_atoms(self, body: list, f) -> list:
@@ -3983,6 +4746,7 @@ class Translator:
             if isinstance(e, Agg):
                 return Agg(e.kind, e.target, self.map_atoms(e.body, f))
             return e
+
         body = [[lit_f(lit) for lit in conj] for conj in body]
         return self.map_body(body, lambda lit: map_lit_exprs(lit, agg_f))
 
@@ -4010,7 +4774,11 @@ class Translator:
 
     def safe_record_fields(self, t: str | None) -> list | None:
         try:
-            return self.record_fields(t) if t is not None and self.is_record_type(t) else None
+            return (
+                self.record_fields(t)
+                if t is not None and self.is_record_type(t)
+                else None
+            )
         except TranslateError:
             return None
 
@@ -4018,6 +4786,7 @@ class Translator:
         """Whether a rule may compute on `unsigned`: an atom (at any depth)
         has a column of that base type or of a component type parameter, or
         a cast or functor names such a type."""
+
         def maybe(t):
             if self.int_prim(t) == PRIM_TYPES["unsigned"]:
                 return True
@@ -4026,6 +4795,7 @@ class Translator:
             except TranslateError:
                 return False
             return isinstance(b, str) and b in self.tparams
+
         found: list = []
 
         def probe(e):
@@ -4036,13 +4806,20 @@ class Translator:
                 if maybe(fn.ret) or any(maybe(t) for _, t in fn.params):
                     found.append(e)
             return e
+
         for lit in heads + [l1 for c in body for l1 in c]:
-            if any(maybe(t) for a in lit_atoms(lit) for t in self.atom_col_types(a.name, scope)):
+            if any(
+                maybe(t)
+                for a in lit_atoms(lit)
+                for t in self.atom_col_types(a.name, scope)
+            ):
                 return True
             deep_map_lit(lit, probe)
         return bool(found)
 
-    def alias_constants(self, heads: list, body: list, scope: tuple, line: int) -> list | None:
+    def alias_constants(
+        self, heads: list, body: list, scope: tuple, line: int
+    ) -> list | None:
         """Souffle's ResolveAliases replaces a variable equated to a constant
         expression by that expression before it types the clause, so each
         copy takes its type from where it lands: in `A(x) :- x = 3, x - 10 <
@@ -4064,12 +4841,19 @@ class Translator:
             sub = self.alias_constants_conj(heads, conj, scope, line)
             if sub:
                 changed = True
-                out.append(([subst_lit(h, sub) for h in heads], [subst_lit(l1, sub) for l1 in conj]))
+                out.append(
+                    (
+                        [subst_lit(h, sub) for h in heads],
+                        [subst_lit(l1, sub) for l1 in conj],
+                    )
+                )
             else:
                 out.append((heads, conj))
         return out if changed else None
 
-    def alias_constants_conj(self, heads: list, conj: list, scope: tuple, line: int) -> dict:
+    def alias_constants_conj(
+        self, heads: list, conj: list, scope: tuple, line: int
+    ) -> dict:
         """The substitution of the variables Souffle surely replaces by a
         constant expression in this clause of a rule (see alias_constants).
 
@@ -4097,7 +4881,11 @@ class Translator:
                     out.update(x.name for x in rec.elems if isinstance(x, Var))
 
         def pair(l, r):
-            if isinstance(l, Rec) and isinstance(r, Rec) and len(l.elems) == len(r.elems):
+            if (
+                isinstance(l, Rec)
+                and isinstance(r, Rec)
+                and len(l.elems) == len(r.elems)
+            ):
                 for a, b in zip(l.elems, r.elems):
                     pair(a, b)
             elif l != r:
@@ -4118,6 +4906,7 @@ class Translator:
                 for agg in all_aggs_in_lit(lit, []):
                     for c in agg.body:
                         walk(c, False)
+
         walk(conj, True)
         if not eqs:
             return {}
@@ -4129,15 +4918,24 @@ class Translator:
                 parent[v] = parent[parent[v]]
                 v = parent[v]
             return v
+
         for l, r in eqs:
             if isinstance(l, Var) and isinstance(r, Var):
                 parent[find(l.name)] = find(r.name)
         defs: dict = {}
         for l, r in eqs:
             for v, t in ((l, r), (r, l)):
-                if (isinstance(v, Var) and not isinstance(t, Var) and v.name not in expr_vars(t, set())
-                        and not isinstance(t, Agg)
-                        and not (isinstance(t, Call) and not t.functor and t.name in SX_GENERATORS)):
+                if (
+                    isinstance(v, Var)
+                    and not isinstance(t, Var)
+                    and v.name not in expr_vars(t, set())
+                    and not isinstance(t, Agg)
+                    and not (
+                        isinstance(t, Call)
+                        and not t.functor
+                        and t.name in SX_GENERATORS
+                    )
+                ):
                     d = defs.setdefault(find(v.name), [])
                     if t not in d:
                         d.append(t)
@@ -4169,6 +4967,7 @@ class Translator:
                         ok.add(c)
                         grew = True
             return ok
+
         # the classes surely replaced, and those that may be
         pure = lfp([c for c in defs if not members[c] & bound], all)
         consts = lfp([c for c in defs if not members[c] <= top], any)
@@ -4178,7 +4977,8 @@ class Translator:
                 raise TranslateError(
                     f"line {line}: `{v}` is equated to several expressions ({', '.join(sx_text(t) for t in defs[c])}); "
                     "Souffle keeps one, chosen by the order of the equalities, and types its copies by where "
-                    "they land — equate it to one only")
+                    "they land — equate it to one only"
+                )
         memo: dict = {}
 
         def res(t):
@@ -4189,15 +4989,25 @@ class Translator:
                         memo[c] = res(defs[c][0])
                     return memo[c]
                 return x
+
             return map_expr(t, f)
+
         kvars = {m for c in consts for m in members[c]}
         risky = {m for c in consts - pure for m in members[c]}
         if risky:
             self.check_alias_uses(heads, conj, scope, line, kvars, risky, res)
         return {m: res(Var(m)) for c in pure for m in sorted(members[c])}
 
-    def check_alias_uses(self, heads: list, conj: list, scope: tuple, line: int,
-                         kvars: set, risky: set, res) -> None:
+    def check_alias_uses(
+        self,
+        heads: list,
+        conj: list,
+        scope: tuple,
+        line: int,
+        kvars: set,
+        risky: set,
+        res,
+    ) -> None:
         """Rejects a use of a `risky` variable (one Souffle may or may not
         replace by its constant, see alias_constants_conj) that is typed by
         nothing but variables of `kvars` (those it may replace) and constants,
@@ -4223,7 +5033,9 @@ class Translator:
                 for a in e.args:
                     scan(a, u)
             elif not isinstance(e, (Num, Wild)):
-                u[1] = True  # a string, cast, call, record or aggregate has a type of its own
+                u[1] = (
+                    True  # a string, cast, call, record or aggregate has a type of its own
+                )
                 if isinstance(e, Agg):
                     if e.target is not None:
                         unit(e.target, False, e.kind in ("min", "max"))
@@ -4232,7 +5044,11 @@ class Translator:
                             visit(l2)
                 elif isinstance(e, Call):
                     for a in e.args:
-                        unit(a, e.functor or e.name in TYPED_PARAM_BUILTINS, e.name != "ord")
+                        unit(
+                            a,
+                            e.functor or e.name in TYPED_PARAM_BUILTINS,
+                            e.name != "ord",
+                        )
                 else:
                     for k in expr_children(e):
                         unit(k, isinstance(e, Rec), not isinstance(e, Cast))
@@ -4247,7 +5063,13 @@ class Translator:
                 for a in (lit.atom if isinstance(lit, Neg) else lit).args:
                     unit(a, True, False)
             elif isinstance(lit, Cmp):
-                u = [set(), False, lit.op not in ("=", "!="), (lit.l, lit.r) if lit.op == "=" else None, lit]
+                u = [
+                    set(),
+                    False,
+                    lit.op not in ("=", "!="),
+                    (lit.l, lit.r) if lit.op == "=" else None,
+                    lit,
+                ]
                 scan(lit.l, u)
                 scan(lit.r, u)
                 units.append(u)
@@ -4258,6 +5080,7 @@ class Translator:
                 for c in lit.disj:
                     for l2 in c:
                         visit(l2)
+
         for lit in heads + conj:
             visit(lit)
         try:
@@ -4271,13 +5094,17 @@ class Translator:
             if hit:
                 v = hit[0]
                 t = types.get(v) or "an unknown type"
-                text = (f"{sx_text(what.l)} {what.op} {sx_text(what.r)}" if isinstance(what, Cmp)
-                        else sx_text(what))
+                text = (
+                    f"{sx_text(what.l)} {what.op} {sx_text(what.r)}"
+                    if isinstance(what, Cmp)
+                    else sx_text(what)
+                )
                 raise TranslateError(
                     f"line {line}: Souffle computes `{text}` on {t} or on number, as its alias resolution "
                     f"leaves `{v}` or replaces it by its constant {sx_text(res(Var(v)))} (which depends on "
                     "the order of the equalities and on aggregate materialization); write the constant or "
-                    f"an atom-bound variable in place of `{v}` there")
+                    f"an atom-bound variable in place of `{v}` there"
+                )
 
     def fold_constants(self, heads: list, body: list | None, scope: tuple, line: int):
         """Evaluates the rule's integer constant expressions as Souffle does,
@@ -4310,10 +5137,21 @@ class Translator:
             if isinstance(e, Call):
                 if e.name == "to_string":
                     a = e.args[0]
-                    return Call(e.name, [fold(a, ctype(a) or (NUMBER if literal_expr(a) else None), env)],
-                                e.functor)
+                    return Call(
+                        e.name,
+                        [
+                            fold(
+                                a,
+                                ctype(a) or (NUMBER if literal_expr(a) else None),
+                                env,
+                            )
+                        ],
+                        e.functor,
+                    )
                 ps = [p] * len(e.args) if e.name == "range" else self.param_prims(e)
-                return Call(e.name, [fold(a, q, env) for a, q in zip(e.args, ps)], e.functor)
+                return Call(
+                    e.name, [fold(a, q, env) for a, q in zip(e.args, ps)], e.functor
+                )
             if isinstance(e, Bin):
                 p = p or ctype(e)
                 v = evaluate(e, p, env)
@@ -4326,8 +5164,14 @@ class Translator:
 
         def typed_fold(e, t, env):
             fields = self.safe_record_fields(t)
-            if isinstance(e, Rec) and fields is not None and len(fields) == len(e.elems):
-                return Rec([typed_fold(x, ft, env) for x, (_, ft) in zip(e.elems, fields)])
+            if (
+                isinstance(e, Rec)
+                and fields is not None
+                and len(fields) == len(e.elems)
+            ):
+                return Rec(
+                    [typed_fold(x, ft, env) for x, (_, ft) in zip(e.elems, fields)]
+                )
             return fold(e, self.int_prim(t), env)
 
         def fold_atom(a, env):
@@ -4350,15 +5194,25 @@ class Translator:
                 if a.kind in ("count", "sum"):
                     return Num(0)
                 raise EmptyAggregate()
-            target = None if a.target is None else fold(a.target, ctype(a.target), inner)
+            target = (
+                None if a.target is None else fold(a.target, ctype(a.target), inner)
+            )
             return Agg(a.kind, target, folded)
 
         def fold_cmp_lit(c, env, is_def):
-            p = ctype(c.l) or ctype(c.r) or (NUMBER if literal_expr(c.l) and literal_expr(c.r) else None)
+            p = (
+                ctype(c.l)
+                or ctype(c.r)
+                or (NUMBER if literal_expr(c.l) and literal_expr(c.r) else None)
+            )
             sides = []
             for x, y in ((c.l, c.r), (c.r, c.l)):
                 t = certain.get(y.name) if isinstance(y, Var) else None
-                sides.append(typed_fold(x, t, env) if self.safe_record_fields(t) is not None else fold(x, p, env))
+                sides.append(
+                    typed_fold(x, t, env)
+                    if self.safe_record_fields(t) is not None
+                    else fold(x, p, env)
+                )
             l, r = sides
             if not is_def:
                 vl, vr = evaluate(l, p, env), evaluate(r, p, env)
@@ -4375,7 +5229,9 @@ class Translator:
                 if isinstance(lit, Cmp):
                     return fold_cmp_lit(lit, env, is_def)
                 if isinstance(lit, Pred):
-                    return Pred(lit.name, [fold(a, None, env) for a in lit.args], lit.neg)
+                    return Pred(
+                        lit.name, [fold(a, None, env) for a in lit.args], lit.neg
+                    )
                 if isinstance(lit, Group):
                     return Group([fold_conj(c, dict(env)) for c in lit.disj])
             except EmptyAggregate:
@@ -4399,7 +5255,11 @@ class Translator:
                 v = env[e.name]
             else:
                 return None
-            lo, hi = INT_RANGES[p] if p is not None else (INT_RANGES["int64"][0], INT_RANGES["uint64"][1])
+            lo, hi = (
+                INT_RANGES[p]
+                if p is not None
+                else (INT_RANGES["int64"][0], INT_RANGES["uint64"][1])
+            )
             return v if lo <= v <= hi else None
 
         def fold_conj(conj, env):
@@ -4430,7 +5290,9 @@ class Translator:
         henv: dict = {}
         if body is not None:
             envs = [{} for _ in body]
-            body = self.simplify_bools([fold_conj(c, env) for c, env in zip(body, envs)])
+            body = self.simplify_bools(
+                [fold_conj(c, env) for c, env in zip(body, envs)]
+            )
             if body is None:
                 return None
             if len(envs) == 1:
@@ -4461,12 +5323,14 @@ class Translator:
                     for c in e.body:
                         note_types(c)
                 return e
+
             for lit in conj:
                 if isinstance(lit, Group):
                     for c in lit.disj:
                         note_types(c)
                 else:
                     map_lit_exprs(lit, probe)
+
         for c in body or []:
             note_types(c)
         return tenv
@@ -4506,7 +5370,10 @@ class Translator:
                 return "strong"
             if isinstance(e, Agg):
                 return "agg"
-            if all(isinstance(x, (Num, Agg)) or isinstance(x, Var) and x.name in cls[1] for x in leaves):
+            if all(
+                isinstance(x, (Num, Agg)) or isinstance(x, Var) and x.name in cls[1]
+                for x in leaves
+            ):
                 return "expr"
             return None
 
@@ -4519,7 +5386,11 @@ class Translator:
                     old = out.get(k)
                     if k in strong or old is not None and not isinstance(old, tuple):
                         continue
-                    if old is None or not isinstance(v, tuple) or abs(v[1]) > abs(old[1]):
+                    if (
+                        old is None
+                        or not isinstance(v, tuple)
+                        or abs(v[1]) > abs(old[1])
+                    ):
                         out[k] = v
             return out
 
@@ -4541,8 +5412,13 @@ class Translator:
                     if isinstance(lit, Group) and lit.disj:
                         alts = [classify(c, (strong, weak))[0] for c in lit.disj]
                         both = set.intersection(*(a[0] for a in alts)) - strong
-                        new = {k: v for k, v in merge_weak([a[1] for a in alts], strong | both).items()
-                               if k not in weak}
+                        new = {
+                            k: v
+                            for k, v in merge_weak(
+                                [a[1] for a in alts], strong | both
+                            ).items()
+                            if k not in weak
+                        }
                         if both or new:
                             strong |= both
                             weak.update(new)
@@ -4581,6 +5457,7 @@ class Translator:
                         wrapped.append(x)
                         return self.anchor(x, p)
                     return x
+
                 return g
 
             def hoist_agg(x):
@@ -4591,9 +5468,19 @@ class Translator:
                 weak[v.name] = "agg"
                 tenv[v.name] = SOUFFLE_KIND[p]
                 return v
+
             exprs = [map_arith_leaves(e, hoist_agg) for e in exprs]
-            exprs = [map_arith_leaves(e, wrap_if(lambda x: isinstance(x, Agg) or isinstance(x, Var)
-                                                 and weak.get(x.name) in ("agg", "expr"))) for e in exprs]
+            exprs = [
+                map_arith_leaves(
+                    e,
+                    wrap_if(
+                        lambda x: isinstance(x, Agg)
+                        or isinstance(x, Var)
+                        and weak.get(x.name) in ("agg", "expr")
+                    ),
+                )
+                for e in exprs
+            ]
             if wrapped:
                 return exprs
 
@@ -4601,17 +5488,31 @@ class Translator:
                 return isinstance(x, Var) and isinstance(weak.get(x.name), tuple)
 
             def big(x):
-                v = x.val if isinstance(x, Num) else weak[x.name][1] if lit_var(x) else None
+                v = (
+                    x.val
+                    if isinstance(x, Num)
+                    else weak[x.name][1] if lit_var(x) else None
+                )
                 return v is not None and not INT32_RANGE[0] <= v <= INT32_RANGE[1]
+
             leaves = [x for e in exprs for x in arith_leaves(e)]
-            if not any(isinstance(e, Bin) for e in exprs) and not any(big(x) for x in leaves):
+            if not any(isinstance(e, Bin) for e in exprs) and not any(
+                big(x) for x in leaves
+            ):
                 return exprs
-            exprs = [map_arith_leaves(e, wrap_if(lambda x: big(x) or lit_var(x))) for e in exprs]
+            exprs = [
+                map_arith_leaves(e, wrap_if(lambda x: big(x) or lit_var(x)))
+                for e in exprs
+            ]
             if wrapped:
                 return exprs
             first = next((x for x in leaves if isinstance(x, Num)), None) or next(
-                (x for x in leaves if isinstance(x, Var)), None)
-            return [map_arith_leaves(e, wrap_if(lambda x: x is first and not wrapped)) for e in exprs]
+                (x for x in leaves if isinstance(x, Var)), None
+            )
+            return [
+                map_arith_leaves(e, wrap_if(lambda x: x is first and not wrapped))
+                for e in exprs
+            ]
 
         def fix_expr(e, cls, hoist):
             """`e` with the contexts in it anchored: `to_string` arguments
@@ -4628,8 +5529,10 @@ class Translator:
                     args = anchor_ctx(args, None, cls, hoist)
                 elif e.name != "cat":
                     ps = self.param_prims(e)
-                    args = [anchor_ctx([a], q, cls, hoist)[0] if isinstance(a, Bin) else a
-                            for a, q in zip(args, ps)]
+                    args = [
+                        anchor_ctx([a], q, cls, hoist)[0] if isinstance(a, Bin) else a
+                        for a, q in zip(args, ps)
+                    ]
                 return Call(e.name, args, e.functor)
             return e
 
@@ -4639,7 +5542,9 @@ class Translator:
             if isinstance(lit, Neg):
                 return Neg(fix_lit(lit.atom, cls, False, hoist))
             if isinstance(lit, Pred):
-                return Pred(lit.name, [fix_expr(a, cls, hoist) for a in lit.args], lit.neg)
+                return Pred(
+                    lit.name, [fix_expr(a, cls, hoist) for a in lit.args], lit.neg
+                )
             if isinstance(lit, Group):
                 return Group([fix_conj(c, cls, hoist is not None) for c in lit.disj])
             if isinstance(lit, Cmp):
@@ -4735,10 +5640,14 @@ class Translator:
                     out.append(el)
             return out
         if isinstance(arg, Var):
-            return [Var(self.flat_var(arg.name, fn_)) for fn_, _ in self.flat_attrs(fields)]
+            return [
+                Var(self.flat_var(arg.name, fn_)) for fn_, _ in self.flat_attrs(fields)
+            ]
         raise TranslateError(f"unsupported record argument {arg}")
 
-    def decl_var_types(self, heads: list, body: list, scope: tuple, line: int, lit: bool = True) -> dict:
+    def decl_var_types(
+        self, heads: list, body: list, scope: tuple, line: int, lit: bool = True
+    ) -> dict:
         """Variable -> declared type, from the attributes of the (unflattened)
         atoms it occurs in, at any depth (record literals, disjunctions,
         aggregate bodies), propagated through equalities (with `lit` false,
@@ -4764,12 +5673,18 @@ class Translator:
             bo, bt = self.base_type(old), self.base_type(t)
             if bo == bt:
                 return
-            if (is_param(bo) or is_param(bt)) and isinstance(bo, str) and isinstance(bt, str):
+            if (
+                (is_param(bo) or is_param(bt))
+                and isinstance(bo, str)
+                and isinstance(bt, str)
+            ):
                 if is_param(bt) and not is_param(bo):
                     types[name] = t
                 return
-            raise TranslateError(f"line {line}: variable `{name}` is typed both {old} and {t} (one name "
-                                 "in several disjuncts or aggregates); rename one of them")
+            raise TranslateError(
+                f"line {line}: variable `{name}` is typed both {old} and {t} (one name "
+                "in several disjuncts or aggregates); rename one of them"
+            )
 
         def visit_arg(a, t):
             if isinstance(a, Var):
@@ -4785,7 +5700,9 @@ class Translator:
             if isinstance(atom, Atom):
                 d = self.resolve_decl(atom.name, scope)
                 if d is not None and len(d.attrs) == len(atom.args):
-                    for (_, t), a in zip(self.decl_attr_types(d, atom.name, scope), atom.args):
+                    for (_, t), a in zip(
+                        self.decl_attr_types(d, atom.name, scope), atom.args
+                    ):
                         visit_arg(a, t)
             elif isinstance(lit, Cmp) and lit.op == "=":
                 eqs.append(lit)
@@ -4800,8 +5717,10 @@ class Translator:
                         for l2 in c:
                             visit(l2)
                 return e
+
             if not isinstance(lit, Group):
                 map_lit_exprs(lit, probe)
+
         for h in heads:
             visit(h)
         for c in body:
@@ -4809,15 +5728,23 @@ class Translator:
                 visit(l1)
         # types from atoms and variables first: a variable equated both to a
         # literal and to a typed variable has the latter's type
-        for lits in ((False, True) if lit else (False,)):
+        for lits in (False, True) if lit else (False,):
             changed = True
             while changed:
                 before = dict(types)
                 for eq in eqs:
                     for x, e in ((eq.l, eq.r), (eq.r, eq.l)):
-                        if isinstance(x, Var) and x.name in types and isinstance(e, Rec):
+                        if (
+                            isinstance(x, Var)
+                            and x.name in types
+                            and isinstance(e, Rec)
+                        ):
                             visit_arg(e, types[x.name])
-                        elif isinstance(x, Var) and x.name in types and isinstance(e, Var):
+                        elif (
+                            isinstance(x, Var)
+                            and x.name in types
+                            and isinstance(e, Var)
+                        ):
                             note(e.name, types[x.name])
                         elif isinstance(x, Var) and x.name not in types:
                             t = self.expr_type(e, types, lits)
@@ -4830,6 +5757,7 @@ class Translator:
     def check_casts(self, lits: list, types: dict, line: int) -> None:
         """`as(e, T)` only relabels a value whose base type is T's; other
         casts reinterpret bits in Souffle, so they are rejected."""
+
         def probe(e):
             if isinstance(e, Cast):
                 src = self.expr_type(e.e, types)
@@ -4838,15 +5766,19 @@ class Translator:
                 except TranslateError:
                     ok = False
                 if not ok:
-                    raise TranslateError(f"line {line}: as(..., {e.ty}) is supported only between types "
-                                         "of the same base type")
+                    raise TranslateError(
+                        f"line {line}: as(..., {e.ty}) is supported only between types "
+                        "of the same base type"
+                    )
             return e
+
         for lit in lits:
             deep_map_lit(lit, probe)
 
     def lower_record_eqs(self, body: list, types: dict, line: int) -> list:
         """`x = [a, b]` and `x = y` over records become equalities of the
         flattened fields (wildcard fields dropped)."""
+
         def rec_type(e):
             t = types.get(e.name) if isinstance(e, Var) else None
             return t if t is not None and self.is_record_type(t) else None
@@ -4866,24 +5798,37 @@ class Translator:
                     out.append(Group([lower(c) for c in lit.disj]))
                 elif isinstance(lit, Cmp) and (is_rec(lit.l) or is_rec(lit.r)):
                     if lit.op != "=":
-                        raise TranslateError(f"line {line}: record comparison `{lit.op}` is not supported")
+                        raise TranslateError(
+                            f"line {line}: record comparison `{lit.op}` is not supported"
+                        )
                     t = rec_type(lit.l) or rec_type(lit.r)
                     if t is None:
-                        raise TranslateError(f"line {line}: cannot tell the record type of `{pl(lit)}`")
+                        raise TranslateError(
+                            f"line {line}: cannot tell the record type of `{pl(lit)}`"
+                        )
                     ls = self.flatten_record_arg(lit.l, t)
                     rs = self.flatten_record_arg(lit.r, t)
-                    out += [Cmp("=", x, y) for x, y in zip(ls, rs)
-                            if not isinstance(x, Wild) and not isinstance(y, Wild)]
+                    out += [
+                        Cmp("=", x, y)
+                        for x, y in zip(ls, rs)
+                        if not isinstance(x, Wild) and not isinstance(y, Wild)
+                    ]
                 else:
                     out.append(map_lit_exprs(lit, agg_f))
             return out
+
         return [lower(c) for c in body]
 
     # -- self equalities
     def drop_self_eq(self, body: list) -> list:
         def keep(lit):
-            return not (isinstance(lit, Cmp) and lit.op == "=" and isinstance(lit.l, Var)
-                        and isinstance(lit.r, Var) and lit.l.name == lit.r.name)
+            return not (
+                isinstance(lit, Cmp)
+                and lit.op == "="
+                and isinstance(lit.l, Var)
+                and isinstance(lit.r, Var)
+                and lit.l.name == lit.r.name
+            )
 
         def fix(disj):
             out = []
@@ -4897,6 +5842,7 @@ class Translator:
                     nc.append(lit)
                 out.append(nc)
             return out
+
         return fix(body)
 
     # -- range
@@ -4913,14 +5859,25 @@ class Translator:
         new_body = []
 
         def is_range(lit):
-            return (isinstance(lit, Cmp) and lit.op == "=" and isinstance(lit.r, Call)
-                    and lit.r.name == "range" and isinstance(lit.l, Var))
+            return (
+                isinstance(lit, Cmp)
+                and lit.op == "="
+                and isinstance(lit.r, Call)
+                and lit.r.name == "range"
+                and isinstance(lit.l, Var)
+            )
+
         work = [list(c) for c in body]
         while work:
             conj = work.pop(0)
             for k, lit in enumerate(conj):
-                if (isinstance(lit, Cmp) and lit.op == "=" and isinstance(lit.l, Call)
-                        and lit.l.name == "range" and isinstance(lit.r, Var)):
+                if (
+                    isinstance(lit, Cmp)
+                    and lit.op == "="
+                    and isinstance(lit.l, Call)
+                    and lit.l.name == "range"
+                    and isinstance(lit.r, Var)
+                ):
                     conj[k] = Cmp("=", lit.r, lit.l)
                 if isinstance(lit, Group):
                     for c2 in lit.disj:
@@ -4929,7 +5886,9 @@ class Translator:
                                 (isinstance(l2.r, Call) and l2.r.name == "range")
                                 or (isinstance(l2.l, Call) and l2.l.name == "range")
                             ):
-                                raise TranslateError("range inside a disjunction is not supported")
+                                raise TranslateError(
+                                    "range inside a disjunction is not supported"
+                                )
             cands = [k for k, lit in enumerate(conj) if is_range(lit)]
             if not cands:
                 new_body.append(conj)
@@ -4937,7 +5896,9 @@ class Translator:
             # one range at a time, preferring one whose bounds the other
             # literals ground; the rewritten clause goes back on the list
             g0 = grounded_vars([lit for lit in conj if not is_range(lit)])
-            idx = next((k for k in cands if expr_vars(conj[k].r, set()) <= g0), cands[0])
+            idx = next(
+                (k for k in cands if expr_vars(conj[k].r, set()) <= g0), cands[0]
+            )
             rlit = conj[idx]
             ivar = rlit.l.name
             rargs = rlit.r.args
@@ -4946,7 +5907,11 @@ class Translator:
             # The request rule keeps the literals that do not mention the
             # generated variable and whose variables are grounded by them.
             rest = [lit for k, lit in enumerate(conj) if k != idx]
-            pre = [lit for lit in rest if ivar not in lit_vars(lit, set()) and not is_range(lit)]
+            pre = [
+                lit
+                for lit in rest
+                if ivar not in lit_vars(lit, set()) and not is_range(lit)
+            ]
             while True:
                 grounded = grounded_vars(pre)
                 keep = [lit for lit in pre if lit_vars(lit, set()) <= grounded]
@@ -4959,7 +5924,7 @@ class Translator:
                 t = self.expr_type(x, types)
                 if t is not None and self.base_type(t) != NUMBER:
                     raise TranslateError(f"range over {t} is not supported")
-            before, after = list(conj[:idx]), list(conj[idx + 1:])
+            before, after = list(conj[:idx]), list(conj[idx + 1 :])
             in_table = [fold_cmp(">=", lo, Num(0)), fold_cmp("<", hi, Num(RANGE_TABLE))]
             ascending = fold_cmp("<", lo, hi) is not False
             descending = fold_cmp("<", hi, lo) is not False
@@ -4967,9 +5932,15 @@ class Translator:
             outs: list = []
             if table:
                 self.need_range = True
-                low = [] if fold_cmp("<=", lo, Num(0)) is True else [Cmp(">=", Var(ivar), lo)]
+                low = (
+                    []
+                    if fold_cmp("<=", lo, Num(0)) is True
+                    else [Cmp(">=", Var(ivar), lo)]
+                )
                 guards = [c for c in in_table if c is not True]
-                outs.append(before + guards + [Atom(RANGE_REL, [hi, Var(ivar)])] + low + after)
+                outs.append(
+                    before + guards + [Atom(RANGE_REL, [hi, Var(ivar)])] + low + after
+                )
             # The cases the table does not serve, as conditions on the
             # helper's (lo, hi): the seeds of its enumeration.
             L, H, I = Var("lo"), Var("hi"), Var("i")
@@ -4987,7 +5958,9 @@ class Translator:
                 continue
             for bound in (lo, hi):
                 if not expr_vars(bound, set()) <= grounded_vars(pre):
-                    raise TranslateError("range bounds are not grounded independently of the generated variable")
+                    raise TranslateError(
+                        "range bounds are not grounded independently of the generated variable"
+                    )
             self.range_counter += 1
             rn = f"Range{self.range_counter}"
             req = f"{rn}_req"
@@ -4995,13 +5968,23 @@ class Translator:
             helpers.append(Raw(f".decl {rn}(lo: {NUMBER}, hi: {NUMBER}, i: {NUMBER})"))
             helpers.append(Rule([Atom(req, [lo, hi])], [list(pre)] if pre else None))
             for seed in up + down:
-                helpers.append(Rule([Atom(rn, [L, H, L])], [[Atom(req, [L, H])] + seed]))
+                helpers.append(
+                    Rule([Atom(rn, [L, H, L])], [[Atom(req, [L, H])] + seed])
+                )
             if up:
-                helpers.append(Rule([Atom(rn, [L, H, Bin("+", I, Num(1))])],
-                                    [[Atom(rn, [L, H, I]), Cmp("<", Bin("+", I, Num(1)), H)]]))
+                helpers.append(
+                    Rule(
+                        [Atom(rn, [L, H, Bin("+", I, Num(1))])],
+                        [[Atom(rn, [L, H, I]), Cmp("<", Bin("+", I, Num(1)), H)]],
+                    )
+                )
             if down:
-                helpers.append(Rule([Atom(rn, [L, H, Bin("-", I, Num(1))])],
-                                    [[Atom(rn, [L, H, I]), Cmp(">", Bin("-", I, Num(1)), H)]]))
+                helpers.append(
+                    Rule(
+                        [Atom(rn, [L, H, Bin("-", I, Num(1))])],
+                        [[Atom(rn, [L, H, I]), Cmp(">", Bin("-", I, Num(1)), H)]],
+                    )
+                )
             outs.append(before + [Atom(rn, [lo, hi, Var(ivar)])] + after)
             work[:0] = outs
         return new_body, helpers
@@ -5010,13 +5993,34 @@ class Translator:
         """`FlowlogRange(hi, i)` for 0 <= i < hi < RANGE_TABLE, built from
         RANGE_DIGITS facts by a cross product (no recursion)."""
         dig, nat = f"{RANGE_REL}Digit", f"{RANGE_REL}Nat"
-        out: list = [Raw(f".decl {dig}(d: {NUMBER})"), Raw(f".decl {nat}(n: {NUMBER})"),
-                     Raw(f".decl {RANGE_REL}(hi: {NUMBER}, i: {NUMBER})")]
+        out: list = [
+            Raw(f".decl {dig}(d: {NUMBER})"),
+            Raw(f".decl {nat}(n: {NUMBER})"),
+            Raw(f".decl {RANGE_REL}(hi: {NUMBER}, i: {NUMBER})"),
+        ]
         out += [Rule([Atom(dig, [Num(d)])], None) for d in range(RANGE_DIGITS)]
-        out.append(Rule([Atom(nat, [Bin("+", Bin("*", Var("a"), Num(RANGE_DIGITS)), Var("b"))])],
-                        [[Atom(dig, [Var("a")]), Atom(dig, [Var("b")])]]))
-        out.append(Rule([Atom(RANGE_REL, [Var("hi"), Var("i")])],
-                        [[Atom(nat, [Var("hi")]), Atom(nat, [Var("i")]), Cmp("<", Var("i"), Var("hi"))]]))
+        out.append(
+            Rule(
+                [
+                    Atom(
+                        nat, [Bin("+", Bin("*", Var("a"), Num(RANGE_DIGITS)), Var("b"))]
+                    )
+                ],
+                [[Atom(dig, [Var("a")]), Atom(dig, [Var("b")])]],
+            )
+        )
+        out.append(
+            Rule(
+                [Atom(RANGE_REL, [Var("hi"), Var("i")])],
+                [
+                    [
+                        Atom(nat, [Var("hi")]),
+                        Atom(nat, [Var("i")]),
+                        Cmp("<", Var("i"), Var("hi")),
+                    ]
+                ],
+            )
+        )
         return out
 
     # -- aggregates
@@ -5033,7 +6037,9 @@ class Translator:
         out: list = []
         for conj in body:
             conjs = [conj]
-            if any(isinstance(l, Group) for l in conj) and any(has_agg(l) for l in conj):
+            if any(isinstance(l, Group) for l in conj) and any(
+                has_agg(l) for l in conj
+            ):
                 conjs = souffle_dnf([conj])
             for c in conjs:
                 outer = set(head_vars)
@@ -5048,7 +6054,12 @@ class Translator:
         out: list = []
         for l in conj:
             extra: list = []
-            l = map_lit_top(l, lambda e: map_outer_aggs(e, lambda a: self.scope_agg(a, outer, line, extra)))
+            l = map_lit_top(
+                l,
+                lambda e: map_outer_aggs(
+                    e, lambda a: self.scope_agg(a, outer, line, extra)
+                ),
+            )
             out += extra + [l]
         return out
 
@@ -5068,25 +6079,43 @@ class Translator:
         Returns the expression replacing the aggregate; `extra` receives
         literals for the enclosing conjunction."""
         if len(a.body) != 1 or any(isinstance(l, Group) for l in a.body[0]):
-            raise TranslateError(f"line {line}: disjunction inside an aggregate body is not supported")
+            raise TranslateError(
+                f"line {line}: disjunction inside an aggregate body is not supported"
+            )
         if any(isinstance(l, Neg) for l in a.body[0]):
-            raise TranslateError(f"line {line}: negation inside an aggregate body is not supported by FlowLog")
+            raise TranslateError(
+                f"line {line}: negation inside an aggregate body is not supported by FlowLog"
+            )
         if a.target is not None and has_agg(a.target):
-            raise TranslateError(f"line {line}: aggregate inside an aggregate target is not supported")
+            raise TranslateError(
+                f"line {line}: aggregate inside an aggregate target is not supported"
+            )
         mat = sx_materialized(a)
         target_vars = expr_vars(a.target, set()) if a.target is not None else set()
         injected = (expr_vars(a, set()) & outer) - target_vars
-        ren = {v: Var(self.fresh(f"{v}_ag")) for v in sorted(expr_vars(a, set()) - injected)}
+        ren = {
+            v: Var(self.fresh(f"{v}_ag"))
+            for v in sorted(expr_vars(a, set()) - injected)
+        }
         local = {v.name for v in ren.values()}
         target = None if a.target is None else subst_expr(a.target, ren)
         conj = [subst_lit(l, ren) for l in a.body[0]]
         if not mat:
+
             def name_wild(x):
                 if isinstance(x, Wild):
                     x = Var(self.fresh("agg_w"))
                     local.add(x.name)
                 return x
-            conj = [Atom(l.name, [name_wild(x) for x in l.args]) if isinstance(l, Atom) else l for l in conj]
+
+            conj = [
+                (
+                    Atom(l.name, [name_wild(x) for x in l.args])
+                    if isinstance(l, Atom)
+                    else l
+                )
+                for l in conj
+            ]
         lifted: list = []
         for l in conj:
             if not isinstance(l, Atom):
@@ -5112,8 +6141,10 @@ class Translator:
             # FlowLog rejects a target without a local variable; Souffle
             # adds it up once per match
             if a.kind != "sum":
-                raise TranslateError(f"line {line}: {a.kind} of an expression without local variables "
-                                     "is not supported")
+                raise TranslateError(
+                    f"line {line}: {a.kind} of an expression without local variables "
+                    "is not supported"
+                )
             n = Var(self.fresh("agg_n"))
             extra.append(Cmp("=", n, Agg("count", None, [conj])))
             return Bin("*", target, n)
@@ -5124,13 +6155,18 @@ class Translator:
         """FlowLog atoms take variables and constants only: a computed
         argument becomes `t = expr` (scope_agg lifts those of aggregate
         bodies)."""
+
         def fix_conj(conj):
             out = []
             for lit in conj:
                 if isinstance(lit, Group):
                     out.append(Group([fix_conj(c) for c in lit.disj]))
                     continue
-                atom = lit.atom if isinstance(lit, Neg) else lit if isinstance(lit, Atom) else None
+                atom = (
+                    lit.atom
+                    if isinstance(lit, Neg)
+                    else lit if isinstance(lit, Atom) else None
+                )
                 if atom is None:
                     out.append(lit)
                     continue
@@ -5147,6 +6183,7 @@ class Translator:
                 na = Atom(atom.name, args)
                 out.append(Neg(na) if isinstance(lit, Neg) else na)
             return out
+
         return [fix_conj(c) for c in body]
 
     # -- choice heads
@@ -5169,7 +6206,10 @@ class Translator:
         if prio is None:
             raise TranslateError(f"line {line}: no min-choice priority for {h.name}")
         prefix = h.name[: len(h.name) - len(base)]
-        return Atom(f"{prefix}{base}_choice", kargs + [Call(f"choice_key{len(dargs)}", [Num(prio)] + dargs)])
+        return Atom(
+            f"{prefix}{base}_choice",
+            kargs + [Call(f"choice_key{len(dargs)}", [Num(prio)] + dargs)],
+        )
 
 
 # ============================================================================
@@ -5178,8 +6218,20 @@ class Translator:
 
 # FlowLog's operator ladder (flowlog-parser ArithmeticOperator::precedence);
 # runs of one level group left to right, except ^.
-FL_PREC = {"bor": 0, "bxor": 1, "band": 2, "bshl": 3, "bshr": 3, "bshru": 3,
-           "+": 4, "-": 4, "*": 5, "/": 5, "%": 5, "^": 6}
+FL_PREC = {
+    "bor": 0,
+    "bxor": 1,
+    "band": 2,
+    "bshl": 3,
+    "bshr": 3,
+    "bshru": 3,
+    "+": 4,
+    "-": 4,
+    "*": 5,
+    "/": 5,
+    "%": 5,
+    "^": 6,
+}
 FL_RIGHT_ASSOC = {"^"}
 
 
@@ -5225,9 +6277,13 @@ def pl(lit: Any) -> str:
     if isinstance(lit, Cmp):
         return f"{pe(lit.l)} {lit.op} {pe(lit.r)}"
     if isinstance(lit, Pred):
-        return ("!" if lit.neg else "") + f"{lit.name}({', '.join(pe(a) for a in lit.args)})"
+        return (
+            "!" if lit.neg else ""
+        ) + f"{lit.name}({', '.join(pe(a) for a in lit.args)})"
     if isinstance(lit, Group):
-        return "(" + "; ".join(", ".join(pl(l) for l in conj) for conj in lit.disj) + ")"
+        return (
+            "(" + "; ".join(", ".join(pl(l) for l in conj) for conj in lit.disj) + ")"
+        )
     raise TranslateError(f"cannot print literal {lit}")
 
 
@@ -5241,7 +6297,9 @@ def print_items(items: list, indent: str = "") -> list[str]:
             if it.tparams:
                 hdr += "<" + ", ".join(it.tparams) + ">"
             if it.supers:
-                hdr += " : " + ", ".join(s + (f"<{', '.join(a)}>" if a else "") for s, a in it.supers)
+                hdr += " : " + ", ".join(
+                    s + (f"<{', '.join(a)}>" if a else "") for s, a in it.supers
+                )
             lines.append(indent + hdr + " {")
             lines.extend(print_items(it.items, indent + "  "))
             lines.append(indent + "}")
@@ -5256,7 +6314,8 @@ def print_items(items: list, indent: str = "") -> list[str]:
                 lines.append(f"{indent}{heads}.")
             else:
                 body = (";\n" + indent + "    ").join(
-                    ", ".join(pl(l) for l in conj) for conj in it.body)
+                    ", ".join(pl(l) for l in conj) for conj in it.body
+                )
                 lines.append(f"{indent}{heads} :-\n{indent}    {body}.")
                 if isinstance(it.plan, tuple) and it.plan:
                     lines.append(f"{indent}.plan ({', '.join(map(str, it.plan))})")
@@ -5269,14 +6328,24 @@ def print_items(items: list, indent: str = "") -> list[str]:
 # CLI
 # ============================================================================
 
+
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("input")
     ap.add_argument("-o", "--output", required=True)
-    ap.add_argument("--policy", help='JSON policy file: {"choice": {RELATION: "drop" | "minchoice" | '
-                    '{"min": COLUMN}}}; a choice-domain relation it does not list is encoded as minchoice')
-    ap.add_argument("--schema", help="write a JSON schema manifest (record columns, sqlite I/O)")
-    ap.add_argument("--extra", action="append", default=[], help="FlowLog text appended verbatim")
+    ap.add_argument(
+        "--policy",
+        help='JSON policy file: {"choice": {RELATION: "drop" | "minchoice" | '
+        '{"min": COLUMN}}}; a choice-domain relation it does not list is encoded as minchoice',
+    )
+    ap.add_argument(
+        "--schema", help="write a JSON schema manifest (record columns, sqlite I/O)"
+    )
+    ap.add_argument(
+        "--extra", action="append", default=[], help="FlowLog text appended verbatim"
+    )
     args = ap.parse_args()
 
     policy = {}

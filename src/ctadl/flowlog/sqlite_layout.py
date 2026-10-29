@@ -43,7 +43,12 @@ import sqlite3
 import sys
 from typing import Iterable
 
-SQL_TYPE = {"symbol": "TEXT", "number": "INTEGER", "unsigned": "INTEGER", "float": "REAL"}
+SQL_TYPE = {
+    "symbol": "TEXT",
+    "number": "INTEGER",
+    "unsigned": "INTEGER",
+    "float": "REAL",
+}
 SYMBOL_TABLE = "__SymbolTable"
 RECORD_TABLE = "__FlowLogRecord"
 CACHE_KIB = 1 << 20  # page cache per database (SQLite's default is 2 MiB)
@@ -70,7 +75,12 @@ def load_schema(paths: Iterable[str]) -> dict:
 
 
 def existing_relations(conn: sqlite3.Connection, schema: str = "main") -> set:
-    return {r[0] for r in conn.execute(f"SELECT name FROM {schema}.sqlite_master WHERE type IN ('table', 'view')")}
+    return {
+        r[0]
+        for r in conn.execute(
+            f"SELECT name FROM {schema}.sqlite_master WHERE type IN ('table', 'view')"
+        )
+    }
 
 
 def connect(path: str, attach: str, alias: str) -> sqlite3.Connection:
@@ -114,14 +124,18 @@ def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) 
     out = connect(out_path, fl_path if os.path.exists(fl_path) else ":memory:", "fl")
     have = existing_relations(out, "fl")
     out.execute("BEGIN")
-    out.execute(f"CREATE TABLE IF NOT EXISTS {q(SYMBOL_TABLE)} (id INTEGER PRIMARY KEY, symbol TEXT UNIQUE)")
+    out.execute(
+        f"CREATE TABLE IF NOT EXISTS {q(SYMBOL_TABLE)} (id INTEGER PRIMARY KEY, symbol TEXT UNIQUE)"
+    )
     counts: dict = {}
     for rel in schema["outputs"]:
         name, cols = rel["name"], rel["columns"]
         shadow = "_" + name
         out.execute(f"DROP VIEW IF EXISTS main.{dq(name)}")
         out.execute(f"DROP TABLE IF EXISTS main.{dq(shadow)}")
-        out.execute(f"CREATE TABLE main.{q(shadow)} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})")
+        out.execute(
+            f"CREATE TABLE main.{q(shadow)} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})"
+        )
         counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
         out.execute(souffle_view_sql(name, cols))
     out.execute("COMMIT")
@@ -138,12 +152,20 @@ def copy_to_souffle(conn: sqlite3.Connection, name: str, cols: list) -> int:
         return 0  # the record table is created with the first record
     syms = [dq(c["fl"][0]) for c in cols if c["kind"] == "symbol"]
     if syms:
-        conn.execute(f"INSERT OR IGNORE INTO main.{q(SYMBOL_TABLE)} (symbol) "
-                     + " UNION ALL ".join(f"SELECT {c} FROM {src}" for c in syms))
+        conn.execute(
+            f"INSERT OR IGNORE INTO main.{q(SYMBOL_TABLE)} (symbol) "
+            + " UNION ALL ".join(f"SELECT {c} FROM {src}" for c in syms)
+        )
     if recs:
-        conn.execute(f"CREATE TABLE IF NOT EXISTS main.{dq(RECORD_TABLE)} (id INTEGER PRIMARY KEY, fields TEXT UNIQUE)")
-        conn.execute(f"INSERT OR IGNORE INTO main.{dq(RECORD_TABLE)} (fields) "
-                     + " UNION ALL ".join(f"SELECT {record_json(c, 'r')} FROM {src} AS r" for c in recs))
+        conn.execute(
+            f"CREATE TABLE IF NOT EXISTS main.{dq(RECORD_TABLE)} (id INTEGER PRIMARY KEY, fields TEXT UNIQUE)"
+        )
+        conn.execute(
+            f"INSERT OR IGNORE INTO main.{dq(RECORD_TABLE)} (fields) "
+            + " UNION ALL ".join(
+                f"SELECT {record_json(c, 'r')} FROM {src} AS r" for c in recs
+            )
+        )
     # CROSS JOIN keeps FlowLog's table as the outer loop, so that each row
     # makes one lookup in the symbol (record) table's unique index.
     sel, frm, where = [], [f"{src} AS r"], []
@@ -183,7 +205,9 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
         defs = []
         for col in cols:
             kinds = col.get("fl_kinds", [col["kind"]])
-            defs.extend(f"{dq(c)} {SQL_TYPE[k]} NOT NULL" for c, k in zip(col["fl"], kinds))
+            defs.extend(
+                f"{dq(c)} {SQL_TYPE[k]} NOT NULL" for c, k in zip(col["fl"], kinds)
+            )
         dst.execute(f"CREATE TABLE main.{dq(name)} ({', '.join(defs)})")
         if not read:
             # no rule reads it (see souffle2flowlog.py's record_io)
@@ -191,12 +215,18 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
             continue
         src_cols = [r[1] for r in dst.execute(f"PRAGMA src.table_info({dq(name)})")]
         if len(src_cols) != len(cols):
-            raise ValueError(f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}")
+            raise ValueError(
+                f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}"
+            )
         if any(col["kind"] == "record" for col in cols) and RECORD_TABLE not in have:
-            if dst.execute(f"SELECT EXISTS (SELECT 1 FROM src.{dq(name)})").fetchone()[0]:
-                raise ValueError(f"{name}: {in_path} does not store record contents (it has no "
-                                 f"{RECORD_TABLE}; Souffle writes record columns as ids that are "
-                                 "only meaningful to the process that wrote them)")
+            if dst.execute(f"SELECT EXISTS (SELECT 1 FROM src.{dq(name)})").fetchone()[
+                0
+            ]:
+                raise ValueError(
+                    f"{name}: {in_path} does not store record contents (it has no "
+                    f"{RECORD_TABLE}; Souffle writes record columns as ids that are "
+                    "only meaningful to the process that wrote them)"
+                )
             counts[name] = 0
             continue
         sel, frm = [], [f"src.{dq(name)} AS r"]
@@ -207,8 +237,12 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
                 continue
             check_records(dst, in_path, name, v)
             frm.append(f"JOIN src.{dq(RECORD_TABLE)} AS t{i} ON t{i}.id = {v}")
-            sel.extend(f"json_extract(t{i}.fields, '$[{k}]')" for k in range(len(col["fl"])))
-        counts[name] = dst.execute(f"INSERT INTO main.{dq(name)} SELECT {', '.join(sel)} FROM {' '.join(frm)}").rowcount
+            sel.extend(
+                f"json_extract(t{i}.fields, '$[{k}]')" for k in range(len(col["fl"]))
+            )
+        counts[name] = dst.execute(
+            f"INSERT INTO main.{dq(name)} SELECT {', '.join(sel)} FROM {' '.join(frm)}"
+        ).rowcount
     dst.execute("COMMIT")
     dst.close()
     return counts
@@ -216,16 +250,22 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
 
 def check_records(conn: sqlite3.Connection, in_path: str, name: str, col: str) -> None:
     """Fails unless every id in src.NAME's record column COL is in the record table."""
-    bad = conn.execute(f"SELECT {col} FROM src.{dq(name)} AS r WHERE NOT EXISTS "
-                       f"(SELECT 1 FROM src.{dq(RECORD_TABLE)} AS t WHERE t.id = {col}) LIMIT 1").fetchone()
+    bad = conn.execute(
+        f"SELECT {col} FROM src.{dq(name)} AS r WHERE NOT EXISTS "
+        f"(SELECT 1 FROM src.{dq(RECORD_TABLE)} AS t WHERE t.id = {col}) LIMIT 1"
+    ).fetchone()
     if bad is not None:
         # nil (0) or a dangling id: the translation has no nil
-        raise ValueError(f"{name}: record id {bad[0]} is nil or unknown in {in_path} "
-                         "(nil records are not supported)")
+        raise ValueError(
+            f"{name}: record id {bad[0]} is nil or unknown in {in_path} "
+            "(nil records are not supported)"
+        )
 
 
 def main(argv: list | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = ap.add_subparsers(dest="cmd", required=True)
     a = sub.add_parser("to-souffle")
     a.add_argument("fldb")
@@ -248,8 +288,13 @@ def main(argv: list | None = None) -> int:
             return 1
         missing = sorted(n for n, c in counts.items() if c < 0)
         if missing:
-            print(f"warning: inputs missing from {args.indb} (not copied): {', '.join(missing)}", file=sys.stderr)
-    print(f"{args.cmd}: {len(counts)} relations, {sum(max(c, 0) for c in counts.values())} rows")
+            print(
+                f"warning: inputs missing from {args.indb} (not copied): {', '.join(missing)}",
+                file=sys.stderr,
+            )
+    print(
+        f"{args.cmd}: {len(counts)} relations, {sum(max(c, 0) for c in counts.values())} rows"
+    )
     return 0
 
 
