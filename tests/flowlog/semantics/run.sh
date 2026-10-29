@@ -1,5 +1,6 @@
 #!/bin/bash
-# Differential semantics suite for souffle2flowlog.py and ctadl_udf.rs.
+# Differential semantics suite for ctadl.flowlog's Soufflé-to-FlowLog
+# translator, souffle2flowlog.py and souffle2flowlog.rs.
 #   cases/*.dl    Soufflé and the port (FlowLog with 1 and 4 workers) must
 #                 write the same rows to every output relation.
 #   rejects/*.dl  the translator must refuse them with an error message.
@@ -15,19 +16,26 @@
 # the translator's error message must contain; a `// expect-fl: <text>` line
 # in a case names text its translation must contain.
 # Needs a 64-bit-domain `souffle` on PATH (CTADL requires one).
-#   [WORKERS="1 4 32"] tests/semantics/run.sh [name...]
+# FlowLog is found as by `ctadl --engine flowlog` (see ctadl.flowlog):
+# $FLOWLOG_COMPILER or flowlog-compiler on PATH, and $FLOWLOG_RUNTIME_PATH
+# if set; Rust builds go to $CARGO_TARGET_DIR (default:
+# ctadl-test-output/flowlog-target).
+#   [WORKERS="1 4 32"] tests/flowlog/semantics/run.sh [name...]
 # (default: every case, with 1 and 4 workers)
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
-PORT=$(dirname "$(dirname "$HERE")")
-TOP=$(dirname "$(dirname "$PORT")") # the workspace: the CTADL checkout's parent
-FLC=${FLOWLOG_COMPILER:-$TOP/flowlog/target/release/flowlog-compiler}
-export FLOWLOG_RUNTIME_PATH=${FLOWLOG_RUNTIME_PATH:-$TOP/flowlog/flowlog-runtime}
-export CARGO_INCREMENTAL=${CARGO_INCREMENTAL:-0}
-TARGET=${FLOWLOG_CARGO_TARGET:-$TOP/fltarget}
+ROOT=$(cd "$HERE/../../.." && pwd) # the CTADL checkout
+PORT=$ROOT/src/ctadl/flowlog
+FLC=${FLOWLOG_COMPILER:-flowlog-compiler}
+TARGET=${CARGO_TARGET_DIR:-$ROOT/ctadl-test-output/flowlog-target}
+# flowlog-compiler names the crate after the executable, and cargo can take
+# a build of another crate of that name in $TARGET for this one's: each run
+# compiles under a name of its own (FlowLog finding B14), and removes that
+# crate's build products from $TARGET when it exits
+BIN=bin_$$
 WORKERS=${WORKERS:-1 4}
 W=$(mktemp -d)
-trap 'rm -rf "$W"' EXIT
+trap 'rm -rf "$W" "$TARGET/release/$BIN"{,.d} "$TARGET"/release/{deps,.fingerprint}/"$BIN"-*' EXIT
 status=0
 
 selected() {
@@ -44,9 +52,10 @@ build() {
   [ -f "${1%.dl}.policy.json" ] && pol=(--policy "${1%.dl}.policy.json")
   python3 "$PORT/souffle2flowlog.py" "$1" -o "$2/p.fl" "${pol[@]}" > "$2/translate.log" 2>&1 \
     || { echo "  translation failed:"; sed 's/^/    /' "$2/translate.log"; return 1; }
-  "$FLC" "$2/p.fl" --str-intern --udf-file "$PORT/ctadl_udf.rs" -o "$2/bin" -B "$2/build" \
+  "$FLC" "$2/p.fl" --str-intern --udf-file "$PORT/souffle2flowlog.rs" -o "$2/$BIN" \
     -T "$TARGET" > "$2/compile.log" 2>&1 \
     || { echo "  compilation failed:"; grep -m5 -A3 'error' "$2/compile.log" | sed 's/^/    /'; return 1; }
+  mv "$2/$BIN" "$2/bin"
 }
 
 describe_exit() {

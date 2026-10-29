@@ -434,6 +434,24 @@ class SouffleCompiledAnalysis(AnySouffleCommand):
         return self.run(capture_output=(ctadl.verbosity <= 0 or args.quiet))
 
 
+class FlowLogCompiledAnalysis(Command):
+    """An analysis compiled with FlowLog (--engine flowlog, see ctadl.flowlog)
+
+    Reads and writes the same inputs and outputs as SouffleCompiledAnalysis."""
+
+    def __init__(self, analysis):
+        super().__init__(str(analysis.bin))
+        self.analysis = analysis
+
+    def analyze(self, fact_dir, out_dir, args) -> subprocess.CompletedProcess:
+        with tempfile.TemporaryDirectory(prefix="flowlog-", dir=args.tmpdir) as tmp:
+            indir, outdir = self.analysis.read_inputs(fact_dir, Path(tmp))
+            self.add_args(["-F", str(indir), "-D", str(outdir), "-w", str(args.jobs)])
+            res = self.run(capture_output=(ctadl.verbosity <= 0 or args.quiet))
+            self.analysis.write_outputs(outdir)
+            return res
+
+
 def write_analyzer_config(args: Namespace, facts: model.Facts):
     features = {}
     features["CTADL_ENABLE_STAR"] = 1 if "star" in args and args.star else 0
@@ -912,7 +930,7 @@ def compile_functors(args):
 
 def build_analysis(
     args: Namespace, src: str
-) -> Union[SouffleCommand, SouffleCompiledAnalysis]:
+) -> Union[SouffleCommand, SouffleCompiledAnalysis, FlowLogCompiledAnalysis]:
     """Finds or compiles an indexer and returns it
 
     This function compiles the functors and puts them in appdata.
@@ -921,7 +939,17 @@ def build_analysis(
     directory. If it's not there, compiles it for re-use before returning it.
     The indexers name is derived from a hash of the contents of the Datalog
 
-    If the user requests interpreted souffle, just returns that"""
+    If the user requests interpreted souffle, just returns that
+
+    With --engine flowlog, the analysis is compiled with FlowLog instead"""
+
+    if args.engine == "flowlog":
+        if args.souffle_arg or not args.compile_analysis_opt:
+            error("--souffle-arg and --no-compile-analysis need --engine souffle")
+            exit(1)
+        from ctadl import flowlog
+
+        return FlowLogCompiledAnalysis(flowlog.FlowLogAnalysis(Path(src)))
 
     os.makedirs(str(analysiscachedir), exist_ok=True)
     compile_functors(args)
@@ -1321,6 +1349,18 @@ def make_parser_with_common_cli_options(parser):
     )
 
 
+ENGINES = ("souffle", "flowlog")
+
+
+def engine_name(name: str) -> str:
+    """Checks an --engine value, including a default taken from CTADL_ENGINE"""
+    if name not in ENGINES:
+        raise argparse.ArgumentTypeError(
+            f"unknown engine '{name}' (choose from {', '.join(ENGINES)}; check CTADL_ENGINE)"
+        )
+    return name
+
+
 def make_parser_with_common_options(parser, overwrite=True):
     make_parser_with_common_cli_options(parser)
     parser_add_argument_wrapper(
@@ -1330,7 +1370,15 @@ def make_parser_with_common_options(parser, overwrite=True):
         metavar="<n>",
         default=get_default_jobs(),
         type=int,
-        help="Concurrent jobs (passed to Souffle). Defaults to half the cpu count. (default: %(default)s)",
+        help="Concurrent jobs (passed to the Datalog engine). Defaults to half the cpu count. (default: %(default)s)",
+    )
+    parser_add_argument_wrapper(
+        parser,
+        "--engine",
+        type=engine_name,
+        choices=ENGINES,
+        default=os.environ.get("CTADL_ENGINE") or "souffle",
+        help="Datalog engine that runs the analysis: souffle, or flowlog (FlowLog, which needs flowlog-compiler and a Rust toolchain; see ctadl.flowlog). The default can be set with CTADL_ENGINE. (default: %(default)s)",
     )
     parser_add_argument_wrapper(
         parser,
@@ -1361,7 +1409,7 @@ def make_parser_with_common_options(parser, overwrite=True):
         "--souffle-arg",
         action="append",
         default=list(),
-        help="Passes arg to souffle",
+        help="Passes arg to souffle (--engine souffle only)",
     )
     parser_add_argument_wrapper(
         parser,
@@ -1384,7 +1432,7 @@ def make_parser_with_common_options(parser, overwrite=True):
         action="store_false",
         dest="compile_analysis_opt",
         default=True,
-        help="If no compiled analysis is available, runs analysis with souffle interpreter (default: False)",
+        help="If no compiled analysis is available, runs analysis with souffle interpreter (--engine souffle only) (default: False)",
     )
     return parser
 
@@ -1982,6 +2030,10 @@ CTADL pays attention to the following environment variables:
 * SOUFFLE: Path to souffle binary.
 * CC, CXX, CXXFLAGS, and LDFLAGS: CC is used to find a preprocessor for
   analyses. CXX, CXXFLAGS, and LDFLAGS are used to compile analyses.
+* CTADL_ENGINE: Default for --engine (souffle or flowlog).
+* FLOWLOG_COMPILER, FLOWLOG_RUNTIME_PATH, and CARGO_TARGET_DIR: Used by the
+  FlowLog engine to compile analyses (flowlog-compiler, the flowlog-runtime
+  source it builds against, and the cargo target directory).
 """
 
 

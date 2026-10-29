@@ -1,28 +1,33 @@
 #!/bin/bash
 # Compiles (and runs) each FlowLog repro; prints the compiler's first error,
 # or the program's outputs. A repro's UDFs, if any, are in <repro>.rs. With
-# -t each repro is first rewritten by
-# souffle2flowlog.py and compiled as the CTADL driver does (--str-intern,
-# UDFs from ctadl_udf.rs plus an identity functor F; choice-domain relations
-# use the minchoice policy), which checks the translator's workaround for
-# each gap. With -s each repro runs on Soufflé instead, for reference, with
-# FlowLog's types int32 and string declared as Soufflé's number and symbol.
+# -t each repro is first rewritten by ctadl.flowlog's souffle2flowlog.py and
+# compiled as `ctadl --engine flowlog` does (--str-intern, the translator's
+# UDFs from souffle2flowlog.rs plus an identity functor F; choice-domain
+# relations get the default policy, minchoice), which checks the
+# translator's workaround for each gap. With -s each repro runs on Soufflé
+# instead, for reference, with FlowLog's types int32 and string declared as
+# Soufflé's number and symbol.
+# FlowLog is found as by `ctadl --engine flowlog`: $FLOWLOG_COMPILER or
+# flowlog-compiler on PATH, and $FLOWLOG_RUNTIME_PATH if set; Rust builds go
+# to $CARGO_TARGET_DIR (default: ctadl-test-output/flowlog-target).
 #   Usage: repros/check.sh [-t|-s] [prog.dl...]
 HERE=$(cd "$(dirname "$0")" && pwd)
-PORT=$(dirname "$HERE")
-TOP=$(dirname "$(dirname "$PORT")") # the workspace: the CTADL checkout's parent
-FLC=${FLOWLOG_COMPILER:-$TOP/flowlog/target/release/flowlog-compiler}
-export FLOWLOG_RUNTIME_PATH=${FLOWLOG_RUNTIME_PATH:-$TOP/flowlog/flowlog-runtime}
-TARGET=${FLOWLOG_CARGO_TARGET:-$TOP/fltarget}
-# the -B dirs are temporary: skip rustc's incremental cache (GBs in $TARGET)
-export CARGO_INCREMENTAL=${CARGO_INCREMENTAL:-0}
+CTADL=$(cd "$HERE/../.." && pwd) # the CTADL checkout
+PORT=$CTADL/src/ctadl/flowlog
+FLC=${FLOWLOG_COMPILER:-flowlog-compiler}
+TARGET=${CARGO_TARGET_DIR:-$CTADL/ctadl-test-output/flowlog-target}
+# flowlog-compiler names the crate after the executable, and cargo can take
+# a build of another crate of that name in $TARGET for this one's: each run
+# compiles under a name of its own (FlowLog finding B14), and removes that
+# crate's build products from $TARGET when it exits
+BIN=bin_$$
 MODE=
 case $1 in -t | -s) MODE=$1; shift ;; esac
 W=$(mktemp -d)
-trap 'rm -rf "$W"' EXIT
+trap 'rm -rf "$W" "$TARGET/release/$BIN"{,.d} "$TARGET"/release/{deps,.fingerprint}/"$BIN"-*' EXIT
 if [ "$MODE" = -t ]; then
-  echo '{"choice": {"C": "minchoice"}}' > "$W/policy.json"
-  { cat "$PORT/ctadl_udf.rs"; echo; echo 'pub fn F(a: String) -> String { a }'; } > "$W/udf.rs"
+  { cat "$PORT/souffle2flowlog.rs"; echo; echo 'pub fn F(a: String) -> String { a }'; } > "$W/udf.rs"
 fi
 [ $# -gt 0 ] || set -- "$HERE"/*.dl
 for p in "$@"; do
@@ -40,20 +45,21 @@ for p in "$@"; do
     flags=()
     [ -f "${p%.dl}.rs" ] && flags=(--udf-file "${p%.dl}.rs")
     if [ "$MODE" = -t ]; then
-      if ! python3 "$PORT/souffle2flowlog.py" "$p" -o "$d/prog.dl" --policy "$W/policy.json" > "$d/log" 2>&1; then
+      if ! python3 "$PORT/souffle2flowlog.py" "$p" -o "$d/prog.dl" > "$d/log" 2>&1; then
         echo "$n: translate FAILED: $(grep -m1 error "$d/log")"
         continue
       fi
       p=$d/prog.dl
       flags=(--str-intern --udf-file "$W/udf.rs")
     fi
-    if ! "$FLC" "$p" "${flags[@]}" -o "$d/bin" -B "$d/build" -T "$TARGET" > "$d/log" 2>&1; then
+    if ! "$FLC" "$p" "${flags[@]}" -o "$d/$BIN" -T "$TARGET" > "$d/log" 2>&1; then
       # for a failed cargo build, report rustc's first error rather than cargo's summary
       msg=$(sed 's/\x1b\[[0-9;]*m//g' "$d/log" | grep -v -E "^error: (cargo build|could not compile)" |
         grep -m1 -E "^(error|Error|bug)|panicked")
       echo "$n: compile FAILED: ${msg:-$(grep -v "^[[:space:]]*$" "$d/log" | tail -1)}"
       continue
     fi
+    mv "$d/$BIN" "$d/bin"
     # 2>/dev/null drops bash's "Aborted (core dumped)" notice; the panic is reported below
     if ! (cd "$d" && ./bin -D out > run.log 2>&1) 2>/dev/null; then
       msg=$(grep -m1 -A1 'panicked' "$d/run.log" | tail -1)

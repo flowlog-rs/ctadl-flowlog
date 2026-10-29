@@ -6,6 +6,9 @@ include src/ctadl/models/jadx/*.json
 include src/ctadl/models/pcode/*.json
 include src/ctadl/models/taint-front/*.json
 include src/ctadl/souffle-logic/functors.cpp
+include src/ctadl/souffle-logic/functors.rs
+include src/ctadl/souffle-logic/flowlog-policy.json
+include src/ctadl/flowlog/souffle2flowlog.rs
 include src/ctadl/souffle-logic/*.dl
 include src/ctadl/souffle-logic/information-flow/*.dl
 include src/ctadl/souffle-logic/match/*.dl

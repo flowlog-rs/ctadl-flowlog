@@ -1,0 +1,7 @@
+{
+  "choice": {
+    "AliasedBy": "drop",
+    "IntraObjectAliasedBy": "drop",
+    "ReachableVertex": "drop"
+  }
+}

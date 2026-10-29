@@ -14,6 +14,10 @@ case choice
   -w 1: same as Soufflé (4 relations, 10 rows)
   -w 4: same as Soufflé (4 relations, 10 rows)
   -w 32: same as Soufflé (4 relations, 10 rows)
+case choice_default
+  -w 1: same as Soufflé (1 relations, 1 rows)
+  -w 4: same as Soufflé (1 relations, 1 rows)
+  -w 32: same as Soufflé (1 relations, 1 rows)
 case comp_scope
   -w 1: same as Soufflé (4 relations, 13 rows)
   -w 4: same as Soufflé (4 relations, 13 rows)
@@ -89,7 +93,6 @@ reject autoinc: ok, error: builtin autoinc is not supported by FlowLog
 reject bnot: ok, error: unary bnot not supported
 reject cast_symbol: ok, error: line 7: as(..., symbol) is supported only between types of the same base type
 reject cast_tparam: ok, error: line 7: as(..., symbol) is supported only between types of the same base type
-reject choice_no_policy: ok, error: relation C has a choice-domain but no policy
 reject comp_scope_choice: ok, error: R in component A_B names a relation of an enclosing instance with a choice-domain or a type parameter (not supported)
 reject comp_scope_mixed: ok, error: R in component B names different relations in its instances (not supported)
 reject comp_scope_tparam: ok, error: R in component B names a relation of an enclosing instance with a choice-domain or a type parameter (not supported)

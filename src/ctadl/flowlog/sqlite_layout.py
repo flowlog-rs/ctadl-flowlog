@@ -165,7 +165,8 @@ def copy_to_souffle(conn: sqlite3.Connection, name: str, cols: list) -> int:
 
 def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
     """Returns {relation: row count}; relations missing from INDB are
-    created empty (and reported with count -1)."""
+    created empty (and reported with count -1). Raises ValueError if an
+    input cannot be converted."""
     if os.path.exists(fl_path):
         os.unlink(fl_path)
     dst = connect(fl_path, in_path, "src")
@@ -188,10 +189,10 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
             continue
         src_cols = [r[1] for r in dst.execute(f"PRAGMA src.table_info({dq(name)})")]
         if len(src_cols) != len(cols):
-            raise SystemExit(f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}")
+            raise ValueError(f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}")
         if any(col["kind"] == "record" for col in cols) and RECORD_TABLE not in have:
             if dst.execute(f"SELECT EXISTS (SELECT 1 FROM src.{dq(name)})").fetchone()[0]:
-                raise SystemExit(f"{name}: {in_path} does not store record contents (it has no "
+                raise ValueError(f"{name}: {in_path} does not store record contents (it has no "
                                  f"{RECORD_TABLE}; Souffle writes record columns as ids that are "
                                  "only meaningful to the process that wrote them)")
             counts[name] = 0
@@ -217,7 +218,7 @@ def check_records(conn: sqlite3.Connection, in_path: str, name: str, col: str) -
                        f"(SELECT 1 FROM src.{dq(RECORD_TABLE)} AS t WHERE t.id = {col}) LIMIT 1").fetchone()
     if bad is not None:
         # nil (0) or a dangling id: the translation has no nil
-        raise SystemExit(f"{name}: record id {bad[0]} is nil or unknown in {in_path} "
+        raise ValueError(f"{name}: record id {bad[0]} is nil or unknown in {in_path} "
                          "(nil records are not supported)")
 
 
@@ -238,7 +239,11 @@ def main(argv: list | None = None) -> int:
     if args.cmd == "to-souffle":
         counts = to_souffle(args.fldb, args.outdb, schema, args.append)
     else:
-        counts = to_flowlog(args.indb, args.fldb, schema)
+        try:
+            counts = to_flowlog(args.indb, args.fldb, schema)
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
         missing = sorted(n for n, c in counts.items() if c < 0)
         if missing:
             print(f"warning: inputs missing from {args.indb} (created empty): {', '.join(missing)}", file=sys.stderr)

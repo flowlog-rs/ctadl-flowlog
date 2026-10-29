@@ -91,6 +91,27 @@ Plugins implement import and export:
 -  `ctadl-taint-front-fact-generator-plugin <https://pypi.org/project/ctadl-taint-front-fact-generator-plugin/>`__.
 -  `ctadl-networkx-export-plugin <https://pypi.org/project/ctadl-networkx-export-plugin/>`__
 
+Optional: the FlowLog engine
+----------------------------
+
+CTADL can run its analyses with `FlowLog
+<https://github.com/flowlog-rs/flowlog>`__ instead of Souffle (``--engine
+flowlog``, see :doc:`usage`). This needs stable Rust and FlowLog's
+compiler:
+
+.. code:: sh
+
+   git clone https://github.com/flowlog-rs/flowlog
+   (cd flowlog && cargo build --release)
+   export FLOWLOG_COMPILER=$PWD/flowlog/target/release/flowlog-compiler
+   export FLOWLOG_RUNTIME_PATH=$PWD/flowlog/flowlog-runtime
+
+``FLOWLOG_COMPILER`` defaults to ``flowlog-compiler`` on ``PATH``, and
+``FLOWLOG_RUNTIME_PATH`` makes the analyses use the runtime of the same
+checkout. ``CARGO_TARGET_DIR`` sets the cargo target directory that all
+compilations share. The FlowLog engine does not need Souffle, but CTADL
+still needs a C preprocessor for its analyses (mcpp, gcc or clang).
+
 Docker distribution
 -------------------
 

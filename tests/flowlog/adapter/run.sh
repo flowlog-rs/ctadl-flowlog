@@ -1,5 +1,6 @@
 #!/bin/bash
-# fl_db_adapter.py on record columns, with a DB that Soufflé itself writes.
+# ctadl.flowlog's sqlite_layout.py on record columns, with a DB that Soufflé
+# itself writes.
 # Soufflé stores a record column as a record id that only the writing
 # process can decode, so:
 #   - an sqlite input that no rule reads is marked "read": false by the
@@ -9,10 +10,10 @@
 #     nil (or dangling) record id fails;
 #   - an empty record relation needs no record table, both ways;
 #   - without FlowLog's DB, to-souffle creates every output empty.
-# Needs `souffle` on PATH.   tests/adapter/run.sh
+# Needs `souffle` on PATH.   tests/flowlog/adapter/run.sh
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
-PORT=$(dirname "$(dirname "$HERE")")
+PORT=$(cd "$HERE/../../../src/ctadl/flowlog" && pwd)
 W=$(mktemp -d)
 trap 'rm -rf "$W"' EXIT
 
@@ -45,7 +46,7 @@ souffle -D "$W" "$W/index.dl"
 python3 - "$PORT" "$W" <<'EOF'
 import sqlite3, sys
 sys.path.insert(0, sys.argv[1])
-import fl_db_adapter as A
+import sqlite_layout as A
 W = sys.argv[2]
 fails = 0
 
@@ -68,7 +69,7 @@ check("and Name is converted", rows(f"{W}/fl1.db", "Name") == [("a",), ("b",)])
 try:
     A.to_flowlog(f"{W}/db.sqlite", f"{W}/fl2.db", read)
     check("Souffle's DB: reading Call's records fails", False)
-except SystemExit as e:
+except ValueError as e:
     check(f"Souffle's DB: reading Call's records fails: {e}", "does not store record contents" in str(e))
 
 # records written by the port (FlowLog layout -> Souffle layout -> back)
@@ -88,7 +89,7 @@ db.commit()
 try:
     A.to_flowlog(f"{W}/port.sqlite", f"{W}/fl4.db", read)
     check("a nil record id fails", False)
-except SystemExit as e:
+except ValueError as e:
     check(f"a nil record id fails: {e}", "record id 0 is nil or unknown" in str(e))
 counts = A.to_souffle(f"{W}/missing.db", f"{W}/empty.sqlite", out, False)
 check("without FlowLog's DB, every output is created empty",

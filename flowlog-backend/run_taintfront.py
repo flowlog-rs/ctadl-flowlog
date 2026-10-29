@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run CTADL's taint-front test suite with Souffle and/or FlowLog backends.
+"""Run CTADL's taint-front test suite with its Souffle and/or FlowLog engines.
 
 For every ctadl/tests/taint-front/*.tnt this mirrors tests/bin/check-taintfront:
 import, index, query (SARIF), then CTADL's checks (test_ctadlir.py against the
@@ -36,7 +36,6 @@ HERE = Path(__file__).resolve().parent
 CTADL = HERE.parent  # the CTADL checkout this port is part of
 TOP = CTADL.parent  # the workspace
 TESTDIR = CTADL / "tests" / "taint-front"
-FLOWLOG_DRIVER = [sys.executable, str(HERE / "flowlog_ctadl.py")]
 
 
 def run(cmd: list, log, cwd=None, env=None) -> tuple[int, float]:
@@ -52,7 +51,6 @@ def run_backend(backend: str, test: Path, out: Path, phase: str, jobs: int,
     name = test.stem
     d = out / name / backend
     d.mkdir(parents=True, exist_ok=True)
-    ctadl = ["ctadl"] if backend == "souffle" else FLOWLOG_DRIVER
     res: dict = {"checks": []}
     (d / "phase").unlink(missing_ok=True)
     with open(d / "run.log", "w") as log:
@@ -62,7 +60,8 @@ def run_backend(backend: str, test: Path, out: Path, phase: str, jobs: int,
             return res
         opts = test.with_suffix(".options")
         extra = index_args + (shlex.split(opts.read_text()) if opts.exists() else [])
-        rc, res["index_s"] = run(ctadl + ["--directory", d, "index", "-f", "-j", jobs] + extra, log)
+        rc, res["index_s"] = run(["ctadl", "--directory", d, "index", "--engine", backend, "-f", "-j", jobs] + extra,
+                                 log)
         if rc:
             res["error"] = "index"
             return res
@@ -70,8 +69,8 @@ def run_backend(backend: str, test: Path, out: Path, phase: str, jobs: int,
             (d / "phase").write_text(phase)
             return res
         sarif = d / f"{name}.sarif"
-        rc, res["query_s"] = run(ctadl + ["--directory", d, "query", "-j", jobs, "--format", "sarif", "-o", sarif]
-                                 + query_args, log)
+        rc, res["query_s"] = run(["ctadl", "--directory", d, "query", "--engine", backend, "-j", jobs,
+                                  "--format", "sarif", "-o", sarif] + query_args, log)
         if rc:
             res["error"] = "query"
             return res

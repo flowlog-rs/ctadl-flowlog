@@ -27,11 +27,11 @@ one() {
   for v in s1 sj fl fa; do
     ctadl import taint-front "$D/p.tnt" -o "$D/$v" -f > /dev/null 2>&1 || { echo "f$n s$s | import FAILED"; return; }
   done
-  ctadl --directory "$D/s1" index -j 1 > "$D/s1.log" 2>&1 || { echo "f$n s$s | souffle -j1 FAILED"; return; }
-  ctadl --directory "$D/sj" index -j "$J" > "$D/sj.log" 2>&1 || { echo "f$n s$s | souffle -j$J FAILED"; return; }
-  python3 "$HERE/flowlog_ctadl.py" --directory "$D/fl" index -j "$J" > "$D/fl.log" 2>&1 ||
+  ctadl --directory "$D/s1" index --engine souffle -j 1 > "$D/s1.log" 2>&1 || { echo "f$n s$s | souffle -j1 FAILED"; return; }
+  ctadl --directory "$D/sj" index --engine souffle -j "$J" > "$D/sj.log" 2>&1 || { echo "f$n s$s | souffle -j$J FAILED"; return; }
+  ctadl --directory "$D/fl" index --engine flowlog -j "$J" > "$D/fl.log" 2>&1 ||
     { echo "f$n s$s | flowlog FAILED"; return; }
-  python3 "$HERE/flowlog_ctadl.py" --directory "$D/fa" index --all-outputs -j "$J" > "$D/fa.log" 2>&1 ||
+  ctadl --directory "$D/fa" index --engine flowlog --all-outputs -j "$J" > "$D/fa.log" 2>&1 ||
     { echo "f$n s$s | flowlog --all-outputs FAILED"; return; }
   "${CMP[@]}" "$D/s1/ctadlir.db" "$D/fl/ctadlir.db" > "$D/flowlog.cmp" 2>&1
   "${CMP[@]}" "$D/s1/ctadlir.db" "$D/sj/ctadlir.db" > "$D/souffle-j$J.cmp" 2>&1

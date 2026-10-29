@@ -2,10 +2,13 @@
 
 # CTADL
 
-> **FlowLog port (this fork).** [`flowlog-backend/`](flowlog-backend) runs CTADL's index and
-> query analyses on [FlowLog](https://github.com/flowlog-rs/flowlog) instead of Soufflé. A
-> translator turns CTADL's Soufflé programs into FlowLog, and CTADL's C++ functors are ported as
-> Rust UDFs; CTADL itself is unchanged. Over 435 differential runs with 32 workers, both backends
+> **FlowLog engine (this fork).** `ctadl index` and `ctadl query` take `--engine flowlog` (or
+> `CTADL_ENGINE=flowlog`) to run CTADL's analyses on [FlowLog](https://github.com/flowlog-rs/flowlog)
+> instead of Soufflé ([install](docs/install.rst#optional-the-flowlog-engine)). The engine,
+> [`ctadl.flowlog`](src/ctadl/flowlog), translates CTADL's Soufflé programs into FlowLog, and
+> CTADL's C++ functors are ported as Rust UDFs
+> ([`functors.rs`](src/ctadl/souffle-logic/functors.rs)); the Soufflé programs stay the single
+> source of the analyses. Over 435 differential runs with 32 workers, both engines
 > give identical databases and SARIF reports, apart from one valid `choice-domain` witness. On a
 > larger generated program, FlowLog's index takes half of Soufflé's engine time with 1 worker and
 > about as long with 32, and its query is 1.1–1.8× as fast. With a pending FlowLog fix for string

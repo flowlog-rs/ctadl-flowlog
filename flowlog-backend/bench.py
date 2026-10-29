@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark CTADL's index and query phases with the Souffle and FlowLog backends.
+"""Benchmark CTADL's index and query phases with its Souffle and FlowLog engines.
 
     bench.py [--jobs 1,4,16] [--backend BACKEND,...|both]
              [--format summary|sarif] [--out DIR] [--prune | --drop-dbs] PROG.tnt...
@@ -18,7 +18,7 @@ written order, as FlowLog's planner does for a rule without a `.plan` (bar
 cross-product avoidance and semijoin folding).
 Reported per phase:
   wall     the whole `ctadl` command (Python driver, model generation, views)
-  analyze  the backend call: Souffle's compiled analysis, or FlowLog's input
+  analyze  the engine call: Souffle's compiled analysis, or FlowLog's input
            conversion + run + result conversion
   engine   FlowLog's binary alone (Souffle's analyze is its binary alone)
   rss      peak RSS of the largest child process (the engine)
@@ -30,7 +30,8 @@ a small program first).
 from __future__ import annotations
 
 import argparse
-import os
+import importlib.machinery
+import importlib.util
 import re
 import resource
 import shutil
@@ -55,16 +56,23 @@ NOPLAN_VARIANTS = {**SOUFFLE_VARIANTS, "flowlog-noplan": ""}
 BACKENDS = ["souffle", *SOUFFLE_VARIANTS, "flowlog", "flowlog-noplan"]
 
 
+def load_cli():
+    """Loads CTADL's `ctadl` script as a module, to time its steps."""
+    path = shutil.which("ctadl")
+    if not path:
+        sys.exit("error: cannot find CTADL's `ctadl` script on PATH")
+    loader = importlib.machinery.SourceFileLoader("ctadl_cli", path)
+    mod = importlib.util.module_from_spec(importlib.util.spec_from_loader("ctadl_cli", loader))
+    sys.modules["ctadl_cli"] = mod
+    loader.exec_module(mod)
+    return mod
+
+
 def shim(backend: str, argv: list) -> None:
-    """Runs the `ctadl` CLI with timing hooks around the backend call."""
-    sys.path.insert(0, str(HERE))
-    import flowlog_ctadl
-    cli = flowlog_ctadl.load_ctadl_cli()
-    if backend.startswith("flowlog"):
-        cls = flowlog_ctadl.FlowLogAnalysis
-        cli.build_analysis = lambda args, src: cls(cli, args, src)
-    else:
-        cls = cli.SouffleCompiledAnalysis
+    """Runs the `ctadl` CLI with timing hooks around the engine call."""
+    cli = load_cli()
+    engine = backend.split("-")[0]
+    cls = cli.FlowLogCompiledAnalysis if engine == "flowlog" else cli.SouffleCompiledAnalysis
     if backend in NOPLAN_VARIANTS:
         build = cli.build_analysis
 
@@ -87,6 +95,8 @@ def shim(backend: str, argv: list) -> None:
         return r
 
     cls.analyze = analyze
+    if engine == "flowlog":
+        time_flowlog_steps(cli)
     # CTADL's own steps around the analysis (the rest of the wall time)
     for step in ("after_index", "after_query", "visualize_query_results"):
         def timed(*a, _f=getattr(cli, step), _step=step, **kw):
@@ -96,8 +106,36 @@ def shim(backend: str, argv: list) -> None:
             return r
 
         setattr(cli, step, timed)
-    sys.argv = ["ctadl"] + argv  # the CLI's argparse reads sys.argv
+    sys.argv = ["ctadl"] + argv + ["--engine", engine]  # the CLI's argparse reads sys.argv
     cli.main(sys.argv)
+
+
+def time_flowlog_steps(cli) -> None:
+    """Prints the FlowLog engine's steps as `[flowlog] <step>: <seconds>s` (bench_reps.py reads
+    them), and the output of its binary."""
+    from ctadl import flowlog
+
+    def timed(f, step):
+        def g(*a, **kw):
+            t0 = time.time()
+            r = f(*a, **kw)
+            print(f"[flowlog] {step}: {time.time() - t0:.2f}s", file=sys.stderr, flush=True)
+            return r
+        return g
+
+    cls = flowlog.FlowLogAnalysis
+    cls.read_inputs = timed(cls.read_inputs, "prepare inputs")
+    cls.write_outputs = timed(cls.write_outputs, "write results")
+    run = timed(cli.FlowLogCompiledAnalysis.run, "FlowLog run")
+
+    def run_and_echo(self, *a, **kw):
+        r = run(self, *a, **kw)
+        # "<elapsed>: Dataflow executed": the rest of the run writes the results
+        for line in (r.stdout or b"").decode(errors="replace").splitlines():
+            print(f"[flowlog]   {line}", file=sys.stderr, flush=True)
+        return r
+
+    cli.FlowLogCompiledAnalysis.run = run_and_echo
 
 
 def run(cmd: list, log: Path) -> tuple[float, dict]:
@@ -105,8 +143,7 @@ def run(cmd: list, log: Path) -> tuple[float, dict]:
     with open(log, "w") as f:
         f.write(f"$ {' '.join(map(str, cmd))}\n")
         f.flush()
-        r = subprocess.run(list(map(str, cmd)), stdout=f, stderr=subprocess.STDOUT,
-                           env=dict(os.environ, FLOWLOG_CTADL_TIMING="1"))
+        r = subprocess.run(list(map(str, cmd)), stdout=f, stderr=subprocess.STDOUT)
     wall = time.time() - t0
     if r.returncode:
         sys.exit(f"command failed (see {log}): {' '.join(map(str, cmd))}")

@@ -1,3 +1,2 @@
 # CTADL's root .gitignore ignores *.csv; the choice_mini test needs its fixtures.
 !*.csv
-__pycache__/

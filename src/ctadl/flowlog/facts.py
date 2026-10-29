@@ -5,7 +5,8 @@ souffle2flowlog.py.
 * Every file-based `.input` relation of the FlowLog program gets a file in
   the output directory (empty when the Souffle fact directory has none,
   matching Souffle, which treats a missing fact file as empty); files that
-  need no conversion are symlinked.
+  need no conversion are symlinked. Absolute file names are rejected: they
+  do not name a file in the fact directory.
 * Record-typed columns (listed in the translator's schema manifest) are
   flattened: a field `[0,foo]` becomes the two fields `0<TAB>foo`.
 """
@@ -18,22 +19,24 @@ import shutil
 import sys
 from pathlib import Path
 
-INPUT_RE = re.compile(r"^\s*\.input\s+([A-Za-z_][A-Za-z0-9_.]*)\s*(?:\((.*)\))?\s*$")
+IO_RE = re.compile(r"^\s*\.(input|output)\s+([A-Za-z_][A-Za-z0-9_.]*)\s*(?:\((.*)\))?\s*$")
 PARAM_RE = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
+DEFAULT_SUFFIX = {"input": ".facts", "output": ".csv"}
 
 
-def parse_inputs(program: Path) -> dict[str, str]:
-    """Maps each file-based `.input` relation to its fact file name."""
-    inputs: dict[str, str] = {}
+def file_io(program: Path, kind: str = "input") -> dict[str, str]:
+    """Maps each file-based `.input` (or, with kind "output", `.output`)
+    relation to its file name."""
+    files: dict[str, str] = {}
     for line in program.read_text().splitlines():
-        m = INPUT_RE.match(line)
-        if not m:
+        m = IO_RE.match(line)
+        if not m or m.group(1) != kind:
             continue
-        rel, params = m.group(1), dict(PARAM_RE.findall(m.group(2) or ""))
-        if params.get("IO", "file") != "file":
+        rel, params = m.group(2), dict(PARAM_RE.findall(m.group(3) or ""))
+        if params.get("IO", "file").lower() != "file":
             continue
-        inputs[rel] = params.get("filename", f"{rel}.facts")
-    return inputs
+        files[rel] = params.get("filename", rel + DEFAULT_SUFFIX[kind])
+    return files
 
 
 def split_record(text: str) -> list[str]:
@@ -89,10 +92,13 @@ def convert(program: Path, src_dir: Path, dst_dir: Path, schema: Path | None = N
     Files without record columns are symlinked; raises ValueError on
     malformed records."""
     records = json.loads(schema.read_text()).get("records", {}) if schema else {}
-    inputs = parse_inputs(program)
+    inputs = file_io(program)
     dst_dir.mkdir(parents=True, exist_ok=True)
     for rel, fname in sorted(inputs.items()):
+        if Path(fname).is_absolute():
+            raise ValueError(f"{rel}: absolute fact file names are not supported: '{fname}'")
         src, dst = src_dir / fname, dst_dir / fname
+        dst.parent.mkdir(parents=True, exist_ok=True)
         if dst.exists() or dst.is_symlink():
             dst.unlink()
         if not src.exists():

@@ -1,8 +1,9 @@
 # CTADL on FlowLog
 
-This experiment runs [CTADL](https://github.com/sandialabs/ctadl)'s taint analysis on
-[FlowLog](https://github.com/flowlog-rs/flowlog) instead of Soufflé. CTADL's analysis is written
-as Soufflé Datalog programs. The questions:
+This fork runs [CTADL](https://github.com/sandialabs/ctadl)'s taint analysis on
+[FlowLog](https://github.com/flowlog-rs/flowlog) instead of Soufflé, with `ctadl index --engine
+flowlog` and `ctadl query --engine flowlog` ([Usage](#usage)). CTADL's analysis is written as
+Soufflé Datalog programs. The questions:
 
 - Can FlowLog, as it is today, express the computation?
 - What FlowLog-specific logic does it need, for example Rust UDFs?
@@ -20,10 +21,11 @@ analyses run on FlowLog and produce the same results as Soufflé:
 - **Differential runs:** 435 runs, each comparing every database relation (120 per run, 143
   with `--all-outputs`) and the SARIF report. Every run is identical except one. In that run,
   FlowLog picked a different but valid `choice-domain` witness ([Limitations](#limitations)).
-- **CTADL's own test expectations** pass on both backends.
-- **Semantics suite:** small programs check each translated construct against Soufflé. 19 programs
+- **CTADL's own tests:** `tests/bin/check-taintfront` passes with `CTADL_ENGINE=flowlog`, as with
+  Soufflé.
+- **Semantics suite:** small programs check each translated construct against Soufflé. 20 programs
   give Soufflé's rows with 1, 4 and 32 workers; on 11 more, Soufflé stops with an error and so does
-  FlowLog. The translator refuses 41 programs it cannot translate faithfully, rejects 7 erroneous
+  FlowLog. The translator refuses 40 programs it cannot translate faithfully, rejects 7 erroneous
   programs as Soufflé does, and warns about 3 ([Validation](#validation)).
 - **Integers:** Soufflé computes on 64 bits with wrap-around. FlowLog types a literal `int32`
   where no column types it, and rustc rejects some constant arithmetic in the crate FlowLog
@@ -44,9 +46,9 @@ FlowLog does not accept CTADL's program as is. It took four things:
 1. **A Soufflé→FlowLog translator** (`souffle2flowlog.py`). It rewrites the Soufflé features
    FlowLog lacks or spells differently ([table](#translation)). Most rewrites are syntactic.
    `choice-domain` is the one that needs real design work.
-2. **Rust UDFs** (`ctadl_udf.rs`), loaded through FlowLog's `.extern fn` and `--udf-file`:
-   - Ports of CTADL's 13 C++ functors (call strings, access paths, substring checks). Soufflé
-     loads these from a C++ shared library.
+2. **Rust UDFs**, loaded through FlowLog's `.extern fn` and `--udf-file`:
+   - Ports of CTADL's 13 C++ functors (call strings, access paths, substring checks), in
+     `functors.rs` next to CTADL's `functors.cpp`. Soufflé loads these from a C++ shared library.
    - Soufflé's semantics for builtins that FlowLog computes differently (`strlen`, `substr`,
      `to_number`, `^`, `ord`), and for `/` and `%`, which panic in FlowLog on a zero divisor even
      where Soufflé never divides (bugs B7–B9).
@@ -57,14 +59,16 @@ FlowLog does not accept CTADL's program as is. It took four things:
        key, so that a FlowLog `min` lattice keeps one deterministic witness per key.
      - `choice_claimN` fixes the witness that reads see inside recursion.
 
-   UDFs fit the functors naturally. For `choice-domain` they are a workaround: the claims are
-   mutable state outside the dataflow ([details](#choice-domain)).
+   The functor ports are CTADL's; the other UDFs are the translator's (`souffle2flowlog.rs`), for
+   any program it translates. UDFs fit the functors naturally. For `choice-domain` they are a
+   workaround: the claims are mutable state outside the dataflow ([details](#choice-domain)).
 3. **One FlowLog compiler fix**, for an internal compiler error that CTADL's string constraints
    trigger (B1, [flowlog-rs/flowlog#464](https://github.com/flowlog-rs/flowlog/issues/464)). The
    fix, [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477), is merged into
    FlowLog's `main` ([Setup](#setup)).
-4. **Glue:**
-   - a drop-in `ctadl` command;
+4. **An engine option in CTADL:** `ctadl index` and `ctadl query` take `--engine flowlog`. The
+   engine, the package `ctadl.flowlog`, translates and compiles the analysis, caches the binary
+   as CTADL caches Soufflé's, and converts the run's inputs and outputs:
    - sqlite layout adapters between FlowLog's plain tables and the Soufflé symbol-table layout
      that CTADL's Python tooling reads;
    - a fact-file converter.
@@ -89,16 +93,19 @@ FlowLog does not accept CTADL's program as is. It took four things:
 - **Compiling** takes 1.2–1.8× as long, and the binaries are 19–28× larger
   ([Performance](#performance)).
 
-**FlowLog bugs:** the port found thirteen (B1–B13), each with a minimal repro in `repros/`. Each is
-filed on FlowLog, with a fix PR; the fixes for B1, B2, B4, B6–B8 and B11 are merged ([FlowLog
-findings](#flowlog-findings)). CTADL's program needs the fix for B1. The translation works around
-the others, except B6 and some shapes of B4, which CTADL's program does not have.
+**FlowLog bugs:** the port found fourteen (B1–B14), each with a minimal repro in `repros/`. B1–B13
+are filed on FlowLog, each with a fix PR; the fixes for B1, B2, B4, B6–B8 and B11 are merged
+([FlowLog findings](#flowlog-findings)). CTADL's program needs the fix for B1. The translation
+works around B2–B13, except B6 and some shapes of B4, which CTADL's program does not have. B14 can
+give a compilation the binary of another program compiled at the same time; the engine and the
+tests avoid it.
 
 ## Layout
 
-The port is `flowlog-backend/` in this fork of CTADL. The rest of the fork is CTADL 0.14.1
-(`4f6f8cb`), unchanged. The scripts expect a workspace that holds the fork, FlowLog and ctadl-rs
-side by side. Run them from the workspace:
+The fork is CTADL 0.14.1 (`4f6f8cb`) with a FlowLog engine: the files below, and the `--engine`
+option of CTADL's command-line driver, `bin/ctadl`. CTADL's analyses and the rest of its code are
+unchanged. The scripts that test and benchmark the engine expect a workspace that holds the fork,
+FlowLog and ctadl-rs side by side. Run them from the workspace:
 
 ```
 workspace/
@@ -112,17 +119,30 @@ workspace/
   runs/                 output of the test and benchmark runs
 ```
 
-The port, `ctadl/flowlog-backend/`:
+The engine, in `ctadl/`:
 
 ```
-flowlog_ctadl.py      drop-in `ctadl` command that uses FlowLog as the backend
-souffle2flowlog.py    Soufflé -> FlowLog translator (also a CLI)
-policy.json           per-relation choice-domain policies
-ctadl_udf.rs          Rust UDFs: functor ports, Soufflé builtins, choice helpers
-fl_db_adapter.py      sqlite layout conversion (FlowLog <-> Soufflé)
-convert_facts.py      fact directory preparation (record flattening)
+src/ctadl/flowlog/        the FlowLog engine, package ctadl.flowlog
+  __init__.py             compiles an analysis (cached) and converts the inputs and outputs of
+                          its runs; bin/ctadl's FlowLogCompiledAnalysis runs it
+  souffle2flowlog.py      Soufflé -> FlowLog translator (also a CLI)
+  souffle2flowlog.rs      the translator's Rust UDFs: Soufflé builtins, choice helpers
+  sqlite_layout.py        sqlite layout conversion (FlowLog <-> Soufflé)
+  facts.py                fact directory preparation (record flattening)
+src/ctadl/souffle-logic/  CTADL's analyses, and:
+  functors.rs             Rust port of functors.cpp, CTADL's functors
+  flowlog-policy.json     choice-domain policies for CTADL's relations
+tests/flowlog/
+  semantics/              semantics suite: the translator and UDFs against Soufflé
+  choice_mini/            regression test for the recursive choice-domain emulation
+  adapter/                sqlite record columns, with a DB that Soufflé writes
+```
+
+The experiment, `ctadl/flowlog-backend/`:
+
+```
 index_tf.fl, query_tf.fl,            the translated taint-front analyses and their
-index_schema.json, query_schema.json   schema manifests (for reference; the driver
+index_schema.json, query_schema.json   schema manifests (for reference; the engine
                                        regenerates them)
 run_taintfront.py     differential runner (CTADL tests or any .tnt corpus)
 run_variants.sh       differential runs under non-default CTADL options
@@ -134,17 +154,14 @@ check_choice_model.py checks that a FlowLog DB is a valid choice model (Soufflé
                       program restricted to FlowLog's choice-domain witnesses)
 bench.py, gen_tnt.py  benchmark harness, synthetic program generator
 bench_reps.py         repeated benchmark runs, and their medians
-repros/               minimal programs for each FlowLog bug/gap, check.sh
-tests/choice_mini/    regression test for the recursive choice-domain emulation
-tests/semantics/      semantics suite: the translator and UDFs against Soufflé
-tests/adapter/        sqlite record columns, with a DB that Soufflé writes
+repros/               minimal programs for each FlowLog bug/gap, check.sh; same_name.sh (B14)
 results/              summaries of the runs reported here
 ```
 
 ## Setup
 
-You need Soufflé 2.5 (the reference backend; CTADL needs it anyway), stable Rust (1.95 was used),
-Python 3.10 or later, OCaml with dune (for CTADL's taint-front front end), and sqlite3.
+You need Soufflé 2.5 (the reference engine), stable Rust (1.95 was used), Python 3.10 or later,
+OCaml with dune (for CTADL's taint-front front end), and sqlite3.
 
 ```bash
 mkdir workspace && cd workspace
@@ -156,7 +173,9 @@ python3 -m venv .venv && . .venv/bin/activate
 pip install -e ctadl -e ctadl/plugins/taint-front
 (cd ctadl/taint-front && dune build)
 mkdir -p bin && ln -s "$PWD/ctadl/taint-front/_build/default/taint.exe" bin/taintfront
-export PATH=$PWD/bin:$PATH FLOWLOG_CARGO_TARGET=$PWD/fltarget
+export PATH=$PWD/bin:$PATH CARGO_TARGET_DIR=$PWD/fltarget \
+       FLOWLOG_COMPILER=$PWD/flowlog/target/release/flowlog-compiler \
+       FLOWLOG_RUNTIME_PATH=$PWD/flowlog/flowlog-runtime
 ```
 
 `ctadl-port` is FlowLog's `main` at `b03d2fd`, which has the B1 fix, PR
@@ -168,35 +187,47 @@ FlowLog's open fixes.
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
 analyses and the cargo target dir take a few GB ([Disk usage](#disk-usage)). Put the workspace,
-`FLOWLOG_CTADL_CACHE` and `TMPDIR` on a disk with room.
+CTADL's state directory (`XDG_STATE_HOME`, where the compiled analyses are cached) and `TMPDIR` on
+a disk with room.
 
 ## Usage
 
-`flowlog_ctadl.py` takes the same arguments as `ctadl`:
+`ctadl index` and `ctadl query` take `--engine flowlog`, and `CTADL_ENGINE=flowlog` makes it the
+default:
 
 ```bash
-P=ctadl/flowlog-backend
-python3 $P/flowlog_ctadl.py import taint-front prog.tnt -o work
-python3 $P/flowlog_ctadl.py --directory work index -j 8
-python3 $P/flowlog_ctadl.py --directory work query --format sarif -o prog.sarif
+ctadl import taint-front prog.tnt -o work
+ctadl --directory work index --engine flowlog -j 8
+ctadl --directory work query --engine flowlog --format sarif -o prog.sarif
 ```
 
 - **First compile:** the first `index` or `query` with a given analysis program translates and
-  compiles it, which takes a few minutes. The result is cached by content hash in
-  `~/.cache/ctadl-flowlog/<key>`, the same way CTADL caches its Soufflé binaries.
-- **Cache key:** it covers the translator, `policy.json`, `ctadl_udf.rs`, the program and the
-  compiler binary. Editing any of them triggers a recompile.
-- **Environment variables:** `CTADL_CLI`, `FLOWLOG_COMPILER`, `FLOWLOG_RUNTIME_PATH`,
-  `FLOWLOG_CTADL_CACHE`, `FLOWLOG_CTADL_POLICY` (an alternative `policy.json`),
-  `FLOWLOG_CARGO_TARGET` and `FLOWLOG_CTADL_TIMING` (per-step timings). See the docstring in
-  `flowlog_ctadl.py`.
+  compiles it, which takes a few minutes. The binary is cached next to CTADL's Soufflé binaries,
+  in `~/.local/state/ctadl/analysis/<version>/flowlog/<key>`, with the translation, its schema
+  manifest and the compiler's log.
+- **Cache key:** it covers the program, the translator and its UDFs, `flowlog-policy.json`,
+  `functors.rs`, the compiler binary and `FLOWLOG_RUNTIME_PATH`. Editing any of them triggers a
+  recompile; editing the runtime's source does not.
+- **Mixing engines:** the index database has Soufflé's layout whichever engine wrote it, and a
+  query with either engine reads an index from either.
+- **Options:** CTADL's options work with both engines, except `--souffle-arg` and
+  `--no-compile-analysis` (Soufflé's interpreter), which need `--engine souffle`.
+- **Environment variables:** `CTADL_ENGINE`; `FLOWLOG_COMPILER` (default: `flowlog-compiler` on
+  `PATH`); `FLOWLOG_RUNTIME_PATH`, the `flowlog-runtime` source that the compiler builds against
+  (default: the crates.io release it was built with); `CARGO_TARGET_DIR`, the cargo target dir
+  that the compilations share (default: in the cache).
 
 The translator also works standalone:
 
 ```bash
-python3 $P/souffle2flowlog.py analysis.dl -o analysis.fl --policy $P/policy.json --schema schema.json
-flowlog/target/release/flowlog-compiler analysis.fl --str-intern --udf-file $P/ctadl_udf.rs -o analysis
+F=ctadl/src/ctadl/flowlog L=ctadl/src/ctadl/souffle-logic
+python3 $F/souffle2flowlog.py analysis.dl -o analysis.fl --policy $L/flowlog-policy.json --schema schema.json
+cat $F/souffle2flowlog.rs $L/functors.rs > udf.rs
+flowlog-compiler analysis.fl --str-intern --udf-file udf.rs -o analysis
 ```
+
+Without `--policy`, every `choice-domain` is encoded as `minchoice` ([choice-domain](#choice-domain)).
+A program that uses none of CTADL's functors needs only `souffle2flowlog.rs`.
 
 ## How it works
 
@@ -211,24 +242,27 @@ CTADL's own command-line driver does all the work except running the Datalog ana
 - query views,
 - SARIF export.
 
-`flowlog_ctadl.py` loads CTADL's `ctadl` script as a module and replaces its `build_analysis` hook.
-`index` and `query` then go through `FlowLogAnalysis`, a stand-in for CTADL's
-`SouffleCompiledAnalysis`, which works in three steps:
+With `--engine flowlog`, CTADL's `build_analysis` returns a `FlowLogCompiledAnalysis` instead of
+a `SouffleCompiledAnalysis`. It has the same interface, so `index` and `query` use it unchanged.
+It works in three steps (`ctadl.flowlog`):
 
 1. **Translate.** `souffle2flowlog.py` translates the preprocessed Soufflé program into
-   `program.fl`. It also writes `schema.json`, a manifest of the sqlite inputs and outputs with
-   their original attribute names and flattened record columns.
-2. **Compile.** `flowlog-compiler --str-intern --udf-file ctadl_udf.rs` compiles the program. It
-   runs with `CARGO_INCREMENTAL=0`; see [Disk usage](#disk-usage).
-3. **Run.** The binary runs as `-F in -D out -w <jobs>`. Around the run:
-   - **Inputs:** fact files are prepared by `convert_facts.py` (missing files read as empty;
-     record columns are flattened). sqlite inputs, which the query phase reads from the index
-     DB, are converted to FlowLog's layout by `fl_db_adapter.py`. Inputs that no rule reads are
-     created empty. CTADL's query declares 46 of them, including three with record columns.
-   - **Outputs:** FlowLog writes each relation as a plain table. `fl_db_adapter.py` converts the
+   `program.fl`, with the policies in `flowlog-policy.json`. It also writes `schema.json`, a
+   manifest of the sqlite inputs and outputs with their original attribute names and flattened
+   record columns.
+2. **Compile.** `flowlog-compiler --str-intern --udf-file udf.rs` compiles the program, where
+   `udf.rs` is `souffle2flowlog.rs` followed by `functors.rs`. It builds in a scratch directory
+   that it deletes afterwards ([Disk usage](#disk-usage)).
+3. **Run.** The binary runs as `-F in -D out -w <jobs>`, on a scratch directory in CTADL's
+   `--tmpdir`. Around the run:
+   - **Inputs:** fact files are prepared by `facts.py` (missing files read as empty; record
+     columns are flattened). sqlite inputs, which the query phase reads from the index DB, are
+     converted to FlowLog's layout by `sqlite_layout.py`. Inputs that no rule reads are created
+     empty. CTADL's query declares 46 of them, including three with record columns.
+   - **Outputs:** FlowLog writes each relation as a plain table. `sqlite_layout.py` converts the
      outputs to Soufflé's layout (a `__SymbolTable`, shadow tables `_R` holding ids, and views
      `R`) and appends them to CTADL's database. CTADL's Python tooling and SQL views therefore
-     work unchanged.
+     work unchanged. Other output files are moved to where Soufflé writes them.
 
    Both conversions are `INSERT ... SELECT` statements that SQLite runs on the two databases,
    attached to one connection. They intern the symbols with `INSERT OR IGNORE`, then fill each
@@ -244,11 +278,11 @@ they need FlowLog's `int64` type or its UDFs; the semantics suite tests those re
 | Soufflé construct (as CTADL uses it) | FlowLog encoding | Repro |
 |---|---|---|
 | `.comp` declared inside a `.comp` | Hoisted to top level. FlowLog cannot resolve a nested component from a nested `.init`. Relation names in a component's clauses resolve as in Soufflé ([below](#components)). | `nested_comp` |
-| Record types `[a: T, b: U]` | One column per field (`attr_field`). In sqlite, records become synthetic ids, with the fields kept in `__FlowLogRecord`. A DB that Soufflé writes keeps only the ids, so a query that reads a record column needs a FlowLog index. CTADL's query reads none, so it also runs on a Soufflé index. | `record_type`, `tests/adapter` |
+| Record types `[a: T, b: U]` | One column per field (`attr_field`). In sqlite, records become synthetic ids, with the fields kept in `__FlowLogRecord`. A DB that Soufflé writes keeps only the ids, so a query that reads a record column needs a FlowLog index. CTADL's query reads none, so it also runs on a Soufflé index. | `record_type`, `tests/flowlog/adapter` |
 | `.functor F(..)`, `@F(..)` | `.extern fn F(..)`, `F(..)`; the implementations are Rust UDFs | `functor_decl` |
 | Variadic `cat(a, b, c)` | `cat(cat(a, b), c)` | `variadic_cat` |
 | `x = range(lo, hi)` | `FlowlogRange(hi, x), x >= lo`. `FlowlogRange` is a precomputed table of `0 <= x < hi < 1024`, built without recursion. Other bounds use a demand-driven recursive `RangeN` relation. | `range_gen` |
-| `choice-domain` | Per-relation policy ([below](#choice-domain)) | `choice_domain` |
+| `choice-domain` | Per-relation policy, `minchoice` by default ([below](#choice-domain)) | `choice_domain` |
 | `inline` relations | Expanded at their positive uses, as Soufflé does. Materialised when used negated or in an aggregate, or when their clauses are given per component instance. Unused ones are dropped. | `inline_rel` |
 | `true`, `false`, `!(a < b)`, `x = x` | Simplified; rules with unsatisfiable bodies are dropped | `true_false` |
 | Expression arguments of atoms, `S(cat(a, "y"))` | `t = cat(a, "y"), S(t)`. In an aggregate, the binding goes inside the aggregate body. FlowLog cannot compile it there when it reads only outer variables and constants (bug B4), so the translator rejects that case. CTADL has no such aggregate. | `agg_computed` |
@@ -256,7 +290,7 @@ they need FlowLog's `int64` type or its UDFs; the semantics suite tests those re
 | Facts with computed arguments, `C(cat("a", "b")).`, and bodies that bind only by computation, `C(s) :- s = cat("a", "b").` | `C(cat("a", "b")) :- FlowlogUnit(_).`, `C(s) :- FlowlogUnit(_), s = cat("a", "b").` | `computed_fact`, `computed_body_only` |
 | `_` inside an aggregate body | Named fresh variables, where Soufflé aggregates over the tuples of the body's single atom. FlowLog aggregates over the distinct bindings of the named variables ([FlowLog findings](#flowlog-findings)). On `84b3a1c`, the names also avoid bug B2. | `count_all_wild` |
 | Variables named like FlowLog keywords (`fn`) | Renamed | `keyword_fn` |
-| `.plan` | FlowLog's `.plan` gives one join order per rule, Soufflé's one per semi-naive version of a recursive rule. The translation keeps version 0's order (the delta on the rule's first recursive atom) and drops the others ([Join order](#join-order)). Like Soufflé, it applies the plan to the rule with its relations inlined. It drops a plan where the translated rule reads other atoms (a `range` rewrite; a `choice-domain` relation read inside its own recursion, in a component instantiated more than once). | `tests/semantics/cases/plans.dl` |
+| `.plan` | FlowLog's `.plan` gives one join order per rule, Soufflé's one per semi-naive version of a recursive rule. The translation keeps version 0's order (the delta on the rule's first recursive atom) and drops the others ([Join order](#join-order)). Like Soufflé, it applies the plan to the rule with its relations inlined. It drops a plan where the translated rule reads other atoms (a `range` rewrite; a `choice-domain` relation read inside its own recursion, in a component instantiated more than once). | `tests/flowlog/semantics/cases/plans.dl` |
 | `.pragma`, representation qualifiers | Dropped. `.limitsize`, which truncates a relation, is rejected. | `pragma` |
 | Output relations that no fact, input or rule derives | A rule that never fires, `A(0) :- FlowlogUnit(u), u != 0.`. Otherwise FlowLog prunes every relation and the generated crate does not compile (bug B12). | `empty_dataflow` |
 | `number`, `unsigned` | `int64`, `uint64`: CTADL needs Soufflé's 64-bit domain. Constant expressions are computed with Soufflé's wrap-around, and expressions FlowLog would compute on `int32` are pinned to 64 bits (bugs B5, B10, B11, B13; [below](#integers)). `float` is rejected (CTADL has none). | `literal_overflow`, `cast_literal`, `type_limit_cmp`, `udf_grouped_arg` |
@@ -270,12 +304,13 @@ conversions, `bnot`, `lnot` and `land`, `^` and `range` over `unsigned`, negatio
 inside an aggregate, and an aggregate correlated through a computed value. It also refuses
 arithmetic whose type depends on the order of Soufflé's alias resolution
 ([Integers](#integers)), and component clauses whose names resolve to different relations in
-different instances ([Components](#components)). `tests/semantics/rejects/` has 41 such programs.
+different instances ([Components](#components)). `tests/flowlog/semantics/rejects/` has 40 such
+programs.
 CTADL uses none of these.
 
 Soufflé rejects an atom of an undefined relation or of the wrong arity, and so does the
 translator, before any rewrite can drop the clause that holds it ([Components](#components)).
-`tests/semantics/invalid/` has 7 such programs.
+`tests/flowlog/semantics/invalid/` has 7 such programs.
 
 **Timing.** The `range` and `inline` rewrites preserve the iteration in which Soufflé derives a
 tuple, not just the fixpoint. In Soufflé a `range` generator or an inline relation is evaluated
@@ -293,12 +328,13 @@ functional (`drop` below).
 CTADL declares `choice-domain` on 7 relations (8 declarations: `ReachableVertex` is declared twice).
 Soufflé keeps the first tuple inserted for each key. Which tuple comes first depends on Soufflé's
 evaluation order, and its documentation calls the choice non-deterministic. FlowLog has no
-equivalent, so `policy.json` assigns each relation an encoding:
+equivalent, so the translator encodes each `choice-domain` by a policy: `minchoice` by default, or
+the one that the policy file names for the relation (`flowlog-policy.json` for CTADL):
 
 | Policy | Relations | Encoding |
 |---|---|---|
 | `drop` | AliasedBy, IntraObjectAliasedBy, ReachableVertex | The `choice-domain` is removed. The dependent columns are functions of the key (always `""`, or `ord` of the key and `0`), so there is one tuple per key anyway. |
-| `minchoice` | VirtualAssign, ParthianVertex, ContextObj, LostAssign | `R_choice(keys.., ck: min<int64>)` with `ck = choice_keyN(prio, deps..)`. `R` is decoded with `choice_field(ck, i)`. |
+| `minchoice` (default) | VirtualAssign, ParthianVertex, ContextObj, LostAssign | `R_choice(keys.., ck: min<int64>)` with `ck = choice_keyN(prio, deps..)`. `R` is decoded with `choice_field(ck, i)`. |
 
 The translator also supports `{"min": "COLUMN"}`, which turns one dependent column into a FlowLog
 `min` lattice. It is unused. For ParthianVertex it would keep the shortest length per (var, path),
@@ -338,7 +374,7 @@ UDF remembers the first candidate presented for each (component instance, relati
 returns it on every later call. All reads in the loop agree on one witness, and the final relation
 is decoded through the same claims.
 
-On CTADL's tests and corpora the results match Soufflé, apart from one tie. `tests/choice_mini` and
+On CTADL's tests and corpora the results match Soufflé, apart from one tie. `tests/flowlog/choice_mini` and
 the benchmark show that they do not depend on the worker count. On the 30 generated programs of
 the [sweep](#larger-programs) and on the benchmark's syn25, every result is a valid choice model.
 The scheme does rely on an evaluation-order property: for each key, the first candidate a claim
@@ -454,7 +490,7 @@ some of the resulting code. The translator therefore rewrites integer expression
     refuses the rule.
   - A `/` or `%` of literals in an `unsigned` context divides unsigned.
 
-`tests/semantics/cases/widths.dl` checks these rewrites against Soufflé. CTADL needs none of them:
+`tests/flowlog/semantics/cases/widths.dl` checks these rewrites against Soufflé. CTADL needs none of them:
 its translation is the same with or without them.
 
 <a id="components"></a>
@@ -475,12 +511,12 @@ in a clause it never evaluates. The translator drops some clauses, such as never
 and the clauses of unused inline relations, so FlowLog would not see the error. The translator
 therefore checks every atom and directive before any rewrite (`check_relations`), so these
 programs fail in both engines. Like Soufflé, it skips components that are never instantiated.
-`tests/semantics/invalid/` has 7 such programs, each with the error it expects.
+`tests/flowlog/semantics/invalid/` has 7 such programs, each with the error it expects.
 
 The never-firing rule for programs without a derived output (B12, [Translation](#translation))
 also covers outputs declared in components: it is given at top level, as `c.A(0) :- ...`.
 
-### UDFs (`ctadl_udf.rs`)
+### UDFs
 
 | UDF | Purpose |
 |---|---|
@@ -495,9 +531,10 @@ also covers outputs declared in components: it is given at top level, as `c.A(0)
 | `souffle_*_error`, `souffle_raise` | The [runtime-error](#runtime-errors) checks: Soufflé's complaint, or `""`; stop the run |
 | `flowlog_int64`, `flowlog_uint64` | Identities that make FlowLog compute an expression on 64 bits ([Integers](#integers)) |
 
-The first four rows port `ctadl/src/ctadl/souffle-logic/functors.cpp`. FlowLog passes `string`
-arguments as owned `String`, and `number` (FlowLog's `int64`, as CTADL builds Soufflé with
-64-bit numbers) as `i64`. The choice helpers' priorities, instance and relation ids are `int32`.
+The first four rows are CTADL's functors, in `src/ctadl/souffle-logic/functors.rs`, which ports
+`functors.cpp` next to it. The others are the translator's, in `src/ctadl/flowlog/souffle2flowlog.rs`.
+FlowLog passes `string` arguments as owned `String`, and `number` (FlowLog's `int64`, as CTADL
+builds Soufflé with 64-bit numbers) as `i64`. The choice helpers' priorities, instance and relation ids are `int32`.
 
 ## Validation
 
@@ -523,9 +560,16 @@ Both backends ran with 32 workers (`-j 32`). That is CTADL's default on the test
 has 64 hardware threads; CTADL uses half the CPUs. The runs used a fresh clone of this branch and
 FlowLog `main` at `84b3a1c` plus #477, with FlowLog's analyses compiled from scratch. An earlier
 round with 4 workers gave the same results, and so do the taint-front tests on `main` at `b03d2fd`
-and `8ce7b5e` ([Setup](#setup)). Each run's line is in `results/taint-front/summary.txt`,
+and `8ce7b5e` ([Setup](#setup)). The runs predate the engine option, but `ctadl --engine flowlog`
+compiles the same FlowLog programs for CTADL's index and query, byte for byte. On `b03d2fd` with
+the engine option, the 12 taint-front tests are again identical (`results/taint-front/engine.txt`),
+and CTADL's `tests/bin/check-taintfront` passes with `CTADL_ENGINE=flowlog`. Each run's line is in
+`results/taint-front/summary.txt`,
 `results/corpus-ctadl/summary.txt`, `results/corpus-ctadl-rs/summary.txt` and
-`results/variants/*/summary.txt`.
+`results/variants/*/summary.txt`. Three more checks of the engine option gave Soufflé's results:
+two runs at the same time, one with `--all-outputs`, which compiled their analyses concurrently;
+four taint-front tests whose query ran on the other engine's index, both ways round; and a `--dl`
+fragment, whose output files are the same with either engine.
 
 The option variants are: `--object-tracking`, `--hybrid-inlining-context-bound=2`,
 `--no-hybrid-inlining`, `--dynamic-access-paths-max-length=3`, `--no-interprocedural-data-flow`,
@@ -548,24 +592,24 @@ Per-variant tallies are in `results/variants/tally.txt`.
 
 Other checks:
 
-- `tests/semantics/run.sh` tests the translation rule by rule against Soufflé, on small programs
+- `tests/flowlog/semantics/run.sh` tests the translation rule by rule against Soufflé, on small programs
   written for the purpose (last run in `results/semantics.txt`):
-  - `cases/` (19 programs, 1,168 rows): every output relation is equal with FlowLog at 1, 4 and
+  - `cases/` (20 programs, 1,169 rows): every output relation is equal with FlowLog at 1, 4 and
     32 workers. They cover rule forms, components and their name scoping, arithmetic and integer
     widths, strings, aggregates and their scoping, records, ranges, `choice-domain`, programs
     without a derived output, `.plan` hints, and Soufflé's builtins (`pow`, `substr`,
     `to_number`, …), including their edge cases. A case can also name text its translation must
     contain (`// expect-fl:`), such as the `.plan`s it keeps.
-  - `rejects/` (41): the translator reports an error.
+  - `rejects/` (40): the translator reports an error.
   - `invalid/` (7): erroneous programs. Soufflé and the translator reject each with the same
     error (undefined relation or wrong arity, at the same line).
   - `aborts/` (11): Soufflé stops on a partial call, and the port stops with the same complaint.
   - `warns/` (3): Soufflé stops on a call the checks cannot cover, and the translator's warning
     lists it.
-- `tests/choice_mini/run.sh` translates, compiles and runs a recursive choice-domain program with
+- `tests/flowlog/choice_mini/run.sh` translates, compiles and runs a recursive choice-domain program with
   1, 4 and 32 workers and compares the output with expected results and with Soufflé's
   (`results/choice_mini.txt`).
-- `tests/adapter/run.sh` checks the sqlite conversion of record columns. Soufflé writes a DB in
+- `tests/flowlog/adapter/run.sh` checks the sqlite conversion of record columns. Soufflé writes a DB in
   which they are only ids. An input no rule reads is created empty, and one a rule reads is
   refused with an explanation. Records the port writes still round-trip, a nil record id is
   refused, and without FlowLog's output DB every output is created empty (`results/adapter.txt`).
@@ -630,9 +674,9 @@ python3 $P/run_taintfront.py $S --testdir ctadl/taint-front --out runs/corpus-ct
 python3 $P/run_taintfront.py $S --testdir ctadl-rs/ctadl-ascent/tests/tnt --out runs/corpus-ctadl-rs
 JOBS=32 bash $P/run_variants.sh    # or: run_variants.sh star allout ...
 JOBS=32 bash $P/run_sweep.sh -P 2  # FUNCS="6 8" SEEDS="1 2" for a subset
-WORKERS="1 4 32" $P/tests/choice_mini/run.sh
-WORKERS="1 4 32" $P/tests/semantics/run.sh   # or: run.sh arith div_zero ...
-$P/tests/adapter/run.sh
+WORKERS="1 4 32" ctadl/tests/flowlog/choice_mini/run.sh
+WORKERS="1 4 32" ctadl/tests/flowlog/semantics/run.sh   # or: run.sh arith div_zero ...
+ctadl/tests/flowlog/adapter/run.sh
 $P/repros/check.sh -s; $P/repros/check.sh; $P/repros/check.sh -t
 ```
 
@@ -697,7 +741,7 @@ both. The figures below for FlowLog's query on syn25 are from the `flowlog-nopla
   | **Wall** | 89.1 | 106.2 | 72.4 | 84.9 |
 
 - **Conversion:** FlowLog writes plain sqlite tables. CTADL's tools read Soufflé's layout, a
-  symbol table plus views, and `fl_db_adapter.py` converts between the two inside SQLite
+  symbol table plus views, and `sqlite_layout.py` converts between the two inside SQLite
   ([Pipeline](#pipeline)). syn25's query writes 18.4 million rows, 18.0 million of them in
   `forward_flow.ReachableEdge`, and converting them takes 18–19 s on one thread. (The port's
   first version converted them row by row in Python, in 56 s.) With 1 worker, the conversion
@@ -875,12 +919,12 @@ index against the benchmark's, and FlowLog's query on Soufflé's index (`ctadl` 
 ```bash
 D=runs/check; T=bench/syn25.tnt; B=runs/bench/syn25
 for v in fa fq; do ctadl import taint-front $T -o $D/$v -f; done
-python3 $P/flowlog_ctadl.py --directory $D/fa index --all-outputs -j 32
+ctadl --directory $D/fa index --engine flowlog --all-outputs -j 32
 python3 $P/check_choice_model.py $D/fa/index.dl $D/fa/facts $D/fa/ctadlir.db $D/model -j 32 \
     --schema $P/index_schema.json
 python3 $P/compare_db.py --schema $P/index_schema.json $D/fa/ctadlir.db $B/flowlog-j1/ctadlir.db
 ctadl --directory $D/fq index -j 1
-python3 $P/flowlog_ctadl.py --directory $D/fq query -j 32 -o "$PWD/$D/fq-summary.txt"
+ctadl --directory $D/fq query --engine flowlog -j 32 -o "$PWD/$D/fq-summary.txt"
 python3 $P/compare_db.py $K $B/souffle-j1/ctadlir.db $D/fq/ctadlir.db
 cmp $B/souffle-j1/summary.txt $D/fq-summary.txt
 ```
@@ -939,7 +983,7 @@ checksums of all reports. To reproduce, after the runs above:
 
 ```bash
 git -C flowlog fetch origin pull/499/head && git -C flowlog worktree add ../flowlog-499 87ed8e8
-(cd flowlog-499 && cargo build --release)
+(cd flowlog-499 && cargo build --release --target-dir target)
 export FLOWLOG_COMPILER=$PWD/flowlog-499/target/release/flowlog-compiler \
        FLOWLOG_RUNTIME_PATH=$PWD/flowlog-499/flowlog-runtime
 P=ctadl/flowlog-backend; PROGS="bench/syn10.tnt bench/syn25.tnt"
@@ -958,15 +1002,15 @@ Each comparison in `comparisons.txt` is `compare_db.py -q $K` on the two databas
 ## FlowLog findings
 
 The programs in `repros/` are minimal. `repros/check.sh` compiles and runs them with FlowLog, and
-`repros/check.sh -s` runs them with Soufflé. `FLOWLOG_COMPILER` and `FLOWLOG_RUNTIME_PATH` select
-another FlowLog checkout than the workspace's. The table compares the FlowLog results with Soufflé
+`repros/check.sh -s` runs them with Soufflé. It finds FlowLog as the engine does, through
+`FLOWLOG_COMPILER` and `FLOWLOG_RUNTIME_PATH` ([Usage](#usage)). The table compares the FlowLog results with Soufflé
 2.5 on the same program. "`main`" is FlowLog's `main` at `84b3a1c`; "with #477" adds the B1 fix.
 The outputs are in `results/repros/`: `souffle.txt`, `main.txt` and `with-477.txt`.
 `main-b03d2fd.txt` has the results on `main` at `b03d2fd`, which has the fixes for B1, B2, B4, B6,
 B7 and B11: those repros give Soufflé's results there, except `count_all_wild` (B2; [Behaviour
 differences](#behaviour-differences)) and B7's `strlen` and `substr`. `main-8ce7b5e.txt` has the
 results on `main` at `8ce7b5e`, which also has B8's fix: only `filter_order` changes, to Soufflé's
-result.
+result. `repros/same_name.sh` reproduces B14, which takes two compilations at once.
 
 **Bugs**
 
@@ -985,12 +1029,14 @@ result.
 | **B11** `cast_literal` (FlowLog syntax): `as(1, int64) bshl 31 > 0` and `as(-1, int64) bshru 1 = 2147483647` | With `number`: `O={shl}` | `O={shru}`: `as` leaves the literal `int32`. | Identity UDFs `flowlog_int64` and `flowlog_uint64` ([Integers](#integers)). |
 | **B12** `empty_dataflow`: no rule, fact or input derives an output | `A={}` | rustc fails: ``unused import: `super::*` ``. FlowLog prunes every relation. | A rule that never fires ([Translation](#translation)). |
 | **B13** `type_limit_cmp`: `A(u) :- U(u), u >= 0.` on `unsigned` | `A={3}` | rustc fails: `comparison is useless due to type limits`. | The translator folds such comparisons ([Integers](#integers)). |
+| **B14** `same_name.sh`: two programs compiled at the same time to executables of the same name, `-o a/bin` and `-o b/bin`, with the same target dir (`-T`) | (no shared build) | `b` runs `a`'s program: `a: O={1}`, `b: O={1}`, every time. FlowLog names the crate after the executable, and each crate is a cargo workspace of its own, so the two share cargo's build of the crate, whose freshness cargo judges by mtimes. `b`'s sources are written while `a` builds, cargo finds `b` up to date, and flowlog-compiler copies `a`'s binary. | The engine names each analysis' crate after its cache key, and the tests name theirs after the run. |
 
 B8's report also mentions a variable repeated in an atom, `O(x) :- R(x, x, b), x / b > 1.`.
 FlowLog tests the repetition after the comparison too, but this is not a difference from Soufflé:
 Soufflé 2.5 also tests such variables after the comparisons, and stops on `R(1, 2, 0)`.
 
-Each bug is filed on flowlog-rs/flowlog, with its repro rechecked on `84b3a1c`, and has a fix PR.
+B1–B13 are filed on flowlog-rs/flowlog, with their repros rechecked on `84b3a1c`, and each has a
+fix PR. B14 was found later, on `b03d2fd`.
 The status is as of `main` at `8ce7b5e`.
 
 | Bug | Issue | Fix | Status |
@@ -1009,7 +1055,8 @@ The status is as of `main` at `8ce7b5e`.
 | B12 | [#475](https://github.com/flowlog-rs/flowlog/issues/475) | [#484](https://github.com/flowlog-rs/flowlog/pull/484) | open |
 | B13 | [#476](https://github.com/flowlog-rs/flowlog/issues/476) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) | open |
 
-B7's `strlen` and `substr`, which count characters where Soufflé counts bytes, are not filed.
+B7's `strlen` and `substr`, which count characters where Soufflé counts bytes, are not filed, nor
+is B14.
 
 **Gaps** (Soufflé features FlowLog does not support)
 
@@ -1037,7 +1084,7 @@ Where the Soufflé column is empty, both engines compute the obvious result once
 accepted.
 
 `repros/check.sh -t` passes each repro through the translator, then compiles and runs it the way the
-driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/translated.txt`):
+engine does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/translated.txt`):
 
 - **Nineteen** rewritten repros give exactly Soufflé's result, among them B2, B7–B9, B12 and B13,
   and B1 thanks to #477. `antijoin_projection` also writes the check relation
@@ -1050,7 +1097,7 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
   `agg_shared_join` and `agg_many_readers` (B6). On `main` at `b03d2fd`, these two give Soufflé's
   results, and the others are unchanged (`results/repros/translated-b03d2fd.txt`); `8ce7b5e` gives
   the same results.
-- **The rest:** both engines reject `agg_min_string`, and the driver handles `empty_output`.
+- **The rest:** both engines reject `agg_min_string`, and the engine handles `empty_output`.
   `cast_literal`, `literal_overflow`, `udf_grouped_arg`, `udf_strlen_arg` and the `lattice_*`
   repros are FlowLog programs. The semantics suite's `widths.dl` tests the rewrites for B5, B10,
   B11 and B13 against Soufflé.
@@ -1080,7 +1127,8 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
    B11 are merged). B9 makes FlowLog evaluate expressions on rows that a negation removes, as B8
    did on rows that an atom's constants exclude. A port must then make every function total, and
    stop the run itself where Soufflé would ([Runtime errors](#runtime-errors)). B5, B10, B12 and
-   B13 are rustc lints on the generated code, which the generated crate could allow.
+   B13 are rustc lints on the generated code, which the generated crate could allow. B14 has no
+   fix yet: a crate name that also depends on the output path, through a hash of it, would do.
 3. **String interning that scales with workers**
    ([#498](https://github.com/flowlog-rs/flowlog/issues/498)). With `--str-intern`, the generated
    code interns or resolves strings on every row, at 859 `intern` and 1,024 `resolve` call sites in
@@ -1129,16 +1177,16 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
     relations ([Larger programs](#larger-programs)).
   - Reproducing one particular Soufflé result would need Soufflé's tie order. That depends on its
     join order, indexes, symbol numbering and thread scheduling.
-  - The `choice_domain` repro and `tests/choice_mini` document such ties.
+  - The `choice_domain` repro and `tests/flowlog/choice_mini` document such ties.
 - **In-recursion choice** relies on evaluation order ([above](#choice-domain)).
 - **Runtime errors:** where Soufflé stops on a partial call that the translator cannot check, the
   port completes, with the call's result 0. The translator lists these calls in a warning
   ([Runtime errors](#runtime-errors)). In CTADL there are three, and they cannot fail.
 - **Translator coverage:** only the Soufflé subset that CTADL uses is translated. Everything else is
-  rejected with an error, not mistranslated. The choice policies in `policy.json` are written for
-  CTADL's relations; a new `choice-domain` relation needs a policy (the translator refuses
-  otherwise). The translator also refuses some valid Soufflé programs that it could not translate
-  faithfully:
+  rejected with an error, not mistranslated. A `choice-domain` relation that the policy file does
+  not name is encoded as `minchoice`, like CTADL's four relations whose dependent columns are not
+  functions of the key, and with the same caveats ([above](#choice-domain)). The translator also
+  refuses some valid Soufflé programs that it could not translate faithfully:
   - arithmetic whose type depends on the order of Soufflé's alias resolution (`alias_order`,
     `alias_several`);
   - a variable name that Soufflé types differently in two disjuncts or sibling aggregates of a
@@ -1157,14 +1205,18 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
 <a id="disk-usage"></a>
 ## Disk usage
 
-- **Compiled analyses:** each takes about 100–190 MB in `~/.cache/ctadl-flowlog`. Delete the
-  entries you no longer need; any change to the translator, policy, UDFs or compiler produces new
-  keys.
-- **Shared target dir:** the cargo target dir (`FLOWLOG_CARGO_TARGET`) keeps the compiled FlowLog
-  runtime and dependencies, about 0.8 GB.
-- **Incremental compilation:** FlowLog enables rustc incremental compilation when given a build dir
-  (`-B`). Each analysis gets its own content-addressed build dir and never reuses it, which would
-  leave about 1 GB per program. The driver therefore sets `CARGO_INCREMENTAL=0`.
+- **Compiled analyses:** each takes about 100–190 MB in CTADL's state directory
+  (`~/.local/state/ctadl/analysis/<version>/flowlog/`). Delete the entries you no longer need; any
+  change to the translator, policy, UDFs or compiler produces new keys.
+- **Shared target dir:** the cargo target dir (`CARGO_TARGET_DIR`, by default `target/` in the
+  cache) keeps the compiled FlowLog runtime and dependencies, about 0.8 GB. Since each analysis'
+  crate is named after its key (B14), it also keeps cargo's copy of each compiled analysis
+  (`release/deps/ctadl_<key>-*`). Deleting the target dir is safe: the next compilation first
+  rebuilds the runtime. The tests use it too when it is set, or `ctadl-test-output/flowlog-target`,
+  and remove their programs' builds from it when they exit.
+- **Build dirs:** FlowLog enables rustc incremental compilation when given a build dir (`-B`). The
+  engine would never reuse one, and each would keep about 1 GB, so it passes none: the compiler
+  then builds in a scratch directory next to its output and deletes it after a successful build.
 - **Run databases:** the runners' `--prune` deletes the databases of identical runs.
 
 ## Versions

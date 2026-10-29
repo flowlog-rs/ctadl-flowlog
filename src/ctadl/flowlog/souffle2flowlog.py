@@ -24,7 +24,8 @@ Rewrites performed (see README.md for the rationale of each one):
     when 0 <= lo and hi < 1024, so the clause fires in a single iteration as
     in Souffle; other bounds fall back to a recursive helper relation;
   * `choice-domain` is handled by a per-relation policy (drop / min lattice /
-    "min-choice" encoding through an interned int64 key); inside recursion,
+    "min-choice" encoding through an interned int64 key; min-choice unless the
+    policy file says otherwise); inside recursion,
     reads of a min-choice relation go through `choice_claimN` UDFs so that the
     loop sees a single witness per key.  The key's priority bits follow the
     clause order Souffle evaluates, i.e. source order as permuted by its AST
@@ -45,7 +46,7 @@ Rewrites performed (see README.md for the rationale of each one):
     of body atoms, keyword-named variables and placeholder-only aggregates are
     normalised into forms FlowLog accepts;
   * builtins whose FlowLog counterparts differ from Souffle's call ports with
-    Souffle's semantics in ctadl_udf.rs (SOUFFLE_UDFS).  The partial ones
+    Souffle's semantics in souffle2flowlog.rs (SOUFFLE_UDFS).  The partial ones
     (`to_number`, `/`, `%`) are total there, and Souffle's stops on them are
     reproduced by check rules where that is sound (add_partial_checks);
   * integers are kept on Souffle's 64 bits: constant expressions are computed
@@ -1122,7 +1123,7 @@ def fold_cmp(op: str, l: Any, r: Any) -> Any:
 
 
 # Souffle's integer types (64-bit domain) as FlowLog primitives, their ranges,
-# and the identity UDFs (ctadl_udf.rs) that pin an expression to one of them.
+# and the identity UDFs (souffle2flowlog.rs) that pin an expression to one of them.
 INT_RANGES = {"int64": (-(1 << 63), (1 << 63) - 1), "uint64": (0, (1 << 64) - 1)}
 INT32_RANGE = (-(1 << 31), (1 << 31) - 1)
 ANCHOR_FNS = {"int64": "flowlog_int64", "uint64": "flowlog_uint64"}
@@ -1792,10 +1793,12 @@ NUMERIC_PRIMS = {"int64", "uint64", "int32"}
 
 # Choice-domain policies decoded through deterministic min-choice keys.
 MINCHOICE_POLICIES = ("minchoice", "choice")
-# Arities of the choice_claimN UDFs in ctadl_udf.rs.
+# The policy of a choice-domain relation the policy file does not list.
+DEFAULT_CHOICE_POLICY = "minchoice"
+# Arities of the choice_claimN UDFs in souffle2flowlog.rs.
 MAX_CLAIM_KEYS = 6
 # Choice-key priorities: non-recursive clauses 0.., recursive ones REC_PRIO..;
-# must match PRIO_BITS in ctadl_udf.rs (2 * REC_PRIO == 1 << PRIO_BITS).
+# must match PRIO_BITS in souffle2flowlog.rs (2 * REC_PRIO == 1 << PRIO_BITS).
 REC_PRIO = 256
 # One-row relation giving computed facts a body.
 UNIT_REL = "FlowlogUnit"
@@ -1809,7 +1812,7 @@ RANGE_DIGITS = 32  # RANGE_TABLE == RANGE_DIGITS ** 2
 # Souffle builtins whose FlowLog counterparts differ (strlen/substr count
 # chars, to_number parses decimal only, a negative exponent gives 0, `/` and
 # `%` panic on a zero divisor, all but the operators are int32) map to the
-# ctadl_udf.rs functions with Souffle's semantics: name, parameters, result.
+# souffle2flowlog.rs functions with Souffle's semantics: name, parameters, result.
 # `u/` and `u%` are the operators on `unsigned`.
 SOUFFLE_UDFS = {
     "strlen": ("souffle_strlen", "s: string", "int64"),
@@ -2983,8 +2986,11 @@ class Translator:
             alive = [c for c in alive if not (c[1] & empty.keys())]
         return empty
 
+    def choice_pol(self, name: str):
+        return self.choice_policy.get(name, DEFAULT_CHOICE_POLICY)
+
     def is_minchoice(self, name: str) -> bool:
-        return self.choice_policy.get(name) in MINCHOICE_POLICIES
+        return self.choice_pol(name) in MINCHOICE_POLICIES
 
     def loop_choice(self, d: RelDecl | None) -> bool:
         """A min-choice relation derived inside a recursive stratum.
@@ -3275,9 +3281,7 @@ class Translator:
         qtxt = (" " + " ".join(quals)) if quals else ""
         if not d.choice:
             return [Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}")]
-        pol = self.choice_policy.get(d.name)
-        if pol is None:
-            raise TranslateError(f"relation {d.name} has a choice-domain but no policy")
+        pol = self.choice_pol(d.name)
         if len(d.choice) != 1:
             raise TranslateError(f"relation {d.name}: multiple choice-domains not supported")
         if pol == "drop":
@@ -5498,7 +5502,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("input")
     ap.add_argument("-o", "--output", required=True)
-    ap.add_argument("--policy", help="JSON policy file")
+    ap.add_argument("--policy", help='JSON policy file: {"choice": {RELATION: "drop" | "minchoice" | '
+                    '{"min": COLUMN}}}; a choice-domain relation it does not list is encoded as minchoice')
     ap.add_argument("--schema", help="write a JSON schema manifest (record columns, sqlite I/O)")
     ap.add_argument("--extra", action="append", default=[], help="FlowLog text appended verbatim")
     args = ap.parse_args()
