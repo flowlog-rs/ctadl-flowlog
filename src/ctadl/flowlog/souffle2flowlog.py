@@ -19,7 +19,8 @@ Rewrites performed (see README.md for the rationale of each one):
     (check_relations);
   * record types are flattened into one column per field;
   * `.functor` declarations become `.extern fn`, `@F(..)` becomes `F(..)`;
-  * variadic `cat` becomes nested binary `cat`;
+  * variadic `cat` becomes nested binary `cat`, and `to_string` of a symbol
+    becomes the symbol, as Souffle computes it (FlowLog's takes numbers only);
   * `range(lo, hi)` generators read a precomputed `FlowlogRange(hi, i)` table
     when 0 <= lo and hi < 1024, so the clause fires in a single iteration as
     in Souffle; other bounds fall back to a recursive helper relation;
@@ -3919,6 +3920,10 @@ class Translator:
                     return acc
                 if e.name == "cat" and len(e.args) == 1:
                     return e.args[0]
+                if e.name == "to_string":
+                    t = self.expr_type(e.args[0], types)
+                    if t is not None and self.base_type(t) == PRIM_TYPES["symbol"]:
+                        return e.args[0]
                 if e.name in ("min", "max", "lnot", "bnot", "to_unsigned", "to_float", "autoinc"):
                     raise TranslateError(f"builtin {e.name} is not supported by FlowLog")
                 if e.name in SOUFFLE_UDFS:

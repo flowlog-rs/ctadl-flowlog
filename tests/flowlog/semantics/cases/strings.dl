@@ -39,6 +39,15 @@ NS(0). NS(-5). NS(3000000000). NS(-9223372036854775807 - 1).
 ToStr(n, to_string(n), to_number(to_string(n))) :- NS(n).
 ToStr(n, cat("#", to_string(n / 2)), strlen(to_string(n))) :- NS(n).
 
+// to_string of a symbol (as in CTADL's JADX object ids) is the symbol.
+.type Name <: symbol
+.decl Named(n: Name)
+Named("n1"). Named("héllo").
+.decl SymStr(s: symbol)
+.output SymStr
+SymStr(to_string(w)) :- W(1, w).
+SymStr(cat(to_string(n), "/", to_string(to_string(7)))) :- Named(n).
+
 // Escape sequences.
 .decl Esc(id: number, s: symbol)
 Esc(0, "q\"t"). Esc(1, "a\\b"). Esc(2, "\t\n\r"). Esc(3, "\a\b\f\v"). Esc(4, "it\'s").

@@ -295,6 +295,7 @@ they need FlowLog's `int64` type or its UDFs; the semantics suite tests those re
 | Record types `[a: T, b: U]` | One column per field (`attr_field`). Fact and output files keep Soufflé's text, `[1, a]`, which the engine converts (with the tab delimiter only). In sqlite, records become synthetic ids, with the fields kept in `__FlowLogRecord`. A DB that Soufflé writes keeps only the ids, so a query that reads a record column needs a FlowLog index. CTADL's query reads none, so it also runs on a Soufflé index. | `record_type`, `tests/flowlog/adapter` |
 | `.functor F(..)`, `@F(..)` | `.extern fn F(..)`, `F(..)`; the implementations are Rust UDFs | `functor_decl` |
 | Variadic `cat(a, b, c)` | `cat(cat(a, b), c)` | `variadic_cat` |
+| `to_string(s)` of a symbol (CTADL's JADX object ids) | `s`, as Soufflé computes it. FlowLog's `to_string` takes numbers only. | `tests/flowlog/semantics/cases/strings.dl` |
 | `x = range(lo, hi)` | `FlowlogRange(hi, x), x >= lo`. `FlowlogRange` is a precomputed table of `0 <= x < hi < 1024`, built without recursion. Other bounds use a demand-driven recursive `RangeN` relation. | `range_gen` |
 | `choice-domain` | Per-relation policy, `minchoice` by default ([below](#choice-domain)) | `choice_domain` |
 | `inline` relations | Expanded at their positive uses, as Soufflé does. Materialised when used negated or in an aggregate, or when their clauses are given per component instance. Unused ones are dropped. | `inline_rel` |
