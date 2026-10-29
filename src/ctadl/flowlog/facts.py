@@ -100,7 +100,7 @@ def souffle_line(line: str, columns: list) -> str:
 def rewrite(src: Path, dst: Path, convert_line, columns: list) -> None:
     """Converts src to dst line by line. As Souffle and FlowLog read a file,
     lines end at a newline only, and the bytes pass through as they are."""
-    opts = {"encoding": "utf-8", "errors": "surrogateescape", "newline": "\n"}
+    opts: dict = {"encoding": "utf-8", "errors": "surrogateescape", "newline": "\n"}
     with src.open(**opts) as fin, dst.open("w", **opts) as fout:
         for n, line in enumerate(fin, 1):
             try:

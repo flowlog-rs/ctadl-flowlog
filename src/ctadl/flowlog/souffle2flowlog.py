@@ -1969,11 +1969,10 @@ class Translator:
             if isinstance(td.rhs, tuple):
                 if td.rhs[0] == "record":
                     return ("record", t, td.rhs[1])
-                if td.rhs[0] == "union":
-                    bases = {self.base_type(a) for a in td.rhs[1]}
-                    if len(bases) != 1:
-                        raise TranslateError(f"union type {t} mixes base types")
-                    return bases.pop()
+                bases = {self.base_type(a) for a in td.rhs[1]}  # a union
+                if len(bases) != 1:
+                    raise TranslateError(f"union type {t} mixes base types")
+                return bases.pop()
             t = td.rhs
         if t not in PRIM_TYPES and t != "float" and t not in self.tparams:
             raise TranslateError(f"unknown type {t}")
@@ -2225,7 +2224,7 @@ class Translator:
         """The relation names of component `comp`'s clauses in its instance
         at `path`, as Souffle's instantiation spells them (resolve_at; top
         level: unchanged)."""
-        if comp is None:
+        if comp is None or path is None:
             return lambda n: n
         return lambda n: self.resolve_at(n, path)[1]
 
@@ -3037,7 +3036,7 @@ class Translator:
                     out.append(Group([fix_conj(c) for c in lit.disj]))
                     continue
                 d = self.resolve_decl(lit.name, scope) if isinstance(lit, Atom) else None
-                if isinstance(lit, Atom) and self.loop_choice(d) and self.scc.get(id(d)) in hs:
+                if isinstance(lit, Atom) and d is not None and self.loop_choice(d) and self.scc.get(id(d)) in hs:
                     out.extend(self.loop_read(lit, d, occ))
                 else:
                     out.append(lit)
@@ -3092,11 +3091,10 @@ class Translator:
         extra_rules: list = []
         for it in items:
             if isinstance(it, TypeDecl):
-                if isinstance(it.rhs, tuple) and it.rhs[0] == "record":
-                    continue  # flattened away
-                if isinstance(it.rhs, tuple) and it.rhs[0] == "union":
-                    out.append(Raw(f".type {it.name} = {self.base_type(it.name)}"))
-                    continue
+                if isinstance(it.rhs, tuple):
+                    if it.rhs[0] == "union":
+                        out.append(Raw(f".type {it.name} = {self.base_type(it.name)}"))
+                    continue  # a record is flattened away
                 out.append(Raw(f".type {it.name} = {self.fl_type(it.rhs)}"))
             elif isinstance(it, Functor):
                 params = ", ".join(f"{fl_name(pn)}: {self.fl_prim(pt)}" for pn, pt in it.params)
@@ -3304,13 +3302,15 @@ class Translator:
             while ck_name in attr_names:
                 ck_name += "_"
             ck_var = Var(ck_name)
-            out = [
+            out: list = [
                 Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}"),
                 Raw(f".decl {cname}({self.fmt_attrs(key_attrs + [(ck_name, 'min<int64>')])})"),
             ]
             # decode rule; a relation read inside its own loop decodes the
             # witnesses its reads claimed there (see loop_choice)
             body = [Atom(cname, [Var(fl_name(a)) for a, _ in key_attrs] + [ck_var])]
+            inst: Any = None
+            claim: tuple = ()
             if self.loop_choice(d):
                 inst, extra = self.claim_tag(d, "")
                 body += extra
@@ -3376,7 +3376,9 @@ class Translator:
         parts = path.split(".")
         chain = [(self.global_inits.get(parts[0]), parts[0])]
         for i in range(1, len(parts)):
-            chain.append((self.comp_inits.get(chain[-1][0], {}).get(parts[i]), ".".join(parts[: i + 1])))
+            comp = chain[-1][0]
+            inits = self.comp_inits.get(comp, {}) if comp is not None else {}
+            chain.append((inits.get(parts[i]), ".".join(parts[: i + 1])))
         for owner, prefix in reversed(chain):
             d = self.resolve_in(name, owner)
             if d is not None:
@@ -3584,7 +3586,7 @@ class Translator:
         if p is None or 0 not in p.orders:
             return None
         atoms = plan_atoms(flowlog_clauses(body)) if body is not None else None
-        if p.atoms is None or atoms != p.atoms:
+        if atoms is None or p.atoms is None or atoms != p.atoms:
             self.warn(f"line {r.line}: .plan dropped (the translated rule reads other atoms)")
             return None
         order = p.orders[0]
