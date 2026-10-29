@@ -8,12 +8,14 @@ Each program is imported once (taint-front), then indexed and queried by
 every backend and worker count in a fresh copy of the facts. The query writes
 CTADL's text summary; with --format sarif it writes a SARIF report instead,
 which can take longer than the analysis and hundreds of MB.
-Backends: souffle, souffle-noplan, souffle-strict, flowlog; both (the default)
-is souffle,flowlog. The souffle-* variants run CTADL's program without its
-`.plan` hints, which the FlowLog translation drops: souffle-noplan with
-Souffle's default SIPS (all-bound), souffle-strict with `.pragma "RamSIPS"
-"strict"`, which joins every rule version in the written order, as FlowLog's
-planner does (bar cross-product avoidance and semijoin folding).
+Backends: souffle, souffle-noplan, souffle-strict, flowlog, flowlog-noplan;
+both (the default) is souffle,flowlog. The *-noplan and souffle-strict
+variants run CTADL's program without its `.plan` hints (the FlowLog
+translation keeps only the order of each hint's version 0, which 4 of them
+give): souffle-noplan with Souffle's default SIPS (all-bound), souffle-strict
+with `.pragma "RamSIPS" "strict"`, which joins every rule version in the
+written order, as FlowLog's planner does for a rule without a `.plan` (bar
+cross-product avoidance and semijoin folding).
 Reported per phase:
   wall     the whole `ctadl` command (Python driver, model generation, views)
   analyze  the backend call: Souffle's compiled analysis, or FlowLog's input
@@ -42,13 +44,15 @@ TOP = HERE.parent.parent  # the workspace: the CTADL checkout's parent
 
 
 PLAN = re.compile(r"\.plan\s+\d+\s*:\s*\([\d\s,]*\)(?:\s*,\s*\d+\s*:\s*\([\d\s,]*\))*")
-# Souffle variants on CTADL's program without its `.plan` hints (which the
-# FlowLog translation drops), with the extra source text appended.
+# Variants on CTADL's program without its `.plan` hints, with the extra
+# source text appended: Souffle's, and FlowLog's (the translation then has no
+# `.plan`).
 SOUFFLE_VARIANTS = {
     "souffle-noplan": "",  # Souffle's default SIPS (all-bound)
     "souffle-strict": '\n.pragma "RamSIPS" "strict"\n',  # the written order, like FlowLog
 }
-BACKENDS = ["souffle", *SOUFFLE_VARIANTS, "flowlog"]
+NOPLAN_VARIANTS = {**SOUFFLE_VARIANTS, "flowlog-noplan": ""}
+BACKENDS = ["souffle", *SOUFFLE_VARIANTS, "flowlog", "flowlog-noplan"]
 
 
 def shim(backend: str, argv: list) -> None:
@@ -56,12 +60,12 @@ def shim(backend: str, argv: list) -> None:
     sys.path.insert(0, str(HERE))
     import flowlog_ctadl
     cli = flowlog_ctadl.load_ctadl_cli()
-    if backend == "flowlog":
+    if backend.startswith("flowlog"):
         cls = flowlog_ctadl.FlowLogAnalysis
         cli.build_analysis = lambda args, src: cls(cli, args, src)
     else:
         cls = cli.SouffleCompiledAnalysis
-    if backend in SOUFFLE_VARIANTS:
+    if backend in NOPLAN_VARIANTS:
         build = cli.build_analysis
 
         def build_variant(args, src):
@@ -69,7 +73,7 @@ def shim(backend: str, argv: list) -> None:
             if ".plan" in text:
                 sys.exit(f"error: a .plan directive in {src} was not removed")
             out = Path(src).with_name(f"{Path(src).stem}-{backend}.dl")
-            out.write_text(text + SOUFFLE_VARIANTS[backend])
+            out.write_text(text + NOPLAN_VARIANTS[backend])
             return build(args, str(out))
 
         cli.build_analysis = build_variant

@@ -62,7 +62,11 @@ Rewrites performed (see README.md for the rationale of each one):
     folded, as rustc rejects them, and a program in which no output is
     derived from a fact or an input gets a rule for one that never fires,
     as FlowLog cannot build it otherwise (keep_dataflow);
-  * `.plan`, `.pragma` and relation representation qualifiers are dropped
+  * a `.plan` keeps the join order of Souffle's version 0 (a delta on the
+    rule's first recursive atom), as FlowLog joins every version of a rule
+    in one order, where each clause of the translated rule reads the atoms
+    the plan orders (flowlog_plan); the other versions are dropped;
+  * `.pragma` and relation representation qualifiers are dropped
     (`.limitsize`, which truncates a relation, is rejected).
 """
 
@@ -368,6 +372,15 @@ class Functor:
 
 
 @dataclass
+class Plan:
+    """A Souffle `.plan`: a join order (1-based positions among the positive
+    atoms) per rule version, and the names of the positive atoms it orders
+    (note_plan_atoms; None if the rule's clauses differ in them)."""
+    orders: dict
+    atoms: tuple | None
+
+
+@dataclass
 class Rule:
     heads: list
     body: Any  # None for facts, else list of conjunctions
@@ -377,6 +390,9 @@ class Rule:
     # flags that place it in Souffle's clause order (see souffle_order_key)
     sub: Any = None
     sx: Any = None
+    # the rule's Souffle `.plan` (a Plan), which finish_rule turns into
+    # FlowLog's join order (a tuple of positions) or drops
+    plan: Any = None
 
 
 @dataclass
@@ -472,7 +488,9 @@ class Parser:
                 elif d == ".functor":
                     items.append(self.parse_functor())
                 elif d == ".plan":
-                    self.parse_plan()
+                    orders = self.parse_plan()
+                    if items and isinstance(items[-1], Rule) and items[-1].body is not None:
+                        items[-1] = replace(items[-1], plan=Plan(orders, None))
                 else:
                     raise TranslateError(f"line {t.line}: unsupported directive {d}")
             else:
@@ -658,22 +676,25 @@ class Parser:
             stateful = True
         return Functor(name, params, ret, stateful)
 
-    def parse_plan(self) -> None:
+    def parse_plan(self) -> dict:
         self.expect("dir", ".plan")
+        orders: dict = {}
         while True:
-            self.expect("num")
+            version = int(self.expect("num").val)
             self.expect_p(":")
             self.expect_p("(")
+            order = []
             if not self.at_p(")"):
-                self.expect("num")
+                order.append(int(self.expect("num").val))
                 while self.at_p(","):
                     self.next()
-                    self.expect("num")
+                    order.append(int(self.expect("num").val))
             self.expect_p(")")
+            orders[version] = tuple(order)
             if self.at_p(",") and self.at("num", None, 1):
                 self.next()
                 continue
-            return
+            return orders
 
     # -- rules
     def parse_rule(self) -> Rule:
@@ -1354,6 +1375,27 @@ def dnf_insert(dnf: list, conj: list) -> None:
     dnf.append(conj)
 
 
+def flowlog_clauses(body: list) -> list:
+    """The clause bodies FlowLog makes of a rule body: nested disjunctions
+    multiplied out in order (unlike souffle_dnf, nothing is dropped)."""
+    out: list = []
+    for conj in body:
+        acc: list = [[]]
+        for lit in conj:
+            alts = flowlog_clauses(lit.disj) if isinstance(lit, Group) else [[lit]]
+            acc = [a + b for a in acc for b in alts]
+        out.extend(acc)
+    return out
+
+
+def plan_atoms(clauses: list) -> tuple | None:
+    """The names of the positive atoms a `.plan` orders, if every clause has
+    the same ones, else None. A min-choice read `R_choice` stands for `R`."""
+    seqs = {tuple(lit.name[: -len("_choice")] if lit.name.endswith("_choice") else lit.name
+                  for lit in c if isinstance(lit, Atom)) for c in clauses}
+    return seqs.pop() if len(seqs) == 1 else None
+
+
 def sx_materialized(a: Agg) -> bool:
     """Souffle's needsMaterializedRelation (MaterializeAggregationQueries):
     an aggregate whose body has several atoms, a nested aggregate, a
@@ -1994,6 +2036,7 @@ class Translator:
         items = self.split_choice_rules(items)
         items = self.add_partial_checks(items)
         items = self.inline_relations(items)
+        self.note_plan_atoms(items)
         self.compute_choice_prio(items)
         items = self.transform_items(items, scope=())
         items = self.dedupe_io(items)
@@ -2512,7 +2555,7 @@ class Translator:
                               "ra1": sx_resolve_aliases_changes(conj),
                               "rbc1": any(isinstance(lit, BoolLit) for lit in conj),
                               "scbc": sx_const_constraint(conj)}
-                        out.append(Rule(it.heads, [conj], it.line, (seq, i), sx))
+                        out.append(Rule(it.heads, [conj], it.line, (seq, i), sx, it.plan))
                     continue
                 out.append(it)
             return out
@@ -2651,7 +2694,7 @@ class Translator:
                                 self.warn(f"line {it.line}: rule unsatisfiable after inlining; dropped")
                             for conj, path, rounds, ceq in exp:
                                 sx = dict(it.sx, k=rounds, scbc=it.sx["scbc"] or ceq)
-                                out.append(Rule(it.heads, [conj], it.line, it.sub + (path,), sx))
+                                out.append(Rule(it.heads, [conj], it.line, it.sub + (path,), sx, it.plan))
                             continue
                     elif it.body is not None:
                         body = self.expand_inline(it.body, scope, ctx, 0)
@@ -2659,7 +2702,7 @@ class Translator:
                             if not body:
                                 self.warn(f"line {it.line}: rule unsatisfiable after inlining; dropped")
                                 continue
-                            it = Rule(it.heads, body, it.line)
+                            it = Rule(it.heads, body, it.line, plan=it.plan)
                 out.append(it)
             return out
         return fix(items, ())
@@ -3051,7 +3094,7 @@ class Translator:
                 else:
                     out.append(lit)
             return out
-        return Rule(r.heads, [fix_conj(c) for c in r.body], r.line, r.sub, r.sx)
+        return Rule(r.heads, [fix_conj(c) for c in r.body], r.line, r.sub, r.sx, r.plan)
 
     def loop_read(self, a: Atom, d: RelDecl, occ: dict) -> list:
         """`occ` counts the literals of the rule each variable occurs in; a
@@ -3435,7 +3478,7 @@ class Translator:
                     raise TranslateError(f"line {r.line}: a choice clause with a disjunction is not supported here")
                 out: list = []
                 for hs, conj in split:
-                    out.extend(self.transform_rule(Rule(hs, [conj], r.line, r.sub, r.sx), scope)[0])
+                    out.extend(self.transform_rule(Rule(hs, [conj], r.line, r.sub, r.sx, r.plan), scope)[0])
                 return out, []
         types = self.decl_var_types(heads, body or [], scope, r.line)
         self.check_casts(heads + [lit for c in body or [] for lit in c], types, r.line)
@@ -3478,7 +3521,7 @@ class Translator:
             if isinstance(e, Call) and e.name == "range":
                 raise TranslateError(f"line {r.line}: range is supported only as `v = range(lo, hi)` in a rule body")
             return e
-        rules = [Rule(heads, body, r.line, r.sub, r.sx)] + [h for h in helpers if isinstance(h, Rule)]
+        rules = [Rule(heads, body, r.line, r.sub, r.sx, r.plan)] + [h for h in helpers if isinstance(h, Rule)]
         for x in rules:
             for h in x.heads:
                 deep_map_lit(h, no_range)
@@ -3499,7 +3542,7 @@ class Translator:
         if body is not None:
             body = self.scope_aggregates(body, r.heads, r.line)
             body = self.lift_atom_args(body)
-        items = self.split_computed_negations(Rule(r.heads, body, r.line, r.sub, r.sx), scope)
+        items = self.split_computed_negations(Rule(r.heads, body, r.line, r.sub, r.sx, r.plan), scope)
         out: list = []
         for it in items:
             if not isinstance(it, Rule):
@@ -3528,8 +3571,36 @@ class Translator:
                 heads = [subst_lit(h, sub) for h in heads]
                 if body is not None:
                     body = [[subst_lit(l, sub) for l in c] for c in body]
-            out.append(Rule(heads, body, it.line, it.sub, it.sx))
+            out.append(Rule(heads, body, it.line, it.sub, it.sx, self.flowlog_plan(it, body)))
         return out
+
+    def note_plan_atoms(self, items: list) -> None:
+        """Souffle applies a `.plan` to each clause it makes of the rule, once
+        relations are inlined; split_choice_rules and inline_relations make
+        the same clauses (in Souffle's order of literals)."""
+        for _, r in iter_rules(items):
+            if r.plan is not None and r.body is not None:
+                r.plan = Plan(r.plan.orders, plan_atoms(souffle_dnf(r.body)))
+
+    def flowlog_plan(self, r: Rule, body: list | None) -> tuple | None:
+        """FlowLog's `.plan` for a rule whose source had a Souffle one.
+        FlowLog joins every version of a rule in one order, so the order of
+        Souffle's version 0 (a delta on the first recursive atom) is kept, if
+        each clause of the translated rule reads the positive atoms the plan
+        orders (plan_atoms): a range rewrite or the `ChoiceInstance` atom of
+        a min-choice read changes them."""
+        p = r.plan
+        if p is None or 0 not in p.orders:
+            return None
+        atoms = plan_atoms(flowlog_clauses(body)) if body is not None else None
+        if p.atoms is None or atoms != p.atoms:
+            self.warn(f"line {r.line}: .plan dropped (the translated rule reads other atoms)")
+            return None
+        order = p.orders[0]
+        if sorted(order) != list(range(1, len(atoms) + 1)):
+            self.warn(f"line {r.line}: .plan dropped (version 0 does not order the rule's {len(atoms)} atoms)")
+            return None
+        return order
 
     @staticmethod
     def spell_vars(heads: list, body: list | None) -> dict:
@@ -3629,7 +3700,7 @@ class Translator:
             return [r]
         items: list = []
         if keep:
-            items.append(Rule(r.heads, [c for c, _ in keep], r.line, r.sub, r.sx))
+            items.append(Rule(r.heads, [c for c, _ in keep], r.line, r.sub, r.sx, r.plan))
         for conj, bad in split:
             pre = [lit for i, lit in enumerate(conj) if i not in bad]
             negs = [conj[i] for i in bad]
@@ -3654,7 +3725,8 @@ class Translator:
             name = f"NegPre{self.fresh('')}"
             attrs = ", ".join(f"c{i}: {self.fl_type(types[v])}" for i, v in enumerate(need))
             items.append(Raw(f".decl {name}({attrs})"))
-            items.append(Rule([Atom(name, [Var(v) for v in need])], [pre], r.line))
+            # the positive part keeps the source's atoms, and so its `.plan`
+            items.append(Rule([Atom(name, [Var(v) for v in need])], [pre], r.line, plan=r.plan))
             items.append(Rule(r.heads, [[Atom(name, [Var(v) for v in need])] + negs], r.line, r.sub, r.sx))
         return items
 
@@ -5411,6 +5483,8 @@ def print_items(items: list, indent: str = "") -> list[str]:
                 body = (";\n" + indent + "    ").join(
                     ", ".join(pl(l) for l in conj) for conj in it.body)
                 lines.append(f"{indent}{heads} :-\n{indent}    {body}.")
+                if isinstance(it.plan, tuple) and it.plan:
+                    lines.append(f"{indent}.plan ({', '.join(map(str, it.plan))})")
         else:
             raise TranslateError(f"cannot print item {it}")
     return lines

@@ -12,7 +12,8 @@
 #                 check rules cannot cover, and the translator must list
 #                 every line marked `// unchecked` in its warning.
 # A `// expect: <text>` line in a reject or an invalid program names text
-# the translator's error message must contain.
+# the translator's error message must contain; a `// expect-fl: <text>` line
+# in a case names text its translation must contain.
 # Needs a 64-bit-domain `souffle` on PATH (CTADL requires one).
 #   [WORKERS="1 4 32"] tests/semantics/run.sh [name...]
 # (default: every case, with 1 and 4 workers)
@@ -70,6 +71,9 @@ for f in "$HERE"/cases/*.dl; do
   souffle -D "$d/souffle" "$f" > "$d/souffle.log" 2>&1 \
     || { echo "  Soufflé failed:"; sed 's/^/    /' "$d/souffle.log"; status=1; continue; }
   build "$f" "$d" || { status=1; continue; }
+  while IFS= read -r want; do
+    grep -qF -- "$want" "$d/p.fl" || { echo "  translation lacks: $want"; status=1; }
+  done < <(sed -n 's|^// expect-fl: ||p' "$f")
   for w in $WORKERS; do
     mkdir -p "$d/out$w"
     timeout 300 "$d/bin" -D "$d/out$w" -w $w > "$d/run$w.log" 2>&1 \

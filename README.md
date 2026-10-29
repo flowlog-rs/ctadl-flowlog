@@ -7,11 +7,13 @@
 > translator turns CTADL's Soufflé programs into FlowLog, and CTADL's C++ functors are ported as
 > Rust UDFs; CTADL itself is unchanged. Over 435 differential runs with 32 workers, both backends
 > give identical databases and SARIF reports, apart from one valid `choice-domain` witness. On a
-> larger generated program, FlowLog's engine time is close to Soufflé's (index 3–8% slower, query
-> 1.1–1.6× as fast), but it needs more memory, and converting its results into CTADL's sqlite
-> layout makes the query 1.6–1.8× slower end to end. The port needs one FlowLog fix,
-> [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477). Details, the FlowLog
-> issues found and how to reproduce everything:
+> larger generated program, FlowLog's index takes half of Soufflé's engine time with 1 worker and
+> about as long with 32, and its query is 1.1–1.8× as fast. With a pending FlowLog fix for string
+> interning, its index is 3.9× as fast as Soufflé's with 32 workers. FlowLog needs more memory,
+> and converting its results into CTADL's sqlite layout makes the query phase 1.2× slower end to
+> end. The port needs one FlowLog fix,
+> [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477), now merged into
+> FlowLog's `main`. Details, the FlowLog issues found and how to reproduce everything:
 > [`flowlog-backend/README.md`](flowlog-backend/README.md).
 
 [CTADL](https://github.com/sandialabs/ctadl) is a static taint analysis tool.

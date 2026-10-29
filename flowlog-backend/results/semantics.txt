@@ -38,6 +38,10 @@ case partial_types
   -w 1: same as Soufflé (3 relations, 7 rows)
   -w 4: same as Soufflé (3 relations, 7 rows)
   -w 32: same as Soufflé (3 relations, 7 rows)
+case plans
+  -w 1: same as Soufflé (6 relations, 99 rows)
+  -w 4: same as Soufflé (6 relations, 99 rows)
+  -w 32: same as Soufflé (6 relations, 99 rows)
 case pow
   -w 1: same as Soufflé (1 relations, 14 rows)
   -w 4: same as Soufflé (1 relations, 14 rows)

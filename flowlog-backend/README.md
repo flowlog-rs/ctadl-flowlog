@@ -21,7 +21,7 @@ analyses run on FlowLog and produce the same results as Soufflé:
   with `--all-outputs`) and the SARIF report. Every run is identical except one. In that run,
   FlowLog picked a different but valid `choice-domain` witness ([Limitations](#limitations)).
 - **CTADL's own test expectations** pass on both backends.
-- **Semantics suite:** small programs check each translated construct against Soufflé. 18 programs
+- **Semantics suite:** small programs check each translated construct against Soufflé. 19 programs
   give Soufflé's rows with 1, 4 and 32 workers; on 11 more, Soufflé stops with an error and so does
   FlowLog. The translator refuses 41 programs it cannot translate faithfully, rejects 7 erroneous
   programs as Soufflé does, and warns about 3 ([Validation](#validation)).
@@ -61,28 +61,32 @@ FlowLog does not accept CTADL's program as is. It took four things:
    mutable state outside the dataflow ([details](#choice-domain)).
 3. **One FlowLog compiler fix**, for an internal compiler error that CTADL's string constraints
    trigger (B1, [flowlog-rs/flowlog#464](https://github.com/flowlog-rs/flowlog/issues/464)). The
-   fix is [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477), not yet merged
-   into FlowLog's `main` ([Setup](#setup)).
+   fix, [flowlog-rs/flowlog#477](https://github.com/flowlog-rs/flowlog/pull/477), is merged into
+   FlowLog's `main` ([Setup](#setup)).
 4. **Glue:**
    - a drop-in `ctadl` command;
    - sqlite layout adapters between FlowLog's plain tables and the Soufflé symbol-table layout
      that CTADL's Python tooling reads;
    - a fact-file converter.
 
-**Performance:** on the larger generated program, FlowLog's engine time is close to Soufflé's as
-CTADL runs it: the index is 3–11% slower, and the query 1.1× as fast with 1 worker and 1.8× with 32.
-CTADL gives Soufflé hand-written join orders (`.plan`: 67 in the index, 6 in the query), which the
-translation drops. Without them both engines join in the order the rules are written (FlowLog has
-no SIPS), and FlowLog's index is 2.7× as fast as Soufflé's with 1 worker and 1.5× with 32
-([Join order](#join-order)). FlowLog's index needs 5–11× Soufflé's memory. End to end, FlowLog's
-query phase takes 1.1–1.2× as long as Soufflé's: the port converts its results into CTADL's
-sqlite layout, which takes 18–19 s. Compiling takes 1.2–1.8× as long, and the binaries are 19–28×
-larger ([Performance](#performance)).
+**Performance:** on the larger generated program, FlowLog's index takes half of Soufflé's engine
+time with 1 worker and 2% more with 32, and its query is 1.1× as fast with 1 worker and 1.8× with
+32. With 32 workers, contention in FlowLog's string interner holds it back: with a pending fix
+([#499](https://github.com/flowlog-rs/flowlog/pull/499)), its index is 3.9× as fast as Soufflé's
+and its query 2.2×. CTADL gives Soufflé hand-written join orders (`.plan`: 67 in the index, 6 in
+the query), one per semi-naive version of a recursive rule. FlowLog's `.plan` takes one order per
+rule, so the translation keeps the first version's orders, which 4 hints give; they halve
+FlowLog's index time with 1 worker. Without any hints, both engines join in the order the rules
+are written (FlowLog has no SIPS), and FlowLog's index is 2.7× as fast as Soufflé's with 1 worker
+and 1.5× with 32 ([Join order](#join-order)). FlowLog's index needs 2.3–7.5× Soufflé's memory.
+End to end, FlowLog's query phase takes 1.2× as long as Soufflé's: the port converts its results
+into CTADL's sqlite layout, which takes about 19 s. Compiling takes 1.2–1.8× as long, and the
+binaries are 19–28× larger ([Performance](#performance)).
 
 **FlowLog bugs:** the port found thirteen (B1–B13), each with a minimal repro in `repros/`. Each is
-filed on FlowLog, with a fix PR ([FlowLog findings](#flowlog-findings)). CTADL's program needs the
-fix for B1. The translation works around the others, except B6 and some shapes of B4, which
-CTADL's program does not have.
+filed on FlowLog, with a fix PR; the fixes for B1, B2, B4, B6, B7 and B11 are merged ([FlowLog
+findings](#flowlog-findings)). CTADL's program needs the fix for B1. The translation works around
+the others, except B6 and some shapes of B4, which CTADL's program does not have.
 
 ## Layout
 
@@ -93,7 +97,7 @@ side by side. Run them from the workspace:
 ```
 workspace/
   ctadl/                this fork; taint-front front end built with dune
-  flowlog/              FlowLog main (84b3a1c) plus the B1 fix, PR #477
+  flowlog/              FlowLog main (b03d2fd), which has the B1 fix, PR #477
   ctadl-rs/             ctadl-rs (7c98b73e), for its .tnt test corpus
   bin/taintfront        symlink to ctadl/taint-front/_build/default/taint.exe
   .venv/                Python env with ctadl and its taint-front plugin
@@ -139,8 +143,7 @@ Python 3.10 or later, OCaml with dune (for CTADL's taint-front front end), and s
 mkdir workspace && cd workspace
 git clone -b flowlog-backend https://github.com/flowlog-rs/ctadl-flowlog ctadl
 git clone https://github.com/flowlog-rs/flowlog
-(cd flowlog && git fetch origin pull/477/head && git checkout -b ctadl-port FETCH_HEAD &&
- cargo build --release)
+(cd flowlog && git checkout -b ctadl-port b03d2fd && cargo build --release)
 git clone https://github.com/sandialabs/ctadl-rs && git -C ctadl-rs checkout 7c98b73e
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e ctadl -e ctadl/plugins/taint-front
@@ -149,11 +152,11 @@ mkdir -p bin && ln -s "$PWD/ctadl/taint-front/_build/default/taint.exe" bin/tain
 export PATH=$PWD/bin:$PATH FLOWLOG_CARGO_TARGET=$PWD/fltarget
 ```
 
-`ctadl-port` is FlowLog's `main` at `84b3a1c` plus the B1 fix: PR
-[#477](https://github.com/flowlog-rs/flowlog/pull/477), at `fed6293`. All the runs reported here
-used it. On the next `main` commit, `bad0ff2`, with #477 merged in, CTADL's taint-front tests, the
-semantics suite and the `choice-domain` test give the same results. Once #477 is merged, FlowLog's
-`main` works as is. The port needs none of FlowLog's other open fixes.
+`ctadl-port` is FlowLog's `main` at `b03d2fd`, which has the B1 fix, PR
+[#477](https://github.com/flowlog-rs/flowlog/pull/477). The runs reported here used `main` at
+`84b3a1c` plus #477 as it was before it was merged (`fed6293`). On `b03d2fd`, CTADL's taint-front
+tests, the semantics suite and the `choice-domain` test give the same results. The port needs none
+of FlowLog's open fixes.
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
 analyses and the cargo target dir take a few GB ([Disk usage](#disk-usage)). Put the workspace,
@@ -243,9 +246,10 @@ they need FlowLog's `int64` type or its UDFs; the semantics suite tests those re
 | Expression arguments of atoms, `S(cat(a, "y"))` | `t = cat(a, "y"), S(t)`. In an aggregate, the binding goes inside the aggregate body. FlowLog cannot compile it there when it reads only outer variables and constants (bug B4), so the translator rejects that case. CTADL has no such aggregate. | `agg_computed` |
 | Negation of a computed value, `!S(t)` with `t = cat(..)` | A `NegPreN` helper relation materialises the positive part, then `NegPreN(.., t), !S(t)` | `neg_computed`, `neg_computed_lifted` |
 | Facts with computed arguments, `C(cat("a", "b")).`, and bodies that bind only by computation, `C(s) :- s = cat("a", "b").` | `C(cat("a", "b")) :- FlowlogUnit(_).`, `C(s) :- FlowlogUnit(_), s = cat("a", "b").` | `computed_fact`, `computed_body_only` |
-| `_` inside an aggregate body | Named fresh variables (works around bug B2) | `count_all_wild` |
+| `_` inside an aggregate body | Named fresh variables, where Soufflé aggregates over the tuples of the body's single atom. FlowLog aggregates over the distinct bindings of the named variables ([FlowLog findings](#flowlog-findings)). On `84b3a1c`, the names also avoid bug B2. | `count_all_wild` |
 | Variables named like FlowLog keywords (`fn`) | Renamed | `keyword_fn` |
-| `.plan`, `.pragma`, representation qualifiers | Dropped (`.plan`: [Join order](#join-order)). `.limitsize`, which truncates a relation, is rejected. | `pragma` |
+| `.plan` | FlowLog's `.plan` gives one join order per rule, Soufflé's one per semi-naive version of a recursive rule. The translation keeps version 0's order (the delta on the rule's first recursive atom) and drops the others ([Join order](#join-order)). Like Soufflé, it applies the plan to the rule with its relations inlined. It drops a plan where the translated rule reads other atoms (a `range` rewrite; a `choice-domain` relation read inside its own recursion, in a component instantiated more than once). | `tests/semantics/cases/plans.dl` |
+| `.pragma`, representation qualifiers | Dropped. `.limitsize`, which truncates a relation, is rejected. | `pragma` |
 | Output relations that no fact, input or rule derives | A rule that never fires, `A(0) :- FlowlogUnit(u), u != 0.`. Otherwise FlowLog prunes every relation and the generated crate does not compile (bug B12). | `empty_dataflow` |
 | `number`, `unsigned` | `int64`, `uint64`: CTADL needs Soufflé's 64-bit domain. Constant expressions are computed with Soufflé's wrap-around, and expressions FlowLog would compute on `int32` are pinned to 64 bits (bugs B5, B10, B11, B13; [below](#integers)). `float` is rejected (CTADL has none). | `literal_overflow`, `cast_literal`, `type_limit_cmp`, `udf_grouped_arg` |
 | `strlen`, `substr`, `^`, `ord` | Calls to UDFs with Soufflé's semantics (`souffle_strlen`, …). FlowLog's `strlen` and `substr` count characters, not bytes, and its `^` is 0 for every negative exponent (bug B7). Its `ord` is an `int32`, which FlowLog cannot widen. | `souffle_builtins` |
@@ -427,7 +431,8 @@ some of the resulting code. The translator therefore rewrites integer expression
   - an arithmetic argument of a UDF.
 
   There the translator wraps a term in the identity UDF `flowlog_int64` or `flowlog_uint64`.
-  FlowLog's own `as(1, int64)` leaves the literal `int32` (B11).
+  On `84b3a1c`, FlowLog's own `as(1, int64)` leaves the literal `int32` (B11; #487 fixes it in
+  `main`).
 - **Parentheses** (`paren_safe`; B5). FlowLog writes a variable that it replaces by its arithmetic
   definition in parentheses, which rustc rejects around the argument of a UDF or of a shift. The
   translator wraps the definition in an identity UDF, which FlowLog writes as a call.
@@ -508,8 +513,9 @@ The differential results:
 
 Both backends ran with 32 workers (`-j 32`). That is CTADL's default on the test machine, which
 has 64 hardware threads; CTADL uses half the CPUs. The runs used a fresh clone of this branch and
-FlowLog `main` plus #477, with FlowLog's analyses compiled from scratch. An earlier round with 4
-workers gave the same results. Each run's line is in `results/taint-front/summary.txt`,
+FlowLog `main` at `84b3a1c` plus #477, with FlowLog's analyses compiled from scratch. An earlier
+round with 4 workers gave the same results, and so do the taint-front tests on `main` at `b03d2fd`
+([Setup](#setup)). Each run's line is in `results/taint-front/summary.txt`,
 `results/corpus-ctadl/summary.txt`, `results/corpus-ctadl-rs/summary.txt` and
 `results/variants/*/summary.txt`.
 
@@ -536,11 +542,12 @@ Other checks:
 
 - `tests/semantics/run.sh` tests the translation rule by rule against Soufflé, on small programs
   written for the purpose (last run in `results/semantics.txt`):
-  - `cases/` (18 programs, 1,069 rows): every output relation is equal with FlowLog at 1, 4 and
+  - `cases/` (19 programs, 1,168 rows): every output relation is equal with FlowLog at 1, 4 and
     32 workers. They cover rule forms, components and their name scoping, arithmetic and integer
     widths, strings, aggregates and their scoping, records, ranges, `choice-domain`, programs
-    without a derived output, and Soufflé's builtins (`pow`, `substr`, `to_number`, …),
-    including their edge cases.
+    without a derived output, `.plan` hints, and Soufflé's builtins (`pow`, `substr`,
+    `to_number`, …), including their edge cases. A case can also name text its translation must
+    contain (`// expect-fl:`), such as the `.plan`s it keeps.
   - `rejects/` (41): the translator reports an error.
   - `invalid/` (7): erroneous programs. Soufflé and the translator reject each with the same
     error (undefined relation or wrong arity, at the same line).
@@ -623,13 +630,13 @@ $P/repros/check.sh -s; $P/repros/check.sh; $P/repros/check.sh -t
 
 ## Performance
 
-`bench.py` timed four backends with 1 and 32 workers on two programs generated by
+`bench.py` timed five backends with 1 and 32 workers on two programs generated by
 `gen_tnt.py --funcs N --stmts 12 --seed 1`:
 
 - Soufflé on CTADL's program, as CTADL runs it;
-- Soufflé on the same program without its `.plan` hints, in two variants
-  ([Join order](#join-order));
-- FlowLog.
+- FlowLog on its translation, which keeps the first version's order of CTADL's `.plan` hints;
+- Soufflé and FlowLog on the same program without the hints, Soufflé in two variants
+  ([Join order](#join-order)).
 
 The query wrote CTADL's text summary. The analyses were compiled beforehand, and the runs were one
 at a time on the otherwise idle machine. Full results are in `results/bench/summary.txt`. Times
@@ -646,49 +653,57 @@ Soufflé as CTADL runs it, and FlowLog:
 
 | Program | Backend | Workers | Index wall | Index engine | Index RSS | Query wall | Query engine | Query conv. | Query RSS |
 |---|---|---|---|---|---|---|---|---|---|
-| syn10 | Soufflé | 1 | 2.8 | 1.1 | 34 MB | 3.4 | 1.0 | | 40 MB |
-| syn10 | Soufflé | 32 | 2.3 | 0.6 | 32 MB | 3.3 | 0.8 | | 36 MB |
-| syn10 | FlowLog | 1 | 4.3 | 2.6 | 248 MB | 4.4 | 1.1 | 0.3 | 146 MB |
-| syn10 | FlowLog | 32 | 3.5 | 1.6 | 2.1 GB | 5.4 | 2.5 | 0.3 | 1.4 GB |
-| syn25 | Soufflé | 1 | 46.6 | 44.5 | 350 MB | 90.3 | 55.5 | | 1.4 GB |
-| syn25 | Soufflé | 32 | 15.0 | 12.9 | 357 MB | 71.7 | 36.8 | | 1.3 GB |
-| syn25 | FlowLog | 1 | 49.2 | 45.8 | 1.7 GB | 102.7 | 48.8 | 18.5 | 2.2 GB |
-| syn25 | FlowLog | 32 | 17.7 | 14.3 | 4.0 GB | 84.3 | 20.2 | 19.3 | 3.4 GB |
+| syn10 | Soufflé | 1 | 2.8 | 1.1 | 34 MB | 3.6 | 1.0 | | 40 MB |
+| syn10 | Soufflé | 32 | 2.3 | 0.6 | 32 MB | 3.4 | 0.8 | | 38 MB |
+| syn10 | FlowLog | 1 | 3.5 | 1.5 | 174 MB | 4.1 | 1.1 | 0.3 | 147 MB |
+| syn10 | FlowLog | 32 | 3.6 | 1.6 | 2.0 GB | 5.7 | 2.6 | 0.3 | 1.4 GB |
+| syn25 | Soufflé | 1 | 46.5 | 44.3 | 350 MB | 89.1 | 54.1 | | 1.4 GB |
+| syn25 | Soufflé | 32 | 15.1 | 12.8 | 357 MB | 72.4 | 36.7 | | 1.3 GB |
+| syn25 | FlowLog | 1 | 25.6 | 22.2 | 795 MB | 104.4 | 48.0 | 18.8 | 2.2 GB |
+| syn25 | FlowLog | 32 | 16.7 | 13.0 | 2.6 GB | 95.6 | 28.1\* | 19.2 | 3.5 GB |
 
-- **Engine time** is similar on syn25. FlowLog's index takes 3–11% longer than Soufflé's. Its query
-  is 1.1× as fast with 1 worker and 1.8× with 32. Both times include writing the results to sqlite.
-  On syn10, a small input, FlowLog's index takes 1.0–1.5 s longer, and its query takes 2.5 s with
-  32 workers against 1.1 s with 1: there the workers cost more than they gain.
-- **End to end**, FlowLog's query phase takes 1.1× Soufflé's wall time with 1 worker and 1.2× with
-  32. syn25's query phase, step by step (`bench.py` logs each step's time):
+\* Writing the query's results to sqlite took 17.3 s in this run, against 9.3 s in the
+`flowlog-noplan` run with 32 workers, whose query engine took 20.1 s. Both run the same query
+program on the same index ([Join order](#join-order)), and computing the results took 10.8 s in
+both. The figures below for FlowLog's query on syn25 are from the `flowlog-noplan` runs.
+
+- **Engine time:** on syn25, FlowLog's index takes half of Soufflé's time with 1 worker and 2% more
+  with 32. Its query is 1.1× as fast with 1 worker and 1.8× with 32. Both times include writing the
+  results to sqlite. With 32 workers, contention in FlowLog's string interner limits both; a
+  pending fix, [#499](https://github.com/flowlog-rs/flowlog/pull/499), brings the index down to
+  3.3 s and the query to 16.9 s ([Suggestions](#suggestions)). On syn10, a small input, FlowLog's
+  index takes 0.3–1.0 s longer, and its query takes 2.6 s with 32 workers against 1.1 s with 1:
+  there the workers cost more than they gain.
+- **End to end**, FlowLog's query phase takes 1.2× Soufflé's wall time with 1 worker and with 32.
+  syn25's query phase, step by step (`bench.py` logs each step's time):
 
   | Step (seconds) | Soufflé, 1 | FlowLog, 1 | Soufflé, 32 | FlowLog, 32 |
   |---|---|---|---|---|
   | Convert the inputs to FlowLog's layout | | 0.4 | | 0.5 |
-  | Engine: load the inputs and compute | 55.5 | 37.5 | 36.8 | 10.6 |
-  | Engine: write the results to sqlite | (above) | 11.3 | (above) | 9.5 |
-  | Convert the results to Soufflé's layout | | 18.0 | | 18.8 |
-  | CTADL indexes the results (`after_query`) | 20.5 | 21.9 | 20.3 | 25.0 |
-  | CTADL writes the report | 12.9 | 11.9 | 13.1 | 18.3 |
-  | Rest (startup, CTADL's setup) | 1.4 | 1.6 | 1.4 | 1.6 |
-  | **Wall** | 90.3 | 102.7 | 71.7 | 84.3 |
+  | Engine: load the inputs and compute | 54.1 | 37.8 | 36.7 | 10.8 |
+  | Engine: write the results to sqlite | (above) | 11.2 | (above) | 9.3 |
+  | Convert the results to Soufflé's layout | | 18.8 | | 19.0 |
+  | CTADL indexes the results (`after_query`) | 20.1 | 24.3 | 21.0 | 25.3 |
+  | CTADL writes the report | 13.2 | 11.9 | 13.1 | 18.3 |
+  | Rest (startup, CTADL's setup) | 1.7 | 1.9 | 1.6 | 1.9 |
+  | **Wall** | 89.1 | 106.2 | 72.4 | 84.9 |
 
 - **Conversion:** FlowLog writes plain sqlite tables. CTADL's tools read Soufflé's layout, a
   symbol table plus views, and `fl_db_adapter.py` converts between the two inside SQLite
   ([Pipeline](#pipeline)). syn25's query writes 18.4 million rows, 18.0 million of them in
   `forward_flow.ReachableEdge`, and converting them takes 18–19 s on one thread. (The port's
   first version converted them row by row in Python, in 56 s.) With 1 worker, the conversion
-  accounts for the difference: FlowLog's engine takes 6.7 s less than Soufflé's, and the
-  conversion 18.5 s. With 32, FlowLog's engine takes 16.6 s less, but the conversion and CTADL's
+  outweighs the engine's gain: FlowLog's engine takes 5 s less than Soufflé's, and the
+  conversion 19.3 s. With 32, FlowLog's engine takes 16.6 s less, but the conversion and CTADL's
   slower steps on its database (next item) take 29 s more. FlowLog writing Soufflé's layout
   itself would save most of the conversion ([Suggestions](#suggestions)).
 - **Row order:** with 32 workers, FlowLog writes a relation's rows in another order than with 1.
   In `forward_flow.ReachableEdge`, the rows that share a value of the first column, one of the
   three columns that CTADL indexes, form 8.5 million runs for 407,832 values. Soufflé's databases
   and FlowLog's with 1 worker have one run per value. FlowLog's databases with 1 and 32 workers
-  have the same contents, but CTADL's indexing and report take 9.5 s longer on the second.
-- **Memory:** FlowLog's index uses 4.9× Soufflé's peak memory with 1 worker and 11× with 32. Its
-  query uses 1.6× and 2.6×. FlowLog's memory grows with the worker count; Soufflé's does not.
+  have the same contents, but CTADL's indexing and report take 7.3 s longer on the second.
+- **Memory:** FlowLog's index uses 2.3× Soufflé's peak memory with 1 worker and 7.5× with 32. Its
+  query uses 1.6× and 2.7×. FlowLog's memory grows with the worker count; Soufflé's does not.
 - **Results:** FlowLog's databases with 1 and 32 workers are identical, on both programs. CTADL's
   query report, which counts the sources, sinks and slices found, is identical in all runs: every
   backend, hint variant and worker count. The databases differ from Soufflé `-j 1`'s, as do
@@ -717,16 +732,29 @@ Soufflé as CTADL runs it, and FlowLog:
 
 ### Join order
 
-The runs above do not use the same join orders. Soufflé runs CTADL's `.plan` hints, which the
-translation drops: 67 in the index and 6 in the query. They are hand-written orders for the
-semi-naive versions of recursive rules; Soufflé rejects `.plan` on other rules. FlowLog's `.plan`
-takes one order per rule, not one per version. Without the hints, both engines join in the
-written order:
+CTADL gives Soufflé hand-written join orders: 67 `.plan` hints in the index and 6 in the query.
+Soufflé evaluates a recursive rule semi-naively, in one version per body atom of the rule's own
+recursion: version *i* joins the new tuples (the delta) of the *i*-th such atom with the full
+relations of the others. A hint orders each version separately, `0:(…)` the first; Soufflé
+rejects `.plan` on other rules. FlowLog's `.plan` takes one order per rule: differential dataflow
+joins the new tuples of every input through the same join tree. The translation keeps each
+hint's version-0 order and drops the others:
+
+- **4 hints order version 0**, all in the index: `SummaryFlow` (`graph/dataflow.dl`),
+  `SummaryAlloc` (`graph/callgraph.dl`), and two rules of `graph/star.dl` that run only with
+  `--star`. The translation writes each star rule as two rules, one per clause of its
+  disjunction, so the index gets 6 FlowLog `.plan`s.
+- **The other 69 order later versions only.** Soufflé runs version 0 of these rules, like every
+  rule without a hint, in about the written order, as FlowLog does (below).
+
+So both engines join the first version of every rule in about the same order, and only Soufflé
+orders the later versions of 73 rules. Without the hints, both engines join in the written order:
 
 - **FlowLog** has no SIPS. Its planner joins a rule's positive atoms left-deep in the written order.
   It deviates only to avoid a cross product (cyclic bodies) or to join join-tree neighbours
   (acyclic bodies). Before joining, it folds an atom whose variables all occur in another atom
-  into a semijoin. Its planner trace for the index has 362 rules with two or more positive atoms:
+  into a semijoin. Its planner trace for the index without the hints has 362 rules with two or
+  more positive atoms:
   - 332 are joined in the written order, 160 of them after folding atoms into semijoins;
   - the other 30 differ only where an atom is linked through a computed binding
     (`lift_t = strlen(ap) - 1`, `full_ap = actual_ap`), which is joined after the atoms it depends
@@ -738,27 +766,38 @@ written order:
   `souffle --show=transformed-ram`). The exceptions are two non-recursive rules, which `all-bound`
   starts from the constant atom `CisAccessPath("")`.
 
-`bench.py` therefore has two more backends, which run CTADL's program without its hints:
+`bench.py` therefore has three more backends, which run CTADL's program without its hints:
 
 - `souffle-noplan` uses Soufflé's default SIPS;
-- `souffle-strict` adds `.pragma "RamSIPS" "strict"`.
+- `souffle-strict` adds `.pragma "RamSIPS" "strict"`;
+- `flowlog-noplan` translates the program without them.
 
 Engine times in seconds, with 1 / 32 workers:
 
-| Program | Phase | Soufflé, CTADL's hints | Soufflé, no hints | Soufflé, strict | FlowLog |
-|---|---|---|---|---|---|
-| syn10 | index | 1.1 / 0.6 | 3.7 / 0.7 | 3.7 / 0.7 | 2.6 / 1.6 |
-| syn10 | query | 1.0 / 0.8 | 1.0 / 0.8 | 1.0 / 0.8 | 1.1 / 2.5 |
-| syn25 | index | 44.5 / 12.9 | 120.9 / 20.9 | 122.9 / 20.9 | 45.8 / 14.3 |
-| syn25 | query | 55.5 / 36.8 | 54.4 / 36.3 | 54.0 / 37.1 | 48.8 / 20.2 |
+| Program | Phase | Soufflé, CTADL's hints | FlowLog, their version 0 | Soufflé, no hints | Soufflé, strict | FlowLog, no hints |
+|---|---|---|---|---|---|---|
+| syn10 | index | 1.1 / 0.6 | 1.5 / 1.6 | 3.7 / 0.7 | 3.7 / 0.7 | 2.6 / 1.6 |
+| syn10 | query | 1.0 / 0.8 | 1.1 / 2.6 | 1.0 / 0.8 | 1.0 / 0.8 | 1.1 / 2.5 |
+| syn25 | index | 44.3 / 12.8 | 22.2 / 13.0 | 121.8 / 20.8 | 123.1 / 20.4 | 45.0 / 13.8 |
+| syn25 | query | 54.1 / 36.7 | 48.0 / 28.1\* | 55.5 / 36.6 | 54.1 / 36.4 | 49.0 / 20.1 |
 
-- **The hints matter for the index only.** Without them, Soufflé's index takes 2.7–2.8× as long on
-  syn25 with 1 worker and 1.6× with 32. The query's 6 hints make no difference, and peak memory
-  does not change.
-- **On the same join orders**, FlowLog's index is 2.7× as fast as Soufflé's on syn25 with 1
-  worker and 1.5× with 32. Its query engine is 1.1× as fast with 1 worker and 1.8× with 32.
-  On syn10, FlowLog's index is 1.4× as fast with 1 worker and 2.3× slower with 32, a fixed cost
-  of its 32 workers on a small input.
+\* See [Performance](#performance): writing the results took 8 s longer in this run.
+
+- **The hints matter for the index only.** Without them, Soufflé's index takes 2.7× as long on
+  syn25 with 1 worker and 1.6× with 32, and FlowLog's 2.0× as long with 1 worker and 1.06× with 32.
+  FlowLog's gain comes from `SummaryFlow` and `SummaryAlloc`. Their version-0 orders join the
+  first `LocallyReachable` atom with `ComputedAccessPathNonEmptySplit(GH, G, H)` before the second
+  `LocallyReachable`, which then joins on two columns, `a` and `GH`, instead of `a` alone. They
+  also cut FlowLog's peak memory, by 55% with 1 worker and 35% with 32. The query's hints, none of
+  which orders version 0, make no difference to Soufflé, and without the hints Soufflé's peak
+  memory stays within 11 MB of its value with them.
+- **On the same join orders**, without any hints, FlowLog's index is 2.7× as fast as Soufflé's on
+  syn25 with 1 worker and 1.5× with 32. With the hints, FlowLog's index is 2.0× as fast with 1
+  worker and 2% slower with 32, though only Soufflé orders the later versions. Both FlowLog
+  columns run the same query program. Its engine is 1.1× as fast as Soufflé's with 1 worker and
+  1.8× with 32 (the `flowlog-noplan` runs), with or without Soufflé's hints. On syn10, FlowLog's
+  index is 1.4× as fast with 1 worker and takes 2.2× as long with 32, a fixed cost of its 32
+  workers on a small input.
 - **The same join order is not the same evaluation.** Soufflé runs each version of a recursive rule
   as nested loops over indexes, with the version's delta relation at its written position. When
   the delta is an inner loop, each iteration scans the full outer relation again. The index's
@@ -770,8 +809,9 @@ Engine times in seconds, with 1 / 32 workers:
   extra memory goes.
 - **Results:** a `.plan` changes only the evaluation order. But for each `choice-domain` key,
   Soufflé keeps the first candidate it derives, so its result depends on that order. Without the
-  hints, 9–12 relations differ on syn25 and 3–4 on syn10. Compared with 1 worker, where both
-  engines are deterministic:
+  hints, 9–10 relations differ on syn25 and 3–4 on syn10. FlowLog's databases with and without the
+  hints are identical, on both programs. Compared with 1 worker, where both engines are
+  deterministic:
 
   | Program | Soufflé with hints, against `strict` | FlowLog, against Soufflé `strict` |
   |---|---|---|
@@ -799,7 +839,8 @@ To reproduce the benchmark:
 ```bash
 P=ctadl/flowlog-backend; mkdir -p bench runs/bench
 for n in 10 25; do python3 $P/gen_tnt.py --funcs $n --stmts 12 --seed 1 -o bench/syn$n.tnt; done
-python3 $P/bench.py --jobs 1,32 --backend souffle,souffle-noplan,souffle-strict,flowlog \
+python3 $P/bench.py --jobs 1,32 \
+    --backend souffle,flowlog,flowlog-noplan,souffle-noplan,souffle-strict \
     bench/syn10.tnt bench/syn25.tnt > runs/bench/summary.txt
 K="--keys VirtualAssign=0,1,2,3,4,5,6 --schema $P/index_schema.json --schema $P/query_schema.json"
 for s in syn10 syn25; do
@@ -808,6 +849,7 @@ for s in syn10 syn25; do
   python3 $P/compare_db.py $K $B/souffle-j1/ctadlir.db $B/souffle-strict-j1/ctadlir.db
   python3 $P/compare_db.py $K $B/souffle-strict-j1/ctadlir.db $B/flowlog-j1/ctadlir.db
   python3 $P/compare_db.py $K $B/flowlog-j1/ctadlir.db $B/flowlog-j32/ctadlir.db
+  python3 $P/compare_db.py $K $B/flowlog-j1/ctadlir.db $B/flowlog-noplan-j1/ctadlir.db
 done
 ```
 
@@ -842,13 +884,16 @@ The programs in `repros/` are minimal. `repros/check.sh` compiles and runs them 
 another FlowLog checkout than the workspace's. The table compares the FlowLog results with Soufflé
 2.5 on the same program. "`main`" is FlowLog's `main` at `84b3a1c`; "with #477" adds the B1 fix.
 The outputs are in `results/repros/`: `souffle.txt`, `main.txt` and `with-477.txt`.
+`main-b03d2fd.txt` has the results on `main` at `b03d2fd`, which has the fixes for B1, B2, B4, B6,
+B7 and B11: those repros give Soufflé's results there, except `count_all_wild` (B2; [Behaviour
+differences](#behaviour-differences)) and B7's `strlen` and `substr`.
 
 **Bugs**
 
 | Repro | Soufflé 2.5 | FlowLog | Port |
 |---|---|---|---|
 | **B1** `string_constraint_literal`: integer literals inside a computed `contains`/`match` operand, e.g. `!contains(".*", substr(s, i, strlen(s) - i + 1))` | `O={abc}` | `main`: internal compiler error in codegen, `polymorphic literal Constant { text: "1", ty: IntLit } reached codegen; typechecker should have pinned it`. With #477: `O={abc}`. | Fixed by #477. CTADL's analysis has this shape. |
-| **B2** `count_all_wild`: `n = count : { R(_, _) }` | `C={2}` | The generated crate fails rustc with E0308: `flowlog_aggregate` expects an `OrdValBatch` arrangement but gets an `OrdKeyBatch`. | The translator names the placeholders. |
+| **B2** `count_all_wild`: `n = count : { R(_, _) }` | `C={2}` | `main`: the generated crate fails rustc with E0308: `flowlog_aggregate` expects an `OrdValBatch` arrangement but gets an `OrdKeyBatch`. With #478: `C={1}`, by design ([Behaviour differences](#behaviour-differences)). | The translator names the placeholders, which also gives Soufflé's count. |
 | **B3** `lattice_min_string`: `min<string>` lattice column | (no lattices) | The front end accepts it, then rustc fails with E0277: `MinAccumulator<String>` is not `Clone`. | Choice keys are interned `int64`s. |
 | **B4** `agg_body_binding`: an aggregate body with a constraint on an outer variable, such as a value computed from it, `n = count : { t = cat(a, "y"), S(t) }` | `O={x 1}` | rustc fails: ``unused variable: `t_…_arr` ``. The generator builds an arrangement that nothing reads, and generated crates build with `-Dwarnings`. | The translator substitutes an equality with an outer variable into the atoms. It rejects the other shapes with an error naming B4, as it does `agg_computed`, which it would rewrite into one. No CTADL aggregate has them. |
 | **B5** `udf_strlen_arg`, `udf_grouped_arg`: `strlen` or `ord` as a UDF argument, `O(id(strlen(s))) :- S(s).`, or a variable that FlowLog replaces by its arithmetic definition, `O(id(y)) :- P(a), y = a + 1.` (also as a shift operand) | (no UDFs) | rustc fails: `unnecessary parentheses around function argument` (`-Dwarnings` again). | The port computes `strlen` and `ord` with UDFs (B7), and wraps such definitions in an identity UDF ([Integers](#integers)). |
@@ -866,23 +911,23 @@ FlowLog tests the repetition after the comparison too, but this is not a differe
 Soufflé 2.5 also tests such variables after the comparisons, and stops on `R(1, 2, 0)`.
 
 Each bug is filed on flowlog-rs/flowlog, with its repro rechecked on `84b3a1c`, and has a fix PR.
-None of the fixes was merged when this was written.
+The status is as of `main` at `b03d2fd`.
 
-| Bug | Issue | Fix |
-|---|---|---|
-| B1 | [#464](https://github.com/flowlog-rs/flowlog/issues/464) | [#477](https://github.com/flowlog-rs/flowlog/pull/477) |
-| B2 | [#465](https://github.com/flowlog-rs/flowlog/issues/465) | [#478](https://github.com/flowlog-rs/flowlog/pull/478) |
-| B3 | [#466](https://github.com/flowlog-rs/flowlog/issues/466) | [#485](https://github.com/flowlog-rs/flowlog/pull/485) |
-| B4 | [#467](https://github.com/flowlog-rs/flowlog/issues/467) | [#488](https://github.com/flowlog-rs/flowlog/pull/488), on top of #479 |
-| B5 | [#468](https://github.com/flowlog-rs/flowlog/issues/468) | [#486](https://github.com/flowlog-rs/flowlog/pull/486) |
-| B6 | [#469](https://github.com/flowlog-rs/flowlog/issues/469) | [#479](https://github.com/flowlog-rs/flowlog/pull/479) |
-| B7 | [#470](https://github.com/flowlog-rs/flowlog/issues/470), for `^` only | [#480](https://github.com/flowlog-rs/flowlog/pull/480); [#489](https://github.com/flowlog-rs/flowlog/pull/489) also makes `^` exact for an exponent past `u32` |
-| B8 | [#471](https://github.com/flowlog-rs/flowlog/issues/471) | [#481](https://github.com/flowlog-rs/flowlog/pull/481) |
-| B9 | [#472](https://github.com/flowlog-rs/flowlog/issues/472) | [#482](https://github.com/flowlog-rs/flowlog/pull/482) |
-| B10 | [#473](https://github.com/flowlog-rs/flowlog/issues/473) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) |
-| B11 | [#474](https://github.com/flowlog-rs/flowlog/issues/474) | [#487](https://github.com/flowlog-rs/flowlog/pull/487); [#492](https://github.com/flowlog-rs/flowlog/pull/492) does the same for an `as` whose operand is not a literal ([#490](https://github.com/flowlog-rs/flowlog/issues/490)) |
-| B12 | [#475](https://github.com/flowlog-rs/flowlog/issues/475) | [#484](https://github.com/flowlog-rs/flowlog/pull/484) |
-| B13 | [#476](https://github.com/flowlog-rs/flowlog/issues/476) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) |
+| Bug | Issue | Fix | Status |
+|---|---|---|---|
+| B1 | [#464](https://github.com/flowlog-rs/flowlog/issues/464) | [#477](https://github.com/flowlog-rs/flowlog/pull/477) | merged |
+| B2 | [#465](https://github.com/flowlog-rs/flowlog/issues/465) | [#478](https://github.com/flowlog-rs/flowlog/pull/478) | merged |
+| B3 | [#466](https://github.com/flowlog-rs/flowlog/issues/466) | [#485](https://github.com/flowlog-rs/flowlog/pull/485) | open |
+| B4 | [#467](https://github.com/flowlog-rs/flowlog/issues/467) | [#488](https://github.com/flowlog-rs/flowlog/pull/488), on top of #479 | merged |
+| B5 | [#468](https://github.com/flowlog-rs/flowlog/issues/468) | [#486](https://github.com/flowlog-rs/flowlog/pull/486) | open |
+| B6 | [#469](https://github.com/flowlog-rs/flowlog/issues/469) | [#479](https://github.com/flowlog-rs/flowlog/pull/479) | merged |
+| B7 | [#470](https://github.com/flowlog-rs/flowlog/issues/470), for `^` only | [#480](https://github.com/flowlog-rs/flowlog/pull/480); [#489](https://github.com/flowlog-rs/flowlog/pull/489) also makes `^` exact for an exponent past `u32` | merged |
+| B8 | [#471](https://github.com/flowlog-rs/flowlog/issues/471) | [#481](https://github.com/flowlog-rs/flowlog/pull/481) | open |
+| B9 | [#472](https://github.com/flowlog-rs/flowlog/issues/472) | [#482](https://github.com/flowlog-rs/flowlog/pull/482) | open |
+| B10 | [#473](https://github.com/flowlog-rs/flowlog/issues/473) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) | open |
+| B11 | [#474](https://github.com/flowlog-rs/flowlog/issues/474) | [#487](https://github.com/flowlog-rs/flowlog/pull/487); [#492](https://github.com/flowlog-rs/flowlog/pull/492) does the same for an `as` whose operand is not a literal ([#490](https://github.com/flowlog-rs/flowlog/issues/490)) | merged |
+| B12 | [#475](https://github.com/flowlog-rs/flowlog/issues/475) | [#484](https://github.com/flowlog-rs/flowlog/pull/484) | open |
+| B13 | [#476](https://github.com/flowlog-rs/flowlog/issues/476) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) | open |
 
 B7's `strlen` and `substr`, which count characters where Soufflé counts bytes, are not filed.
 
@@ -912,7 +957,7 @@ Where the Soufflé column is empty, both engines compute the obvious result once
 accepted.
 
 `repros/check.sh -t` passes each repro through the translator, then compiles and runs it the way the
-driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
+driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/translated.txt`):
 
 - **Nineteen** rewritten repros give exactly Soufflé's result, among them B2, B7–B9, B12 and B13,
   and B1 thanks to #477. `antijoin_projection` also writes the check relation
@@ -922,14 +967,23 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
   round ([Limitations](#limitations)).
 - **Unsupported:** five repros, none of which CTADL needs. The translator rejects
   `agg_computed`, `agg_body_binding` (B4) and `agg_computed_lifted`. FlowLog fails on
-  `agg_shared_join` and `agg_many_readers` (B6).
+  `agg_shared_join` and `agg_many_readers` (B6). On `main` at `b03d2fd`, these two give Soufflé's
+  results, and the others are unchanged (`results/repros/translated-b03d2fd.txt`).
 - **The rest:** both engines reject `agg_min_string`, and the driver handles `empty_output`.
   `cast_literal`, `literal_overflow`, `udf_grouped_arg`, `udf_strlen_arg` and the `lattice_*`
   repros are FlowLog programs. The semantics suite's `widths.dl` tests the rewrites for B5, B10,
   B11 and B13 against Soufflé.
 
+<a id="behaviour-differences"></a>
 **Behaviour differences**
 
+- **`count_all_wild`:** with #478, FlowLog answers `C={1}` and Soufflé `C={2}`. FlowLog aggregates
+  over the distinct bindings of the body's named variables, and `_` names nothing. Soufflé
+  aggregates over the tuples of a single atom, and over the distinct bindings when it outlines the
+  body into a relation, as it does for several atoms
+  ([FlowLog's design notes](https://github.com/flowlog-rs/flowlog/blob/main/docs/design/aggregation.md)).
+  The translator names the wildcards where Soufflé reads an atom's tuples, so the port counts as
+  Soufflé does.
 - **`empty_output`:** FlowLog writes no table for an output relation that has no rules. Soufflé
   creates an empty one. The adapter creates the missing tables.
 - **`lattice_in_loop`:** a `min` lattice relation that is read inside its own recursion also
@@ -941,26 +995,40 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
 
 1. **Native `choice-domain`**, or an aggregate that picks one witness per key and never revises it
    inside recursion. It is the only non-syntactic gap, and it would replace the stateful UDFs.
-2. **Merge the fixes** for B1 (#477; CTADL needs it) and B2–B13. B8 and B9 make FlowLog
-   evaluate expressions on rows that the rule excludes. A port must then make every function
-   total, and stop the run itself where Soufflé would ([Runtime errors](#runtime-errors)). B4,
-   B5, B10, B12 and B13 are rustc lints on the generated code, which the generated crate could
-   allow.
-3. **64-bit literals:** a literal that no column or parameter types is an `int32`, and `as` does
-   not change it (B11). An option to default to `int64`, or an `as` that types the literal (#487),
-   would make the translator's anchors unnecessary ([Integers](#integers)).
-4. **Soufflé-compatible syntax**: nested components; `inline`; records (flattening would be enough);
+2. **Merge the remaining fixes**, for B3, B5, B8–B10, B12 and B13 (those for B1, B2, B4, B6, B7 and
+   B11 are merged). B8 and B9 make FlowLog evaluate expressions on rows that the rule excludes. A
+   port must then make every function total, and stop the run itself where Soufflé would
+   ([Runtime errors](#runtime-errors)). B5, B10, B12 and B13 are rustc lints on the generated code,
+   which the generated crate could allow.
+3. **String interning that scales with workers**
+   ([#498](https://github.com/flowlog-rs/flowlog/issues/498)). With `--str-intern`, the generated
+   code interns or resolves strings on every row, at 859 `intern` and 1,024 `resolve` call sites in
+   the code for CTADL's index, and every call takes a read lock on a map that all workers share.
+   With 32 workers, the locks are contended: perf puts 67% of the index's CPU time and 51% of
+   the query's in the interner, and the index computes only 1.7× as fast as with 1 worker.
+   [#499](https://github.com/flowlog-rs/flowlog/pull/499) caches the lookups in each thread. With
+   it, on `main` at `f14db3d` (medians of 3 `bench.py` runs on syn25 with 32 workers), the index
+   computes in 2.9 s, 7.1× as fast as with 1 worker, and the query in 5.4 s, against 12.6 s and
+   10.8 s in the runs of [Performance](#performance), with the same results. FlowLog's binary then
+   takes 3.3 s on the index and 16.9 s on the query, against Soufflé's 12.9 s and 36.7 s in the
+   same runs. Code generation could avoid most of the calls: intern a rule's string literals once
+   rather than per row, and pass strings to UDFs as `&str`.
+4. **64-bit literals:** a literal that no column or parameter types is an `int32`, and on `84b3a1c`
+   `as` does not change it (B11). An option to default to `int64`, or an `as` that types the
+   literal (#487, now merged), would make the translator's anchors unnecessary
+   ([Integers](#integers)).
+5. **Soufflé-compatible syntax**: nested components; `inline`; records (flattening would be enough);
    `range`; variadic `cat`; expression arguments of atoms; negation and aggregation over computed
    values; computed facts and bodies; `true`/`false`; ignoring unknown `.pragma`s;
    `.functor`/`@F` mapping to `.extern fn`.
-5. **Output parity:** create empty tables/files for output relations that have no rules. Writing
+6. **Output parity:** create empty tables/files for output relations that have no rules. Writing
    Soufflé's sqlite layout (a symbol table, shadow tables of ids, and views) as an option would
    remove most of the port's conversion. On syn25 with 32 workers, FlowLog computes the query's
-   results in 10.6 s, then takes 9.5 s to write them as plain tables, and the port 18.8 s to
+   results in 10.8 s, then takes 9.3 s to write them as plain tables, and the port 19.0 s to
    convert them. With several workers, FlowLog should also write each relation in the order it
-   uses with 1 worker: CTADL's indexing and report take 9.5 s longer on the 32-worker database
+   uses with 1 worker: CTADL's indexing and report take 7.3 s longer on the 32-worker database
    ([Performance](#performance)).
-6. **Compile time and binary size.** CTADL's index and query take 3 min 8 s and 2 min 3 s to
+7. **Compile time and binary size.** CTADL's index and query take 3 min 8 s and 2 min 3 s to
    compile, against Soufflé's 2 min 43 s and 1 min 10 s. The binaries are 19–28× larger (168 and
    116 MB). Both engines cache the binary, so this cost is paid once per version of the analysis,
    but it slows down work on the analysis itself.
@@ -999,9 +1067,10 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
   - component names that denote different relations in different instances, or an enclosing
     instance's `choice-domain` or type-parameter relation; components with type parameters and
     nested components ([Components](#components));
-  - aggregate shapes FlowLog cannot compile (B4).
-- **B6:** FlowLog's planner fails on some aggregates over an arrangement that other rules also
-  use. The translator does not avoid this; CTADL's aggregates do not trigger it.
+  - aggregate shapes that FlowLog compiles only since #488 (B4), which `84b3a1c` does not have.
+- **B6:** on `84b3a1c`, FlowLog's planner fails on some aggregates over an arrangement that other
+  rules also use; #479 fixes it in `main`. The translator does not avoid this; CTADL's aggregates
+  do not trigger it.
 - **Front ends:** only the taint-front front end was exercised. Ghidra (P-code) and JADX (Android)
   imports use the same analysis programs but were not run.
 
@@ -1022,7 +1091,7 @@ driver does, with FlowLog `main` plus #477 (`results/repros/translated.txt`):
 
 | Component | Version |
 |---|---|
-| FlowLog | `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477 |
+| FlowLog | `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477, and on `main` at `b03d2fd` (#488), which has #477 merged |
 | CTADL | 0.14.1, `4f6f8cb` |
 | ctadl-rs | `7c98b73e` |
 | Soufflé | 2.5 |
