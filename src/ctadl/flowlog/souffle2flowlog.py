@@ -2540,7 +2540,7 @@ class Translator:
         Souffle makes of it (one per DNF conjunct), so that each gets its own
         priority, and record the flags of the rewrites Souffle applies before
         inlining (see souffle_order_key).  A clause's `sub` is (rule number,
-        DNF index): unique, even for several rules on one line."""
+        DNF index): unique, even for several rules or facts on one line."""
         seq = 0
 
         def fix(its: list, scope: tuple) -> list:
@@ -2549,10 +2549,13 @@ class Translator:
             for it in its:
                 if isinstance(it, Comp):
                     it = Comp(it.name, it.tparams, it.supers, fix(it.items, scope + (it.name,)))
-                elif isinstance(it, Rule) and it.body is not None and any(
+                elif isinstance(it, Rule) and any(
                         d is not None and d.choice and self.is_minchoice(d.name)
                         for d in (self.resolve_decl(h.name, scope) for h in it.heads)):
                     seq += 1
+                    if it.body is None:
+                        out.append(Rule(it.heads, None, it.line, (seq, 0), None, it.plan))
+                        continue
                     for i, conj in enumerate(souffle_dnf(it.body)):
                         sx = {"farc": sx_record_constraint(conj),
                               "ra1": sx_resolve_aliases_changes(conj),
