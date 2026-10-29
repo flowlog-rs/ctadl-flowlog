@@ -1,7 +1,6 @@
-// As no_derivation.dl, in a program with components: no output is derived
-// from a fact or an input, so the translator gives the rule that never fires
-// at top level for the first output in its instance, with the instance's
-// type arguments: o.i.A("", 0).  Souffle writes every output empty.
+// As no_derivation.dl, in a program with components: no output, at top
+// level or in an instance, is derived from a fact or an input.  Souffle
+// writes every output empty.
 .comp Outer {
   .comp Inner<U> {
     .decl A(x: U, n: number)

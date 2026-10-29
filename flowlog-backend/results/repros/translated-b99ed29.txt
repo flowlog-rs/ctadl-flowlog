@@ -1,0 +1,36 @@
+agg_body_binding: ok: O={x	1}
+agg_computed: ok: O={x	1}
+agg_computed_lifted: translate FAILED: error: line 9: aggregate atom over a computed value
+agg_many_readers: ok: W={1 10 100 11 12 2 3 4 5 6 7 8 9}
+agg_min_string: compile FAILED: error: aggregation `Min` requires a numeric input but got `String`
+agg_shared_join: ok: O={b	1 m	2}
+antijoin_projection: ok: A={25} FlowlogAbort={}
+cast_literal: translate FAILED: error: unknown type int64
+choice_domain: ok: C={1	3}
+computed_body_only: ok: C={ab}
+computed_fact: ok: C={ab}
+count_all_wild: ok: C={2}
+dup_output: ok: R={1} R2={1}
+empty_dataflow: ok: (no output)
+empty_output: ok: O={1}
+filter_order: ok: O={6	2}
+functor_decl: ok: O={x}
+inline_rel: ok: O={1}
+keyword_fn: ok: O={f}
+lattice_in_loop: translate FAILED: error: line 9: expected ), got '<'
+lattice_min_string: translate FAILED: error: line 5: expected ), got '<'
+literal_overflow: translate FAILED: error: unknown type int64
+neg_computed: ok: O={}
+neg_computed_lifted: ok: O={z}
+neg_only_body: ok: A={1}
+nested_comp: ok: Out={1}
+pragma: ok: O={1}
+range_gen: ok: O={0 1 2}
+record_type: ok: O={1}
+souffle_builtins: ok: O={(-1)^-1	-1 1^-1	1 2^-1	0 strlen(é)	2} S={substr(aéb,1,2)	é}
+string_constraint_literal: ok: O={abc}
+true_false: ok: O={1}
+type_limit_cmp: ok: A={3}
+udf_grouped_arg: translate FAILED: error: line 4: expected id, got '.'
+udf_strlen_arg: translate FAILED: error: line 3: expected id, got '.'
+variadic_cat: ok: O={x-x}

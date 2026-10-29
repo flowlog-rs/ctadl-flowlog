@@ -1,7 +1,7 @@
 case aggregates
-  -w 1: same as Soufflé (4 relations, 70 rows)
-  -w 4: same as Soufflé (4 relations, 70 rows)
-  -w 32: same as Soufflé (4 relations, 70 rows)
+  -w 1: same as Soufflé (5 relations, 92 rows)
+  -w 4: same as Soufflé (5 relations, 92 rows)
+  -w 32: same as Soufflé (5 relations, 92 rows)
 case aliases
   -w 1: same as Soufflé (4 relations, 13 rows)
   -w 4: same as Soufflé (4 relations, 13 rows)
@@ -30,10 +30,10 @@ case no_derivation_comp
   -w 1: same as Soufflé (3 relations, 0 rows)
   -w 4: same as Soufflé (3 relations, 0 rows)
   -w 32: same as Soufflé (3 relations, 0 rows)
-case no_derivation_unit
-  -w 1: same as Soufflé (1 relations, 0 rows)
-  -w 4: same as Soufflé (1 relations, 0 rows)
-  -w 32: same as Soufflé (1 relations, 0 rows)
+case outputs
+  -w 1: same as Soufflé (6 relations, 7 rows)
+  -w 4: same as Soufflé (6 relations, 7 rows)
+  -w 32: same as Soufflé (6 relations, 7 rows)
 case partial
   -w 1: same as Soufflé (12 relations, 23 rows)
   -w 4: same as Soufflé (12 relations, 23 rows)
@@ -83,8 +83,6 @@ reject agg_inline_relation: ok, error: inline relation I is used inside an aggre
 reject agg_local_types: ok, error: line 9: variable `x` is typed both number and symbol (one name in several disjuncts or aggregates); rename one of them
 reject agg_minmax_const: ok, error: line 7: min of an expression without local variables is not supported
 reject agg_negation: ok, error: line 8: negation inside an aggregate body is not supported by FlowLog
-reject agg_outer_filter: ok, error: line 9: an aggregate body filters on outer variables only (FlowLog fails to compile this shape: bug B4 in README.md)
-reject agg_outer_local: ok, error: line 9: an aggregate body atom reads `t_ag1`, which is computed from outer variables or constants only (FlowLog fails to compile this shape: bug B4 in README.md)
 reject alias_order: ok, error: line 8: Souffle computes `x - 10 < 0` on unsigned or on number, as its alias resolution leaves `x` or replaces it by its constant 3 (which depends on the order of the equalities and on aggregate materialization); write the constant or an atom-bound variable in place of `x` there
 reject alias_order_agg: ok, error: line 7: Souffle computes `u - 10 < 0` on unsigned or on number, as its alias resolution leaves `u` or replaces it by its constant 3 (which depends on the order of the equalities and on aggregate materialization); write the constant or an atom-bound variable in place of `u` there
 reject alias_several: ok, error: line 7: `y` is equated to several expressions (x bshr 62, 0 - 2); Souffle keeps one, chosen by the order of the equalities, and types its copies by where they land — equate it to one only
@@ -106,12 +104,15 @@ reject limitsize: ok, error: .limitsize O is not supported (it truncates the rel
 reject lnot: ok, error: unary lnot not supported
 reject min_functor: ok, error: builtin min is not supported by FlowLog
 reject nil_record: ok, error: recursive record type L is not supported
+reject output_kinds: ok, error: .output R: two outputs of the relation are not to a file
+reject output_same_file: ok, error: .output R: two outputs of the relation write 'R.csv'
 reject override: ok, error: component inheritance (Sub : Base) is not supported
 reject pow_unsigned: ok, error: line 6: operator ^ over type unsigned is not supported
 reject range_head: ok, error: line 6: range is supported only as `v = range(lo, hi)` in a rule body
 reject range_step: ok, error: range with a step is not supported
 reject range_unsigned: ok, error: range over unsigned is not supported
 reject record_attr_collision: ok, error: two attributes are both spelled `p_a` once records are flattened and names are spelled for FlowLog
+reject record_delimiter: ok, error: .input R: record columns in a file need the tab delimiter
 reject record_neq: ok, error: line 7: record comparison `!=` is not supported
 reject record_targ: ok, error: .init b: record type argument P is not supported
 reject reserved_name: ok, error: relation name FlowlogUnit is reserved by the translation

@@ -1,9 +1,0 @@
-// A local computed from injected variables only and then read by an atom
-// (FlowLog bug B4).
-.decl T(a: number)
-T(7). T(9).
-.decl K(a: number)
-K(1). K(3).
-.decl O(d: number, n: number)
-.output O
-O(d, n) :- K(d), n = count : { T(t), t = d + 6 }.

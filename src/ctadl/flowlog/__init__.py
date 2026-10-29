@@ -7,10 +7,10 @@ is the same as with Souffle. The preprocessed Souffle program is translated
 to FlowLog (souffle2flowlog.py) and compiled with flowlog-compiler. Like the
 Souffle binaries, the compiled analyses are cached in CTADL's state
 directory, keyed by the program, the translation and the compiler. A run
-converts the analysis' inputs to the layouts FlowLog reads (facts.py,
-sqlite_layout.py) and its sqlite outputs to Souffle's layout
-(sqlite_layout.py), so the index database is the same whichever engine
-wrote it. The sqlite databases must have relative names, as CTADL's do.
+converts the analysis' inputs to the layouts FlowLog reads, and its outputs
+back to Souffle's (facts.py for files, sqlite_layout.py for sqlite), so the
+index database and the output files are the same whichever engine wrote
+them. Input and output files must have relative names, as CTADL's do.
 
 The translation is generic; CTADL's part of it is in souffle-logic/:
 functors.rs, the Rust port of functors.cpp, and flowlog-policy.json, which
@@ -39,7 +39,7 @@ from importlib import resources
 from pathlib import Path
 
 import ctadl
-from ctadl import analysiscachedir, error, status, warn
+from ctadl import analysiscachedir, error, status
 
 from . import facts, souffle2flowlog, sqlite_layout
 
@@ -86,12 +86,21 @@ class FlowLogAnalysis:
             if not self.bin.exists():
                 self.build(src, flc)
         self.schema = json.loads((self.dir / "schema.json").read_text())
-        for rel in self.schema.get("inputs", []) + self.schema.get("outputs", []):
+        self.files = self.schema.get("files", {})
+        for rel in self.inputs() + self.outputs():
             name = rel["file"]
             # the run reads and writes FlowLog's layout in a scratch directory
             if Path(name).is_absolute() or name.startswith(("file:", ":memory:")):
-                error(f"the FlowLog engine needs relative sqlite file names: '{name}' ({rel['name']})")
+                error(f"the FlowLog engine needs relative input and output file names: '{name}' ({rel['name']})")
                 sys.exit(1)
+
+    def inputs(self) -> list:
+        """The manifest's sqlite and file inputs"""
+        return self.schema.get("inputs", []) + self.files.get("inputs", [])
+
+    def outputs(self) -> list:
+        """The manifest's sqlite and file outputs"""
+        return self.schema.get("outputs", []) + self.files.get("outputs", [])
 
     def build(self, src: Path, flc: Path) -> None:
         try:
@@ -126,25 +135,26 @@ class FlowLogAnalysis:
 
     def read_inputs(self, fact_dir, tmp: Path) -> tuple[Path, Path]:
         """Writes the analysis' inputs, from the Souffle fact directory
-        FACT_DIR (if any) and the sqlite databases its program reads, to a
-        fresh directory in TMP, in FlowLog's layout. Returns the input and
-        output directories for the FlowLog run."""
+        FACT_DIR (default: the working directory, as for Souffle) and the
+        sqlite databases its program reads, to a fresh directory in TMP, in
+        FlowLog's layout. An input missing from them is left out: like
+        Souffle, FlowLog fails if it reads it. Returns the input and output
+        directories for the FlowLog run."""
         indir, outdir = tmp / "in", tmp / "out"
-        indir.mkdir()
-        outdir.mkdir()
+        src = Path(fact_dir or ".")
+        for d, rels in ((indir, self.inputs()), (outdir, self.outputs())):
+            d.mkdir()
+            for rel in rels:
+                (d / rel["file"]).parent.mkdir(parents=True, exist_ok=True)
         try:
-            if fact_dir is not None:
-                facts.convert(self.dir / "program.fl", Path(fact_dir), indir, self.dir / "schema.json")
+            facts.convert(self.files.get("inputs", []), src, indir)
             for fname, rels in by_file(self.schema.get("inputs", [])).items():
                 # resolved as Souffle does
-                db = Path(fact_dir or ".") / fname
+                db = src / fname
                 if not db.exists():
                     error(f"input database does not exist: '{db}'")
                     sys.exit(1)
-                counts = sqlite_layout.to_flowlog(str(db), str(indir / fname), {"inputs": rels})
-                missing = sorted(n for n, c in counts.items() if c < 0)
-                if missing:
-                    warn(f"relations missing from '{db}', read as empty: {', '.join(missing)}")
+                sqlite_layout.to_flowlog(str(db), str(indir / fname), {"inputs": rels})
         except ValueError as e:
             error(f"cannot read the analysis inputs: {e}")
             sys.exit(1)
@@ -152,14 +162,16 @@ class FlowLogAnalysis:
 
     def write_outputs(self, outdir: Path) -> None:
         """Writes the outputs of the run, in OUTDIR, where Souffle writes them
-        (CTADL runs it in the output directory): the sqlite outputs are added
-        to their databases, in Souffle's layout, the output files moved."""
+        (CTADL runs it in the output directory), in Souffle's layout: the
+        sqlite outputs are added to their databases, the output files placed
+        (facts.place_outputs)."""
         for fname, rels in by_file(self.schema.get("outputs", [])).items():
             sqlite_layout.to_souffle(str(outdir / fname), fname, {"outputs": rels}, append=True)
-        for fname in facts.file_io(self.dir / "program.fl", "output").values():
-            if (outdir / fname).is_file() and not Path(fname).is_absolute():
-                Path(fname).parent.mkdir(parents=True, exist_ok=True)
-                shutil.move(str(outdir / fname), fname)
+        try:
+            facts.place_outputs(self.files.get("outputs", []), outdir)
+        except ValueError as e:
+            error(f"cannot write the analysis outputs: {e}")
+            sys.exit(1)
 
 
 def by_file(rels: list) -> dict:

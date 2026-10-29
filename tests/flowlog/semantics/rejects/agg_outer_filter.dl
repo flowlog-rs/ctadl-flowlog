@@ -1,9 +1,0 @@
-// A filter on injected variables only inside an aggregate body (FlowLog
-// bug B4: the generated Rust fails to compile).
-.decl R(a: number, b: number)
-R(1, 10). R(4, 2).
-.decl K(a: number)
-K(1). K(4).
-.decl O(k: number, n: number)
-.output O
-O(k, n) :- K(k), n = sum 5 : { R(k, _), k > 3 }.

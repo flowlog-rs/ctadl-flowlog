@@ -1,10 +1,9 @@
 // Rust support for the programs that souffle2flowlog.py translates: Souffle's
 // semantics for the builtins whose FlowLog counterparts differ, the checks for
-// Souffle's runtime errors, the identities that keep FlowLog's integers on 64
-// bits, and the helpers of the translator's "min-choice" encoding of Souffle's
-// `choice-domain`. flowlog-compiler takes it as the program's UDF file
-// (--udf-file), followed by the program's own functors, if it has any (CTADL's
-// are in ctadl/souffle-logic/functors.rs).
+// Souffle's runtime errors, and the helpers of the translator's "min-choice"
+// encoding of Souffle's `choice-domain`. flowlog-compiler takes it as the
+// program's UDF file (--udf-file), followed by the program's own functors, if
+// it has any (CTADL's are in ctadl/souffle-logic/functors.rs).
 //
 // FlowLog passes `string` parameters as owned `String`s and integers as the
 // matching Rust type. The translation keeps Souffle's `number` on 64 bits, as
@@ -22,24 +21,25 @@ use std::sync::{LazyLock, Mutex};
 //   to_number       Souffle infers the base from a 0b/0x prefix and parses
 //                   the longest valid prefix; FlowLog parses the whole text
 //                   as decimal.
-//   ^               Souffle truncates std::pow, so 1 ^ -1 = 1; FlowLog gives
-//                   0 for every negative exponent.
-//   ord             FlowLog's int32 cannot be widened to `number`: FlowLog
-//                   has no numeric conversions, and a UDF taking its `ord`
-//                   fails to compile (unused parentheses).
+//   ^               Souffle truncates std::pow, a double, so a result past
+//                   2^53 is rounded and one past int64 is INT64_MIN; FlowLog
+//                   computes it exactly, with wrap-around.
+//   ord             FlowLog's `ord` is int32, and FlowLog has no numeric
+//                   conversion (`as` only types) to widen it to `number`.
 //   /, %            FlowLog's operators panic on a zero divisor.
 // FlowLog's versions also work on int32, Souffle's `number` is int64.
 //
 // Partial functions. Souffle stops the program on `to_number` of a string
 // without digits or out of range, and on `/` or `%` by zero or of INT64_MIN
-// by -1 (SIGFPE). The ports return 0 there instead, because FlowLog calls
-// functions on bindings Souffle never evaluates: before the rule's other
-// conditions (flowlog-rs/flowlog B8) and on the rows a negation retracts
-// (B9), and on clauses Souffle's optimiser deletes. Aborting in the call
-// would stop runs Souffle completes. Each partial function has an `_error`
-// companion, "" for arguments it is defined on and Souffle's complaint
-// otherwise. The translator checks the calls Souffle surely evaluates with
-// rules `FlowlogError(m) :- <body>, m = <f>_error(args), m != "".`, and
+// by -1 (SIGFPE). The ports return 0 there instead. FlowLog's planner orders
+// a rule's joins, filters and computations its own way, so a call can see
+// bindings Souffle never evaluates it on (flowlog-rs/flowlog B8 and B9 were
+// two such cases), and FlowLog also runs the clauses Souffle's optimiser
+// deletes. Aborting in the call would stop runs Souffle completes. Each
+// partial function has an `_error` companion, "" for arguments it is defined
+// on and Souffle's complaint otherwise. The translator checks the calls
+// Souffle surely evaluates with rules
+// `FlowlogError(m) :- <body>, m = <f>_error(args), m != "".`, and
 // `FlowlogAbort(n) :- FlowlogError(m), n = souffle_raise(m).` stops the run.
 // ---------------------------------------------------------------------------
 
@@ -194,23 +194,6 @@ pub fn souffle_pow(a: i64, b: i64) -> i64 {
 /// without the cast to int32.
 pub fn souffle_ord(s: String) -> i64 {
     i64::from(::flowlog_runtime::intern::intern(&s).into_inner().get())
-}
-
-// ---------------------------------------------------------------------------
-// Width anchors. FlowLog types an integer expression from its context and
-// falls back to int32 where none pins it (a comparison of literals and
-// count results, a `to_string` argument); `as(.., int64)` does not pin a
-// literal (flowlog-rs/flowlog B11). The translator wraps such expressions in
-// these identities, whose parameter types make FlowLog compute them on 64
-// bits, as Souffle does.
-// ---------------------------------------------------------------------------
-
-pub fn flowlog_int64(x: i64) -> i64 {
-    x
-}
-
-pub fn flowlog_uint64(x: u64) -> u64 {
-    x
 }
 
 // ---------------------------------------------------------------------------

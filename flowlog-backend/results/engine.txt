@@ -1,0 +1,41 @@
+alias1, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal; ctadlir ok
+alias1, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; ctadlir ok
+global1, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal; ctadlir ok
+global1, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; ctadlir ok
+ex3, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal; codeflows ok
+ex3, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; codeflows ok
+sanitizer1, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal; nocodeflows ok
+sanitizer1, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; nocodeflows ok
+--dl fragment, flowlog1: same files as Soufflé (19 rows); summary: 120 equal, 0 different; sarif: equal
+--dl fragment, flowlog2: same files as Soufflé (19 rows); summary: 120 equal, 0 different; sarif: equal
+--dl fragment, FlowLog compilations: 1
+== FragName.csv
+F	F
+== frag_rec.tsv
+[F, F]	1
+== frag/rec.tsv
+[F, F]	1
+== frag/vars.csv
+F/<ret>	<ret>
+F/p	p
+F/this	this
+F/tmp	tmp
+F/tmp2	tmp2
+== frag.Out.csv
+x	F
+y z	F
+== FragRecOut.csv
+a	b c
+d 	e 
+f"g	h
+== FragAny.csv
+()
+== frag/any.csv
+()
+== FragNone.csv
+== IntCInsn_InFunction.csv
+F/assign/0	0	F
+F/assign/1	1	F
+F/assign/2	2	F
+F/assign/3	3	F
+exit=0

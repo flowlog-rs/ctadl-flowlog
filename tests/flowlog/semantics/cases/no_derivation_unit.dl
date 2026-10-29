@@ -1,6 +1,0 @@
-// As no_derivation.dl, in a program that already has the translator's unit
-// relation: the fact C(1 + 1) is computed by a rule that reads it.
-.decl C(x: number)
-C(1 + 1).
-.decl A(x: number)
-.output A

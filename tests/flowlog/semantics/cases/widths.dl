@@ -1,9 +1,12 @@
-// Integer literals in FlowLog: it types a literal int32 unless its context
-// pins it, and `as` does not (flowlog-rs/flowlog#474); rustc rejects literal
+// Integer widths in FlowLog: it types a literal int32 unless its context
+// pins it.  The translator keeps Souffle's 64-bit `number` by computing
+// constant expressions itself and pinning, with `as(.., int64)`, what no
+// context types (souffle2flowlog.py: fold_constants, anchor_widths).  These
+// shapes also hit FlowLog bugs that its `main` has fixed: `as` left a
+// literal int32 (flowlog-rs/flowlog#474), and rustc rejected literal
 // arithmetic that overflows or divides by zero (#473), comparisons whose
 // result the type decides (#476), and grouped call arguments and shift or
-// pow operands (#468).  The translator folds and anchors literals
-// (souffle2flowlog.py: fold_constants, anchor_widths, paren_safe).
+// pow operands (#468).
 .decl K(x: number)
 K(0).
 
@@ -19,11 +22,7 @@ W("mul var") :- K(_), x = 65536, x * x != 0.
 W("typed ctl") :- K(z), x = z + 1, x bshl 31 > 0.
 W("as lit") :- K(_), as(1, number) bshl 31 > 0.
 W("not as lit") :- K(_), !as(1, number) bshl 31 < 0.
-// over KS, not K: FlowLog's planner fails on an aggregate over a relation
-// twelve other rules read (b6.md)
-.decl KS(x: number)
-KS(1).
-W("sum first") :- K(_), sum(x) : { KS(x) } + 2147483647 + 1 > 0.
+W("sum first") :- K(_), sum(x) : { K(x) } + 2147483647 + 1 > 0.
 
 // Literal arithmetic that overflows wraps, as in Souffle.
 .decl O(name: symbol, v: number)

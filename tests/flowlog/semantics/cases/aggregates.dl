@@ -36,16 +36,29 @@ Agg("sum strings", 0, n) :- n = sum k : { S(s, k), s != "y" }.
 Agg("two aggs", k, n + m) :- K(k), n = count : { R(k, _) }, m = sum b : { R(k, b) }.
 Agg("nested", 0, n) :- n = sum m : { K(k), m = count : { R(k, _) } }.
 
-// B2 shape: the body names only variables bound outside it.
+// B2 shapes: the body names only variables bound outside it, or reads no
+// relation.
 .decl B2(k: number, n: number)
 .output B2
 B2(k, n) :- K(k), n = count : { E(k) }.
 B2(k + 10, n) :- K(k), n = count : { K(k) }.
+B2(k + 20, n) :- K(k), n = count : { k > 1 }.
 
-// B4 shape: a variable equated to an outside one inside the body.
+// B4 shapes: inside the body, a variable equated to an outside one or to a
+// value computed from outside ones, a filter on outside variables only, and
+// an atom argument computed from them.
 .decl B4(k: number, n: number)
 .output B4
 B4(k, n) :- K(k), n = count : { R(t, _), t = k }.
+B4(k + 10, n) :- K(k), n = count : { R(t, _), t = k - 2 }.
+B4(k + 20, n) :- K(k), n = sum 5 : { R(k, _), k > 2 }.
+B4(k + 30, n) :- K(k), n = count : { R(k + 2, _) }.
+.decl XY(s: symbol)
+XY("xy"). XY("zy").
+.decl B4s(s: symbol, n: number)
+.output B4s
+B4s(s, n) :- S(s, _), n = count : { XY(t), t = cat(s, "y") }.
+B4s(cat(s, "+"), n) :- S(s, _), n = count : { XY(cat(s, "y")) }.
 
 // Aggregate results used as keys.
 .decl Top(k: number, b: number)

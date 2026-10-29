@@ -1748,7 +1748,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ]
   },
@@ -1862,7 +1863,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ]
   },
@@ -1894,7 +1896,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ]
   },
@@ -1961,48 +1964,935 @@
    ]
   }
  ],
- "records": {
-  "ActualParam": [
-   [
-    "index",
-    1
-   ],
-   [
-    "var",
-    1
-   ],
-   [
-    "path",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
-  ],
-  "DirectCall": [
-   [
-    "fn",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
-  ],
-  "IndirectCall": [
-   [
-    "var",
-    1
-   ],
-   [
-    "path",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
+ "files": {
+  "inputs": [
+   {
+    "name": "CTADLConfig_Input",
+    "file": "CTADLConfig_Input.facts",
+    "columns": [
+     {
+      "attr": "feature",
+      "kind": "symbol",
+      "fl": [
+       "feature"
+      ]
+     },
+     {
+      "attr": "enabled",
+      "kind": "number",
+      "fl": [
+       "enabled"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Edge2",
+    "file": "MG_Edge2.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "child1",
+      "kind": "symbol",
+      "fl": [
+       "child1"
+      ]
+     },
+     {
+      "attr": "child2",
+      "kind": "symbol",
+      "fl": [
+       "child2"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Edge1",
+    "file": "MG_Edge1.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "child1",
+      "kind": "symbol",
+      "fl": [
+       "child1"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_AllOf",
+    "file": "MG_AllOf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_AnyOf",
+    "file": "MG_AnyOf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_Not",
+    "file": "MG_Not.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_OpNode",
+    "file": "MG_OpNode.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "op",
+      "kind": "symbol",
+      "fl": [
+       "op"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchParent",
+    "file": "MG_SigMatchParent.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "parent",
+      "kind": "symbol",
+      "fl": [
+       "parent"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchPattern",
+    "file": "MG_SigMatchPattern.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "pattern",
+      "kind": "symbol",
+      "fl": [
+       "pattern"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchName",
+    "file": "MG_SigMatchName.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "name",
+      "kind": "symbol",
+      "fl": [
+       "name"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchUnqualifiedId",
+    "file": "MG_SigMatchUnqualifiedId.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "fid",
+      "kind": "symbol",
+      "fl": [
+       "fid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Parent",
+    "file": "MG_Parent.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Extends",
+    "file": "MG_Extends.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Parameter",
+    "file": "MG_Parameter.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_AnyParameter",
+    "file": "MG_AnyParameter.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "start_idx",
+      "kind": "number",
+      "fl": [
+       "start_idx"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_NumberParameters",
+    "file": "MG_NumberParameters.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_IntCompare",
+    "file": "MG_IntCompare.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "rel",
+      "kind": "symbol",
+      "fl": [
+       "rel"
+      ]
+     },
+     {
+      "attr": "value",
+      "kind": "number",
+      "fl": [
+       "value"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Name",
+    "file": "MG_Name.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "pattern",
+      "kind": "symbol",
+      "fl": [
+       "pattern"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_HasCode",
+    "file": "MG_HasCode.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "value",
+      "kind": "symbol",
+      "fl": [
+       "value"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Propagation",
+    "file": "MG_Propagation.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "propid",
+      "kind": "symbol",
+      "fl": [
+       "propid"
+      ]
+     },
+     {
+      "attr": "direction",
+      "kind": "symbol",
+      "fl": [
+       "direction"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "is_star",
+      "kind": "number",
+      "fl": [
+       "is_star"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_ForwardSelf",
+    "file": "MG_ForwardSelf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "whereid",
+      "kind": "symbol",
+      "fl": [
+       "whereid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_ForwardCall",
+    "file": "MG_ForwardCall.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "targetid",
+      "kind": "symbol",
+      "fl": [
+       "targetid"
+      ]
+     },
+     {
+      "attr": "forwardid",
+      "kind": "symbol",
+      "fl": [
+       "forwardid"
+      ]
+     },
+     {
+      "attr": "isdirect",
+      "kind": "number",
+      "fl": [
+       "isdirect"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_UsesFieldName",
+    "file": "MG_UsesFieldName.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "name",
+      "kind": "symbol",
+      "fl": [
+       "name"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_UsesFieldUnqualifiedId",
+    "file": "MG_UsesFieldUnqualifiedId.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "symbol",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Endpoint",
+    "file": "MG_Endpoint.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "source_or_sink",
+      "kind": "symbol",
+      "fl": [
+       "source_or_sink"
+      ]
+     },
+     {
+      "attr": "label",
+      "kind": "symbol",
+      "fl": [
+       "label"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointVertex",
+    "file": "MG_EndpointVertex.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "is_star",
+      "kind": "number",
+      "fl": [
+       "is_star"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     },
+     {
+      "attr": "all_fields",
+      "kind": "symbol",
+      "fl": [
+       "all_fields"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointField",
+    "file": "MG_EndpointField.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointInsn",
+    "file": "MG_EndpointInsn.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "Function",
+    "file": "Function.facts",
+    "columns": [
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "arity",
+      "kind": "number",
+      "fl": [
+       "arity"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Global",
+    "file": "Global.facts",
+    "columns": [
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "FormalParam",
+    "file": "FormalParam.facts",
+    "columns": [
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "ActualParam",
+    "file": "ActualParam.facts",
+    "columns": [
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     },
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "path",
+      "kind": "symbol",
+      "fl": [
+       "path"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "Assign",
+    "file": "Assign.facts",
+    "columns": [
+     {
+      "attr": "v1",
+      "kind": "symbol",
+      "fl": [
+       "v1"
+      ]
+     },
+     {
+      "attr": "p1",
+      "kind": "symbol",
+      "fl": [
+       "p1"
+      ]
+     },
+     {
+      "attr": "v2",
+      "kind": "symbol",
+      "fl": [
+       "v2"
+      ]
+     },
+     {
+      "attr": "p2",
+      "kind": "symbol",
+      "fl": [
+       "p2"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "AssignFunction",
+    "file": "AssignFunction.facts",
+    "columns": [
+     {
+      "attr": "v1",
+      "kind": "symbol",
+      "fl": [
+       "v1"
+      ]
+     },
+     {
+      "attr": "p1",
+      "kind": "symbol",
+      "fl": [
+       "p1"
+      ]
+     },
+     {
+      "attr": "m",
+      "kind": "symbol",
+      "fl": [
+       "m"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "DirectCall",
+    "file": "DirectCall.facts",
+    "columns": [
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "IndirectCall",
+    "file": "IndirectCall.facts",
+    "columns": [
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "path",
+      "kind": "symbol",
+      "fl": [
+       "path"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "TaintSpec",
+    "file": "TaintSpec.facts",
+    "columns": [
+     {
+      "attr": "source_sink_sanitizer",
+      "kind": "symbol",
+      "fl": [
+       "source_sink_sanitizer"
+      ]
+     },
+     {
+      "attr": "v",
+      "kind": "symbol",
+      "fl": [
+       "v"
+      ]
+     },
+     {
+      "attr": "p",
+      "kind": "symbol",
+      "fl": [
+       "p"
+      ]
+     },
+     {
+      "attr": "label",
+      "kind": "symbol",
+      "fl": [
+       "label"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     },
+     {
+      "attr": "sanitize_from",
+      "kind": "symbol",
+      "fl": [
+       "sanitize_from"
+      ]
+     },
+     {
+      "attr": "sanitize_from_path",
+      "kind": "symbol",
+      "fl": [
+       "sanitize_from_path"
+      ]
+     }
+    ]
+   }
   ]
  }
 }

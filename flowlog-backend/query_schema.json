@@ -1,48 +1,4 @@
 {
- "records": {
-  "ActualParam": [
-   [
-    "index",
-    1
-   ],
-   [
-    "var",
-    1
-   ],
-   [
-    "path",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
-  ],
-  "DirectCall": [
-   [
-    "fn",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
-  ],
-  "IndirectCall": [
-   [
-    "var",
-    1
-   ],
-   [
-    "path",
-    1
-   ],
-   [
-    "info",
-    2
-   ]
-  ]
- },
  "inputs": [
   {
    "name": "IndirectCallStmt",
@@ -176,7 +132,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ],
    "read": false
@@ -293,7 +250,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ],
    "read": false
@@ -326,7 +284,8 @@
      "fl_kinds": [
       "number",
       "symbol"
-     ]
+     ],
+     "format": "[{}, {}]"
     }
    ],
    "read": false
@@ -3062,5 +3021,29 @@
     }
    ]
   }
- ]
+ ],
+ "files": {
+  "inputs": [
+   {
+    "name": "CTADLConfig_Input",
+    "file": "CTADLConfig_Input.facts",
+    "columns": [
+     {
+      "attr": "feature",
+      "kind": "symbol",
+      "fl": [
+       "feature"
+      ]
+     },
+     {
+      "attr": "enabled",
+      "kind": "number",
+      "fl": [
+       "enabled"
+      ]
+     }
+    ]
+   }
+  ]
+ }
 }

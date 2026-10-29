@@ -1,0 +1,5 @@
+// A relation with two .output directives, to two files.
+.decl R(a: number)
+R(1).
+.output R
+.output R(filename="R2.csv")

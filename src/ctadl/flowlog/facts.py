@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """Prepare a Souffle fact directory for a FlowLog program emitted by
-souffle2flowlog.py.
+souffle2flowlog.py, and place the program's output files as Souffle does.
+Both follow the "files" entries of the translator's schema manifest, which
+list every file-based `.input` and `.output`, in each component instance,
+with its file name and columns.
 
-* Every file-based `.input` relation of the FlowLog program gets a file in
-  the output directory (empty when the Souffle fact directory has none,
-  matching Souffle, which treats a missing fact file as empty); files that
-  need no conversion are symlinked. Absolute file names are rejected: they
-  do not name a file in the fact directory.
-* Record-typed columns (listed in the translator's schema manifest) are
-  flattened: a field `[0,foo]` becomes the two fields `0<TAB>foo`.
+* convert: every input gets its file in FlowLog's input directory,
+  symlinked, or converted where it has record columns, which the
+  translation flattens (a record `[0, "a b"]` is read as Souffle reads it,
+  into the two fields `0<TAB>a b`). An input that no rule reads is created
+  empty, as Souffle does not load it. A missing file is left out: like
+  Souffle, FlowLog fails if it loads the relation.
+* place_outputs: after the run, every output gets its file where Souffle
+  writes it, also one FlowLog prunes, with its record columns written as
+  Souffle writes them (`[0, a b]`), and a nullary fact as Souffle writes it
+  (`()`, where FlowLog writes `True`).
 """
 from __future__ import annotations
 
@@ -19,118 +25,150 @@ import shutil
 import sys
 from pathlib import Path
 
-IO_RE = re.compile(r"^\s*\.(input|output)\s+([A-Za-z_][A-Za-z0-9_.]*)\s*(?:\((.*)\))?\s*$")
-PARAM_RE = re.compile(r'(\w+)\s*=\s*"([^"]*)"')
-DEFAULT_SUFFIX = {"input": ".facts", "output": ".csv"}
+NUMBER = re.compile(r"[+-]?[0-9]+")
+QUOTED = re.compile(r'"((?:[^"\\]|\\.)*)"', re.S)
+ESCAPE = re.compile(r"\\(.)", re.S)
 
 
-def file_io(program: Path, kind: str = "input") -> dict[str, str]:
-    """Maps each file-based `.input` (or, with kind "output", `.output`)
-    relation to its file name."""
-    files: dict[str, str] = {}
-    for line in program.read_text().splitlines():
-        m = IO_RE.match(line)
-        if not m or m.group(1) != kind:
-            continue
-        rel, params = m.group(2), dict(PARAM_RE.findall(m.group(3) or ""))
-        if params.get("IO", "file").lower() != "file":
-            continue
-        files[rel] = params.get("filename", rel + DEFAULT_SUFFIX[kind])
-    return files
-
-
-def split_record(text: str) -> list[str]:
-    """Splits a flat Souffle record literal `[a, "b", c]` into its fields."""
-    text = text.strip()
-    if not (text.startswith("[") and text.endswith("]")):
-        raise ValueError(f"not a record literal: {text!r}")
-    body = text[1:-1]
-    fields, cur, quoted, i = [], [], False, 0
-    while i < len(body):
-        c = body[i]
-        if quoted:
-            if c == "\\" and i + 1 < len(body):
-                cur.append(body[i + 1])
-                i += 2
-                continue
-            if c == '"':
-                quoted = False
-            else:
-                cur.append(c)
-        elif c == '"':
-            quoted = True
-        elif c == "[":
-            raise ValueError(f"nested records are not supported: {text!r}")
-        elif c == ",":
-            fields.append("".join(cur).strip())
-            cur = []
+def read_record(text: str, fmt: str, kinds: list) -> list[str]:
+    """Reads a record literal as Souffle's ReadStream::readRecord does, given
+    its format and its fields' kinds from the manifest; returns the fields.
+    A symbol is either double-quoted, with backslash escapes, or the text up
+    to the next `,` or `]`, as is."""
+    fields: list[str] = []
+    kinds_left = iter(kinds)
+    pos = 0
+    for token in re.findall(r"\[|\]|,|\{\}", fmt):
+        while pos < len(text) and text[pos].isspace():
+            pos += 1
+        if token != "{}":
+            if not text.startswith(token, pos):
+                raise ValueError(f"expected '{token}' at offset {pos} of record {text!r}")
+            pos += 1
+        elif next(kinds_left) != "symbol":
+            m = NUMBER.match(text, pos)
+            if not m:
+                raise ValueError(f"expected a number at offset {pos} of record {text!r}")
+            fields.append(m.group())
+            pos = m.end()
+        elif text.startswith('"', pos):
+            m = QUOTED.match(text, pos)
+            if not m:
+                raise ValueError(f"unterminated symbol in record {text!r}")
+            fields.append(ESCAPE.sub(r"\1", m.group(1)))
+            pos = m.end()
         else:
-            cur.append(c)
-        i += 1
-    fields.append("".join(cur).strip())
+            end = min((i for i in (text.find(",", pos), text.find("]", pos)) if i >= 0), default=-1)
+            if end < 0:
+                raise ValueError(f"unterminated record {text!r}")
+            fields.append(text[pos:end])
+            pos = end
+    if pos != len(text):
+        raise ValueError(f"unexpected text after record {text!r}")
     return fields
 
 
-def convert_line(line: str, layout: list) -> str:
-    cols = line.split("\t")
-    if len(cols) != len(layout):
-        raise ValueError(f"expected {len(layout)} columns, got {len(cols)}: {line!r}")
+def flat_line(line: str, columns: list) -> str:
+    """A Souffle fact line, with the record columns flattened. The carriage
+    return of a CRLF line end is dropped, as Souffle and FlowLog drop it."""
+    if line.endswith("\r"):
+        line = line[:-1]
+    texts = line.split("\t")
+    if len(texts) != len(columns):
+        raise ValueError(f"expected {len(columns)} columns, got {len(texts)}: {line!r}")
     out: list[str] = []
-    for col, (_attr, width) in zip(cols, layout):
-        if width == 1:
-            out.append(col)
-            continue
-        fields = split_record(col)
-        if len(fields) != width:
-            raise ValueError(f"record {col!r} has {len(fields)} fields, expected {width}")
-        out.extend(fields)
+    for text, col in zip(texts, columns):
+        out.extend(read_record(text, col["format"], col["fl_kinds"]) if col["kind"] == "record" else [text])
     return "\t".join(out)
 
 
-def convert(program: Path, src_dir: Path, dst_dir: Path, schema: Path | None = None) -> None:
-    """Fill dst_dir with one fact file per file-based `.input` of program.
-    Files without record columns are symlinked; raises ValueError on
-    malformed records."""
-    records = json.loads(schema.read_text()).get("records", {}) if schema else {}
-    inputs = file_io(program)
-    dst_dir.mkdir(parents=True, exist_ok=True)
-    for rel, fname in sorted(inputs.items()):
+def souffle_line(line: str, columns: list) -> str:
+    """A line FlowLog wrote, with the record columns flattened, as Souffle
+    writes it."""
+    fields = line.split("\t")
+    width = sum(len(col["fl"]) for col in columns)
+    if len(fields) != width:
+        raise ValueError(f"expected {width} fields, got {len(fields)}: {line!r}")
+    out: list[str] = []
+    for col in columns:
+        n = len(col["fl"])
+        out.append(col["format"].format(*fields[:n]) if col["kind"] == "record" else fields[0])
+        fields = fields[n:]
+    return "\t".join(out)
+
+
+def rewrite(src: Path, dst: Path, convert_line, columns: list) -> None:
+    """Converts src to dst line by line. As Souffle and FlowLog read a file,
+    lines end at a newline only, and the bytes pass through as they are."""
+    opts = {"encoding": "utf-8", "errors": "surrogateescape", "newline": "\n"}
+    with src.open(**opts) as fin, dst.open("w", **opts) as fout:
+        for n, line in enumerate(fin, 1):
+            try:
+                fout.write(convert_line(line.rstrip("\n"), columns) + "\n")
+            except ValueError as e:
+                raise ValueError(f"{src}:{n}: {e}") from None
+
+
+def has_records(columns: list) -> bool:
+    return any(col["kind"] == "record" for col in columns)
+
+
+def convert(inputs: list, src_dir: Path, dst_dir: Path) -> None:
+    """Fills dst_dir with the files of `inputs` (the manifest's file inputs)
+    that the Souffle fact directory src_dir has. Raises ValueError on an
+    absolute file name (it does not name a file in the fact directory) or a
+    malformed record."""
+    for rel in inputs:
+        fname = rel["file"]
         if Path(fname).is_absolute():
-            raise ValueError(f"{rel}: absolute fact file names are not supported: '{fname}'")
+            raise ValueError(f"{rel['name']}: absolute fact file names are not supported: '{fname}'")
         src, dst = src_dir / fname, dst_dir / fname
         dst.parent.mkdir(parents=True, exist_ok=True)
         if dst.exists() or dst.is_symlink():
             dst.unlink()
-        if not src.exists():
+        if not rel.get("read", True):
             dst.write_text("")
+        elif not src.is_file():
             continue
-        layout = records.get(rel)
-        if layout is None:
+        elif has_records(rel["columns"]):
+            rewrite(src, dst, flat_line, rel["columns"])
+        else:
             try:
                 dst.symlink_to(src.resolve())
             except OSError:
                 shutil.copyfile(src, dst)
-            continue
-        with src.open() as fin, dst.open("w") as fout:
-            for n, line in enumerate(fin, 1):
-                line = line.rstrip("\n")
-                if not line:
-                    continue
-                try:
-                    fout.write(convert_line(line, layout) + "\n")
-                except ValueError as e:
-                    raise ValueError(f"{src}:{n}: {e}") from None
+
+
+def place_outputs(outputs: list, out_dir: Path) -> None:
+    """Writes the files of `outputs` (the manifest's file outputs) that
+    FlowLog wrote in out_dir where Souffle writes them, relative to the
+    working directory. Souffle writes every output, but FlowLog writes no
+    file for one it prunes (nothing derives it), so such a file is created
+    empty. A nullary relation that holds has a line in FlowLog's file, and
+    `()` in Souffle's. Raises ValueError on a line it cannot convert."""
+    for fname, columns in {rel["file"]: rel["columns"] for rel in outputs}.items():
+        src, dst = out_dir / fname, Path(fname)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not src.is_file():
+            dst.write_text("")
+        elif not columns:
+            with src.open("rb") as f:
+                holds = bool(f.readline())
+            dst.write_text("()\n" if holds else "")
+        elif has_records(columns):
+            rewrite(src, dst, souffle_line, columns)
+        else:
+            shutil.move(str(src), dst)
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("program", type=Path, help="FlowLog program (.fl/.dl)")
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("schema", type=Path, help="schema manifest written by souffle2flowlog.py --schema")
     ap.add_argument("src", type=Path, help="Souffle fact directory")
-    ap.add_argument("dst", type=Path, help="output fact directory")
-    ap.add_argument("--schema", type=Path, help="schema manifest written by souffle2flowlog.py")
+    ap.add_argument("dst", type=Path, help="FlowLog fact directory")
     args = ap.parse_args()
     try:
-        convert(args.program, args.src, args.dst, args.schema)
+        convert(json.loads(args.schema.read_text()).get("files", {}).get("inputs", []), args.src, args.dst)
     except ValueError as e:
         print(e, file=sys.stderr)
         return 1

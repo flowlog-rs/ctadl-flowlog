@@ -1,0 +1,25 @@
+// Several .output directives of a relation: FlowLog writes one per
+// relation, so each further one writes a copy of it (split_outputs).
+// expect-fl: .output FlowlogOutput2(delimiter=",", filename="R3.csv")
+// expect-fl: .output FlowlogOutput3(filename="E.csv")
+// expect-fl: .output FlowlogOutput4(filename="S.csv")
+.decl R(x: number, s: symbol)
+R(1, "a").
+R(2, "b c").
+.output R
+.output R(filename="R2.csv")
+.output R(delimiter=",", filename="R3.csv")
+// the same outputs again
+.output R(filename="R3.csv", delimiter=",")
+.output R
+
+// a relation nothing derives
+.decl E(x: number)
+.output E(filename="E2.csv")
+.output E
+
+// the output that is not to a file stays on the relation, wherever it is
+.decl S(x: number)
+S(3).
+.output S
+.output S(IO=sqlite, filename="s.db")

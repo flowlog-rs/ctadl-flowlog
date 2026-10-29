@@ -25,7 +25,8 @@ databases attached to one connection; no rows pass through Python.
       Copy the manifest's sqlite inputs from a Souffle-layout DB (read by
       position through the views, as Souffle does) into a fresh FlowLog DB.
       Inputs the manifest marks `"read": false` (no rule reads them) are
-      created empty.
+      created empty; inputs missing from INDB are not (like Souffle, FlowLog
+      fails if it reads one).
 
 Souffle does not persist record contents; record columns are stored as
 synthetic record ids, with the flattened fields kept in `__FlowLogRecord`
@@ -164,9 +165,9 @@ def copy_to_souffle(conn: sqlite3.Connection, name: str, cols: list) -> int:
 
 
 def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
-    """Returns {relation: row count}; relations missing from INDB are
-    created empty (and reported with count -1). Raises ValueError if an
-    input cannot be converted."""
+    """Returns {relation: row count}; relations missing from INDB are left
+    out (count -1): like Souffle, FlowLog fails if it loads one. Raises
+    ValueError if an input cannot be converted."""
     if os.path.exists(fl_path):
         os.unlink(fl_path)
     dst = connect(fl_path, in_path, "src")
@@ -175,17 +176,18 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
     counts: dict = {}
     for rel in schema["inputs"]:
         name, cols = rel["name"], rel["columns"]
+        read = rel.get("read", True)
+        if read and name not in have:
+            counts[name] = -1
+            continue
         defs = []
         for col in cols:
             kinds = col.get("fl_kinds", [col["kind"]])
             defs.extend(f"{dq(c)} {SQL_TYPE[k]} NOT NULL" for c, k in zip(col["fl"], kinds))
         dst.execute(f"CREATE TABLE main.{dq(name)} ({', '.join(defs)})")
-        if not rel.get("read", True):
+        if not read:
             # no rule reads it (see souffle2flowlog.py's record_io)
             counts[name] = 0
-            continue
-        if name not in have:
-            counts[name] = -1
             continue
         src_cols = [r[1] for r in dst.execute(f"PRAGMA src.table_info({dq(name)})")]
         if len(src_cols) != len(cols):
@@ -246,7 +248,7 @@ def main(argv: list | None = None) -> int:
             return 1
         missing = sorted(n for n, c in counts.items() if c < 0)
         if missing:
-            print(f"warning: inputs missing from {args.indb} (created empty): {', '.join(missing)}", file=sys.stderr)
+            print(f"warning: inputs missing from {args.indb} (not copied): {', '.join(missing)}", file=sys.stderr)
     print(f"{args.cmd}: {len(counts)} relations, {sum(max(c, 0) for c in counts.values())} rows")
     return 0
 

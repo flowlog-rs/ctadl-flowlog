@@ -10,6 +10,7 @@ choice_domain: ok: C={1	2}
 computed_body_only: ok: C={ab}
 computed_fact: ok: C={ab}
 count_all_wild: ok: C={2}
+dup_output: ok: R={1} R2={1}
 empty_dataflow: ok: A={}
 empty_output: ok: Empty={} O={1}
 filter_order: ok: O={6	2}
@@ -21,6 +22,7 @@ lattice_min_string: FAILED: Error: syntax error, unexpected min aggregator, expe
 literal_overflow: FAILED: Error: Undefined type in attribute x:int64 in file prog.dl at line 6
 neg_computed: ok: O={}
 neg_computed_lifted: ok: O={z}
+neg_only_body: ok: A={1}
 nested_comp: ok: Out={1}
 pragma: ok: O={1}
 range_gen: ok: O={0 1 2}

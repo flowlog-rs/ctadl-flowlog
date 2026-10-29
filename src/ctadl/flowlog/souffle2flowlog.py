@@ -41,7 +41,9 @@ Rewrites performed (see README.md for the rationale of each one):
     atoms are bound inside the aggregate body, and facts with computed
     arguments are anchored on a one-row `FlowlogUnit` relation;
   * `.output`/`.input` directives inside components are recorded in the
-    schema manifest once per instance (`inst.R`);
+    schema manifest once per instance (`inst.R`). FlowLog writes one
+    `.output` per relation, so each further file output of a top-level
+    relation writes a `FlowlogOutputN` copy of it (split_outputs);
   * `true`/`false`, negated comparisons, self equalities, expression arguments
     of body atoms, keyword-named variables and placeholder-only aggregates are
     normalised into forms FlowLog accepts;
@@ -51,18 +53,12 @@ Rewrites performed (see README.md for the rationale of each one):
     reproduced by check rules where that is sound (add_partial_checks);
   * integers are kept on Souffle's 64 bits: constant expressions are computed
     as Souffle does, with wrap-around (fold_constants), and the expressions
-    FlowLog would type as int32 are pinned with the identity UDFs
-    `flowlog_int64`/`flowlog_uint64` (anchor_widths); the same UDFs keep
-    rustc from rejecting the parentheses FlowLog writes around a computed
-    UDF or shift argument (paren_safe);
+    FlowLog would type as int32 are pinned with `as(_, int64)` or
+    `as(_, uint64)` (anchor_widths);
   * in rules that involve unsigned values, a variable equated to a constant
     is replaced by the constant as Souffle does, so each copy takes the type
     of its own context (alias_constants), and a `/` or `%` of literals only
     is computed in the type of its context (type_context_partials);
-  * comparisons the limits of their type decide (`u >= 0` on unsigned) are
-    folded, as rustc rejects them, and a program in which no output is
-    derived from a fact or an input gets a rule for one that never fires,
-    as FlowLog cannot build it otherwise (keep_dataflow);
   * a `.plan` keeps the join order of Souffle's version 0 (a delta on the
     rule's first recursive atom), as FlowLog joins every version of a rule
     in one order, where each clause of the translated rule reads the atoms
@@ -1111,8 +1107,6 @@ def rule_vars(r: Rule) -> set:
 
 CMP_FNS = {"<": lambda a, b: a < b, "<=": lambda a, b: a <= b, ">": lambda a, b: a > b,
            ">=": lambda a, b: a >= b, "=": lambda a, b: a == b, "!=": lambda a, b: a != b}
-# `a op b` is `b FLIP_CMP[op] a`
-FLIP_CMP = {"<": ">", "<=": ">=", ">": "<", ">=": "<="}
 
 
 def fold_cmp(op: str, l: Any, r: Any) -> Any:
@@ -1122,11 +1116,9 @@ def fold_cmp(op: str, l: Any, r: Any) -> Any:
     return Cmp(op, l, r)
 
 
-# Souffle's integer types (64-bit domain) as FlowLog primitives, their ranges,
-# and the identity UDFs (souffle2flowlog.rs) that pin an expression to one of them.
+# Souffle's integer types (64-bit domain) as FlowLog primitives, and their ranges.
 INT_RANGES = {"int64": (-(1 << 63), (1 << 63) - 1), "uint64": (0, (1 << 64) - 1)}
 INT32_RANGE = (-(1 << 31), (1 << 31) - 1)
-ANCHOR_FNS = {"int64": "flowlog_int64", "uint64": "flowlog_uint64"}
 # The operators FlowLog evaluates itself (the others call SOUFFLE_UDFS); it
 # writes the shifts as calls of runtime functions.
 INT_OPS = {"+": lambda a, b: a + b, "-": lambda a, b: a - b, "*": lambda a, b: a * b,
@@ -1903,7 +1895,6 @@ class Translator:
         self.claim_arities: set[int] = set()
         self.souffle_udfs: set[str] = set()  # keys of SOUFFLE_UDFS in use
         self.error_udfs: set[str] = set()  # keys of PARTIAL_UDFS whose `_error` is in use
-        self.anchor_prims: set[str] = set()  # keys of ANCHOR_FNS in use
         self.check_vars: list[str] = []  # see check_var
         self.need_choice_number = False
         self.tparams: set[str] = set()  # component type parameters
@@ -1911,6 +1902,7 @@ class Translator:
         self.init_targs: dict[tuple, list] = {}  # (component or None, instance) -> type arguments
         self.need_unit = False
         self.need_range = False
+        self.output_copies = 0  # see split_outputs
         # every variable name the program spells, and those generated so far:
         # generated names (fresh, flattened record fields) avoid them all
         self.taken: set[str] = set()
@@ -2018,6 +2010,12 @@ class Translator:
     def record_width(self, t: str) -> int:
         return len(self.flat_attrs([("x", t)]))
 
+    def record_format(self, t: str) -> str:
+        """How Souffle writes a record of type t, with `{}` for each flattened
+        field: `[[{}, {}], {}]`."""
+        return "[" + ", ".join(self.record_format(ft) if self.is_record_type(ft) else "{}"
+                               for _, ft in self.record_fields(t)) + "]"
+
     def choice_keys(self, d: RelDecl) -> set:
         """The flattened attribute names of d's choice-domain key: a record
         attribute contributes all of its fields."""
@@ -2032,6 +2030,7 @@ class Translator:
         if clash:
             # the types are resolved globally, so the parameter would read as the type
             raise TranslateError(f"component type parameter {clash[0]} has the name of a type")
+        items = self.split_outputs(items)
         self.instances = self.comp_instances()
         self.check_relations(items)
         self.read_rels = self.collect_read_rels(items)
@@ -2048,7 +2047,6 @@ class Translator:
             items += [Raw(f".decl {UNIT_REL}(u: int32)"), Rule([Atom(UNIT_REL, [Num(0)])], None)]
         if self.need_range:
             items += self.range_table()
-        items = self.keep_dataflow(items)
         if self.error_udfs:
             # FlowlogError is a relation, so the messages are consolidated
             # (rows a negation retracts cancel out) before souffle_raise sees them
@@ -2076,67 +2074,7 @@ class Translator:
             externs.append(Raw(f".extern fn {name}_error({params}) -> string"))
         if self.error_udfs:
             externs.append(Raw(".extern fn souffle_raise(msg: string) -> int64"))
-        for p in sorted(self.anchor_prims):
-            externs.append(Raw(f".extern fn {ANCHOR_FNS[p]}(x: {p}) -> {p}"))
         return externs + items
-
-    def keep_dataflow(self, items: list) -> list:
-        """FlowLog cannot build a program in which no output relation has a
-        fact, an input or a rule it keeps (flowlog-rs/flowlog#475): it prunes them
-        all, and the generated crate fails on unused items.  This happens
-        when every rule of the outputs was dropped as never satisfied, or
-        they only have recursive rules.  A program none of whose outputs is
-        derived from a fact or an input (a superset: FlowLog keeps a rule
-        reading relations nothing derives) gets a rule for its first output
-        that never fires, `A(0, "") :- FlowlogUnit(u), u != 0.`.  A
-        component's clauses and directives are read in each of its instances
-        (resolve_at), and the rule for an instance's output is given at top
-        level, `inst.A(0, "") :- ...`, with the instance's type arguments."""
-        io: dict = {}
-        rules: list = []  # (heads, positive body atoms per conjunction), full names
-
-        def walk(its: list, path: str | None) -> None:
-            full = (lambda n: n) if path is None else (lambda n: self.resolve_at(n, path)[1])
-            for it in its:
-                if isinstance(it, Comp):
-                    for p in self.instances.get(it.name, []) if path is None else []:
-                        walk(it.items, p)
-                    continue
-                m = isinstance(it, Raw) and re.match(r"\.(input|output|printsize)\s+([\w.]+)", it.text)
-                if m:
-                    io.setdefault(m.group(1), []).append(full(m.group(2)))
-                elif isinstance(it, Rule):
-                    body = None if it.body is None else \
-                        [[full(l.name) for l in conj if isinstance(l, Atom)] for conj in it.body]
-                    rules.append(([full(h.name) for h in it.heads], body))
-        walk(items, None)
-        outs = io.get("output", []) + io.get("printsize", [])
-        cands: list = []
-        for n in outs:
-            d = self.resolve_in(n, None)
-            if d is None or d.choice:
-                continue
-            attrs = self.flat_attrs(self.decl_attr_types(d, n, ()))
-            if not any(t in self.tparams for _, t in attrs):
-                cands.append((n, attrs))
-        if not cands:
-            return items
-        grounded = set(io.get("input", []))
-        while True:
-            new = {h for heads, body in rules
-                   if body is None or any(all(a in grounded for a in conj) for conj in body)
-                   for h in heads} - grounded
-            if not new:
-                break
-            grounded |= new
-        if grounded & set(outs):
-            return items
-        extra = [] if self.need_unit else [Raw(f".decl {UNIT_REL}(u: int32)"), Rule([Atom(UNIT_REL, [Num(0)])], None)]
-        self.need_unit = True
-        name, attrs = cands[0]
-        args = [Str("") if self.base_type(t) == PRIM_TYPES["symbol"] else Num(0) for _, t in attrs]
-        u = Var("u")
-        return items + extra + [Rule([Atom(name, args)], [[Atom(UNIT_REL, [u]), Cmp("!=", u, Num(0))]])]
 
     def add_choice_instances(self, items: list) -> list:
         """Number the instances of components whose choice claims need one."""
@@ -3201,6 +3139,48 @@ class Translator:
             raise TranslateError(f"record type {t} in functor signature")
         return b
 
+    def split_outputs(self, items: list) -> list:
+        """Souffle writes every `.output` of a relation, FlowLog one per
+        relation. Of the outputs of a top-level relation, the one that is not
+        to a file (sqlite; at most one), else the first, stays on it,
+        and each other one writes a copy of the relation, `FlowlogOutputN`,
+        to the file Souffle writes. Two outputs to one file are refused."""
+        def file(io: IODecl) -> str | None:
+            ps = dict(io.params)
+            return ps.get("filename", io.name + ".csv") if ps.get("IO", "file") == "file" else None
+
+        outs: dict[str, list] = {}  # relation -> its distinct outputs
+        for it in items:
+            # check_relations reports the outputs of undeclared relations
+            if isinstance(it, IODecl) and it.kind == ".output" and it.name in self.global_decls:
+                ios = outs.setdefault(it.name, [])
+                if all(sorted(o.params) != sorted(it.params) for o in ios):
+                    ios.append(it)
+        keep = {}  # relation -> the output that stays on it
+        for name, ios in outs.items():
+            files = [file(o) for o in ios]
+            if files.count(None) > 1:
+                raise TranslateError(f".output {name}: two outputs of the relation are not to a file")
+            dup = [f for f in files if f is not None and files.count(f) > 1]
+            if dup:
+                raise TranslateError(f".output {name}: two outputs of the relation write '{dup[0]}'")
+            keep[name] = ios[files.index(None) if None in files else 0]
+        out: list = []
+        for it in items:
+            if not (isinstance(it, IODecl) and it.kind == ".output" and it.name in outs) or it is keep[it.name]:
+                out.append(it)
+            elif any(it is o for o in outs[it.name]):
+                attrs = self.global_decls[it.name].attrs
+                self.output_copies += 1
+                copy = f"FlowlogOutput{self.output_copies}"
+                self.decls[copy] = self.global_decls[copy] = RelDecl(copy, list(attrs), [], [])
+                vs = [Var(self.fresh("out")) for _ in attrs]
+                params = [(k, v) for k, v in it.params if k != "filename"] + [("filename", file(it))]
+                out += [self.decls[copy], Rule([Atom(copy, vs)], [[Atom(it.name, list(vs))]]),
+                        IODecl(".output", copy, params)]
+            # else it repeats an output of the relation: dropped
+        return out
+
     def dedupe_io(self, items: list) -> list:
         seen = set()
         out = []
@@ -3215,14 +3195,17 @@ class Translator:
         return out
 
     def record_io(self, io: IODecl, scope: tuple) -> None:
-        """Describe sqlite inputs/outputs in the schema manifest, so tools can
-        map FlowLog tables back to Souffle's layout (original attribute names,
-        flattened record columns, renamed attributes). A directive inside a
+        """Describe the sqlite and file inputs/outputs in the schema manifest
+        (sqlite ones under "inputs"/"outputs", file ones under "files"), so
+        tools can find FlowLog's files and map its tables back to Souffle's
+        layout (original attribute names, flattened record columns and how
+        Souffle writes them, renamed attributes). A directive inside a
         component names, in each instance, the relation its name resolves to
         there (resolve_at: `inst.R` for the instance's own), which is the
-        table name of both Souffle and FlowLog."""
+        table name, and the default file name, of both Souffle and FlowLog."""
         params = dict(io.params)
-        if io.kind not in (".input", ".output") or params.get("IO") != "sqlite":
+        io_kind = params.get("IO", "file")
+        if io.kind not in (".input", ".output") or io_kind not in ("file", "sqlite"):
             return
         if io.name.split(".")[-1] in self.dropped_rels:
             return
@@ -3241,19 +3224,24 @@ class Translator:
                 flat = self.flat_attrs([(an, at)])
                 cols.append({"attr": an, "kind": "record",
                              "fl": [fl_name(a) for a, _ in flat],
-                             "fl_kinds": [kind(t) for _, t in flat]})
+                             "fl_kinds": [kind(t) for _, t in flat],
+                             "format": self.record_format(at)})
             else:
                 cols.append({"attr": an, "kind": kind(at), "fl": [fl_name(an)]})
+        if io_kind == "file" and params.get("delimiter", "\t") != "\t" and any(c["kind"] == "record" for c in cols):
+            raise TranslateError(f"{io.kind} {io.name}: record columns in a file need the tab delimiter")
         key = "outputs" if io.kind == ".output" else "inputs"
-        lst = self.schema.setdefault(key, [])
-        # An input nothing reads cannot affect the results, so the adapter
-        # creates it empty. CTADL's query declares such inputs with record
-        # columns, which a DB written by Souffle cannot supply.
+        lst = (self.schema if io_kind == "sqlite" else self.schema.setdefault("files", {})).setdefault(key, [])
+        suffix = ".sqlite" if io_kind == "sqlite" else ".csv" if key == "outputs" else ".facts"
+        # An input nothing reads cannot affect the results, so the engine
+        # creates it empty (Souffle does not load it). CTADL's query declares
+        # such inputs with record columns, which a DB written by Souffle
+        # cannot supply.
         unread = (key == "inputs" and self.read_rels is not None
                   and io.name.split(".")[-1] not in self.read_rels)
         for name in names:
             if all(e["name"] != name for e in lst):
-                entry = {"name": name, "file": params.get("filename", f"{name}.sqlite"), "columns": cols}
+                entry = {"name": name, "file": params.get("filename", name + suffix), "columns": cols}
                 if unread:
                     entry["read"] = False
                 lst.append(entry)
@@ -3277,10 +3265,6 @@ class Translator:
     def transform_decl(self, d: RelDecl, scope: tuple) -> list:
         attrs = self.flat_attrs(d.attrs)
         quals = [q for q in d.quals if q == "overridable"]
-        if any(self.is_record_type(t) for _, t in d.attrs) and not scope:
-            self.schema.setdefault("records", {})[d.name] = [
-                (an, self.record_width(at)) for an, at in d.attrs
-            ]
         qtxt = (" " + " ".join(quals)) if quals else ""
         if not d.choice:
             return [Raw(f".decl {d.name}({self.fmt_attrs(attrs)}){qtxt}")]
@@ -3561,7 +3545,6 @@ class Translator:
                 body = None
             tenv = self.rule_type_env(body, types, scope)
             heads, body = self.anchor_widths(heads, body, tenv)
-            heads, body = self.paren_safe(heads, body, tenv)
             if body is None:
                 if any(not isinstance(a, (Num, Str)) for h in heads for a in h.args):
                     # FlowLog only accepts constant facts; a computed one
@@ -4292,12 +4275,11 @@ class Translator:
     def fold_constants(self, heads: list, body: list | None, scope: tuple, line: int):
         """Evaluates the rule's integer constant expressions as Souffle does,
         on 64 bits with wrap-around: FlowLog computes an expression that no
-        column or parameter types on int32, and rejects constants rustc sees
-        overflow (flowlog-rs/flowlog B10).  A variable equated to a constant
-        is valued in its conjunction (and the aggregates and disjunctions in
-        it), comparisons of constants become true or false, and an aggregate
-        over an always false body becomes 0 (count, sum), or makes its
-        literal false (min, max: no value).
+        column or parameter types on int32.  A variable equated to a
+        constant is valued in its conjunction (and the aggregates and
+        disjunctions in it), comparisons of constants become true or false,
+        and an aggregate over an always false body becomes 0 (count, sum),
+        or makes its literal false (min, max: no value).
 
         The type of an expression comes from the column or parameter it
         fills, else from the declared type of a variable in it (variables
@@ -4375,15 +4357,6 @@ class Translator:
                 vl, vr = evaluate(l, p, env), evaluate(r, p, env)
                 if vl is not None and vr is not None:
                     return BoolLit(CMP_FNS[c.op](vl, vr))
-                # one the limits of its type decide, which rustc rejects
-                # (FlowLog builds with -Dwarnings; flowlog-rs/flowlog B13)
-                if p is not None and c.op in FLIP_CMP:
-                    lo, hi = INT_RANGES[p]
-                    for op, v in ((c.op, vr), (FLIP_CMP[c.op], vl)):
-                        if (op, v) in (("<", lo), (">", hi)):
-                            return BoolLit(False)
-                        if (op, v) in ((">=", lo), ("<=", hi)):
-                            return BoolLit(True)
             return Cmp(c.op, l, r)
 
         def fold_lit(lit, env, is_def):
@@ -4461,9 +4434,10 @@ class Translator:
             pass  # an aggregate in a head is rejected later
         return heads, body
 
-    def anchor(self, e: Any, prim: str) -> Call:
-        self.anchor_prims.add(prim)
-        return Call(ANCHOR_FNS[prim], [e])
+    @staticmethod
+    def anchor(e: Any, prim: str) -> Cast:
+        """`e` pinned to the integer primitive `prim` (a FlowLog `as`)."""
+        return Cast(e, prim)
 
     def rule_type_env(self, body: list | None, types: dict, scope: tuple) -> dict:
         """The rule's variable types (decl_var_types), with those
@@ -4499,15 +4473,13 @@ class Translator:
         it: a column, a parameter, or a comparison with a typed operand pins
         it.  A comparison of such terms only, the argument of `to_string`,
         and an arithmetic argument of a UDF fall back to int32, as do the
-        aggregates and literals in them (`as` pins nothing, B11).  In these
-        contexts each use of a count or computed variable is wrapped in the
-        identity UDF flowlog_int64/flowlog_uint64 (ANCHOR_FNS), an aggregate
-        being first bound to a variable; failing these, if the context
-        computes or holds a literal beyond int32, its literal variables and
-        literals beyond int32 are wrapped, else its first literal.  (The
-        wrapper of a computed variable moves to its definition in
-        paren_safe.)  `tenv` is rule_type_env's, and receives the types of
-        the variables introduced."""
+        aggregates and literals in them.  In these contexts each use of a
+        count or computed variable is pinned with `as(_, int64)` (or
+        `uint64`), an aggregate being first bound to a variable; failing
+        these, if the context computes or holds a literal beyond int32, its
+        literal variables and literals beyond int32 are pinned, else its
+        first literal.  `tenv` is rule_type_env's, and receives the types
+        of the variables introduced."""
 
         def strong_leaf(x, cls):
             if isinstance(x, Var):
@@ -4517,7 +4489,7 @@ class Translator:
                     return False
                 icls, _ = classify(x.body[0], cls)
                 return any(strong_leaf(y, icls) for y in arith_leaves(x.target))
-            return isinstance(x, (Str, Call))
+            return isinstance(x, (Str, Call, Cast))
 
         def def_kind(e, cls):
             if isinstance(e, Num):
@@ -4691,179 +4663,6 @@ class Translator:
                 strong = set.intersection(*(c[0] for c in clss))
                 hcls = (strong, merge_weak([c[1] for c in clss], strong))
         heads = [Atom(h.name, [fix_expr(a, hcls, None) for a in h.args]) for h in heads]
-        return heads, body
-
-    def paren_safe(self, heads: list, body: list | None, tenv: dict) -> tuple:
-        """Works around flowlog-rs/flowlog B5.  FlowLog writes in
-        parentheses a variable it substitutes by its defining arithmetic
-        expression (`+ - * band bor bxor`; see value_kinds), and such an
-        expression as an operand of a shift; rustc's unused_parens lint
-        rejects these parentheses around the argument of a Rust function: a
-        UDF's, or a shift's (the runtime's bshl/bshr/bshru).  So where a UDF
-        or a shift takes such a variable, its definition is wrapped in the
-        identity UDF of its type (ANCHOR_FNS), which FlowLog writes as a
-        call, and so is a shift's arithmetic operand.  An identity UDF of
-        such a variable (anchor_widths) is moved to its definition."""
-        marks: dict = {}  # id(defining Cmp) -> (defining expression, prim)
-        unwrap: set = set()  # id(identity UDF call) to drop
-        wrap: dict = {}  # id(shift operand) -> prim
-        anchors = {f: p for p, f in ANCHOR_FNS.items()}
-
-        def arith(e):
-            return isinstance(e, Bin) and e.op not in SHIFT_OPS
-
-        def prim_of(e):
-            return self.int_prim(self.expr_type(e, tenv))
-
-        def assigns(conj, base):
-            """value_kinds over `conj` in the scope `base` (kinds, defs),
-            with defs mapping each variable FlowLog substitutes to its
-            defining (equality, expression), through aliases."""
-            kind, defs = dict(base[0]), dict(base[1])
-            for lit in conj:
-                if isinstance(lit, Atom):
-                    for a in lit.args:
-                        if isinstance(a, Var):
-                            kind[a.name] = "atomic"
-            for lit in conj:
-                if isinstance(lit, Group) and lit.disj:
-                    branches = [assigns(c, (kind, defs))[0] for c in lit.disj]
-                    for v in set.intersection(*(set(b) for b in branches)) - set(kind):
-                        if all(b[v] == "atomic" for b in branches):
-                            kind[v] = "atomic"
-            changed = True
-            while changed:
-                changed = False
-                for lit in conj:
-                    if not (isinstance(lit, Cmp) and lit.op == "="):
-                        continue
-                    for x, e in ((lit.l, lit.r), (lit.r, lit.l)):
-                        if not isinstance(x, Var) or x.name in kind:
-                            continue
-                        if not expr_vars(e, set(), include_agg=False) <= set(kind):
-                            continue
-                        if isinstance(e, (Agg, Num, Str)):
-                            kind[x.name] = "atomic"
-                        elif isinstance(e, Var):
-                            kind[x.name] = kind[e.name]
-                            if e.name in defs:
-                                defs[x.name] = defs[e.name]
-                        else:
-                            kind[x.name] = "computed"
-                            defs[x.name] = (lit, e)
-                        changed = True
-                        break
-            return kind, defs
-
-        def mark(v, sc, p):
-            """Marks the arithmetic definitions of `v` (in each disjunct
-            defining it) to be wrapped; whether there are any."""
-            kind, defs, branches = sc
-            cands = [defs[v]] if v in defs else [b[v] for b in branches if v in b]
-            cands = [(c, e) for c, e in cands if arith(e)]
-            for c, e in cands:
-                q = p or prim_of(e)
-                if q is None:
-                    return False
-                marks.setdefault(id(c), (e, q))
-            return bool(cands)
-
-        def scan_expr(e, sc):
-            if isinstance(e, Call):
-                for a in e.args:
-                    if isinstance(a, Var) and e.name not in ("cat", "to_string"):
-                        # (FlowLog writes these two builtins otherwise)
-                        if mark(a.name, sc, anchors.get(e.name)) and e.name in anchors:
-                            unwrap.add(id(e))
-                    else:
-                        scan_expr(a, sc)
-            elif isinstance(e, Bin):
-                for a in (e.l, e.r):
-                    if e.op in SHIFT_OPS and isinstance(a, Var):
-                        mark(a.name, sc, None)
-                    elif e.op in SHIFT_OPS and arith(a):
-                        q = prim_of(a) or prim_of(e)
-                        if q is not None:
-                            wrap[id(a)] = q
-                    scan_expr(a, sc)
-            elif isinstance(e, Agg):
-                for c in e.body:
-                    isc = scan_conj(c, sc[:2])
-                    if e.target is not None:
-                        scan_expr(e.target, isc)
-            elif isinstance(e, Rec):
-                for x in e.elems:
-                    scan_expr(x, sc)
-
-        def scan_lit(lit, sc):
-            if isinstance(lit, Neg):
-                lit = lit.atom
-            if isinstance(lit, (Atom, Pred)):
-                for a in lit.args:
-                    scan_expr(a, sc)
-            elif isinstance(lit, Cmp):
-                scan_expr(lit.l, sc)
-                scan_expr(lit.r, sc)
-
-        def scan_conj(conj, base):
-            kind, defs = assigns(conj, base)
-            branches = [scan_conj(c, (kind, defs))[1] for lit in conj if isinstance(lit, Group)
-                        for c in lit.disj]
-            sc = (kind, defs, branches)
-            for lit in conj:
-                if not isinstance(lit, Group):
-                    scan_lit(lit, sc)
-            return sc
-
-        scopes = [scan_conj(c, ({}, {})) for c in body or []]
-        for h in heads:
-            for sc in scopes or [({}, {}, [])]:
-                scan_lit(h, sc)
-        if not (marks or unwrap or wrap):
-            return heads, body
-
-        def fix_expr(e):
-            if isinstance(e, Call):
-                if id(e) in unwrap:
-                    return fix_expr(e.args[0])
-                return Call(e.name, [fix_expr(a) for a in e.args], e.functor)
-            if isinstance(e, Bin):
-                l, r = fix_expr(e.l), fix_expr(e.r)
-                if id(e.l) in wrap:
-                    l = self.anchor(l, wrap[id(e.l)])
-                if id(e.r) in wrap:
-                    r = self.anchor(r, wrap[id(e.r)])
-                return Bin(e.op, l, r)
-            if isinstance(e, Agg):
-                return Agg(e.kind, None if e.target is None else fix_expr(e.target),
-                           [[fix_lit(x) for x in c] for c in e.body])
-            if isinstance(e, Rec):
-                return Rec([fix_expr(x) for x in e.elems])
-            return e
-
-        def fix_lit(lit):
-            if isinstance(lit, Atom):
-                return Atom(lit.name, [fix_expr(a) for a in lit.args])
-            if isinstance(lit, Neg):
-                return Neg(fix_lit(lit.atom))
-            if isinstance(lit, Pred):
-                return Pred(lit.name, [fix_expr(a) for a in lit.args], lit.neg)
-            if isinstance(lit, Group):
-                return Group([[fix_lit(x) for x in c] for c in lit.disj])
-            if isinstance(lit, Cmp):
-                l, r = fix_expr(lit.l), fix_expr(lit.r)
-                m = marks.get(id(lit))
-                if m is not None:
-                    if lit.r is m[0]:
-                        r = self.anchor(r, m[1])
-                    else:
-                        l = self.anchor(l, m[1])
-                return Cmp(lit.op, l, r)
-            return lit
-
-        heads = [fix_lit(h) for h in heads]
-        if body is not None:
-            body = [[fix_lit(x) for x in c] for c in body]
         return heads, body
 
     # -- booleans
@@ -5260,9 +5059,7 @@ class Translator:
         wildcards of a non-materialised body are named.
 
         Returns the expression replacing the aggregate; `extra` receives
-        literals for the enclosing conjunction.  Shapes FlowLog miscompiles
-        (FlowLog bug B4 in README.md) are rejected."""
-        b4 = "(FlowLog fails to compile this shape: bug B4 in README.md)"
+        literals for the enclosing conjunction."""
         if len(a.body) != 1 or any(isinstance(l, Group) for l in a.body[0]):
             raise TranslateError(f"line {line}: disjunction inside an aggregate body is not supported")
         if any(isinstance(l, Neg) for l in a.body[0]):
@@ -5283,31 +5080,6 @@ class Translator:
                     local.add(x.name)
                 return x
             conj = [Atom(l.name, [name_wild(x) for x in l.args]) if isinstance(l, Atom) else l for l in conj]
-        # a local equated to a function of injected variables: FlowLog reads
-        # an injected variable directly but not such a local (B4), so
-        # substitute it (a constant stays: FlowLog handles `t = 1`)
-        changed = True
-        while changed:
-            changed = False
-            for i, l in enumerate(conj):
-                if not (isinstance(l, Cmp) and l.op == "="):
-                    continue
-                for x, e in ((l.l, l.r), (l.r, l.l)):
-                    if (not isinstance(x, Var) or x.name not in local or isinstance(e, (Num, Str))
-                            or has_agg(e) or expr_vars(e, set()) & local):
-                        continue
-                    if not isinstance(e, Var) and any(
-                            isinstance(l2, Atom) and x.name in lit_vars(l2, set()) for l2 in conj):
-                        raise TranslateError(f"line {line}: an aggregate body atom reads `{x.name}`, which is "
-                                             f"computed from outer variables or constants only {b4}")
-                    conj = [subst_lit(l2, {x.name: e}) for k, l2 in enumerate(conj) if k != i]
-                    if target is not None:
-                        target = subst_expr(target, {x.name: e})
-                    local.discard(x.name)
-                    changed = True
-                    break
-                if changed:
-                    break
         lifted: list = []
         for l in conj:
             if not isinstance(l, Atom):
@@ -5316,9 +5088,6 @@ class Translator:
             args = []
             for x in l.args:
                 if not isinstance(x, (Var, Wild, Num, Str)):
-                    if not has_agg(x) and not expr_vars(x, set()) & local:
-                        raise TranslateError(f"line {line}: an aggregate body atom has an argument computed "
-                                             f"from outer variables or constants only {b4}")
                     v = Var(self.fresh("lift_t"))
                     local.add(v.name)
                     lifted.append(Cmp("=", v, x))
@@ -5326,23 +5095,12 @@ class Translator:
                 args.append(x)
             lifted.append(Atom(l.name, args))
         conj = lifted
-        for l in conj:
-            if isinstance(l, (Cmp, Pred)) and not has_agg(l):
-                vs = lit_vars(l, set())
-                if vs and not vs & local:
-                    raise TranslateError(f"line {line}: an aggregate body filters on outer variables only {b4}")
         inner: set = set(outer)
         for l in conj:
             lit_vars(l, inner, include_agg=False)
         if target is not None:
             expr_vars(target, inner, include_agg=False)
         conj = self.scope_conj(conj, inner, line)
-        if not any(isinstance(l, Atom) and lit_vars(l, set()) & local for l in conj):
-            # FlowLog needs a local variable read by an atom (bug B2)
-            u = Var(self.fresh("unit_u"))
-            local.add(u.name)
-            conj.append(Atom(UNIT_REL, [u]))
-            self.need_unit = True
         if target is not None and not expr_vars(target, set()) & local:
             # FlowLog rejects a target without a local variable; Souffle
             # adds it up once per match
@@ -5432,6 +5190,9 @@ def pe(e: Any, operand: tuple[int, bool] | None = None) -> str:
         return fl_string(e.val)
     if isinstance(e, Call):
         return f"{e.name}({', '.join(pe(a) for a in e.args)})"
+    if isinstance(e, Cast):
+        # FlowLog's `as` takes a factor: an arithmetic operand is parenthesized
+        return f"as({'(' + pe(e.e) + ')' if isinstance(e.e, Bin) else pe(e.e)}, {e.ty})"
     if isinstance(e, Bin):
         p = FL_PREC[e.op]
         ra = e.op in FL_RIGHT_ASSOC

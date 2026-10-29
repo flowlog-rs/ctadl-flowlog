@@ -1,8 +1,7 @@
 // No output has a fact, an input or a rule FlowLog keeps: it prunes every
-// relation, and the generated crate does not build (flowlog-rs/flowlog#475), so the
-// translator adds a rule that never fires (souffle2flowlog.py,
-// keep_dataflow).  Souffle writes every output empty.  (A rule reading a
-// relation nothing derives, `C(x) :- B(x).`, is kept.)
+// relation (the generated crate then did not build, flowlog-rs/flowlog#475,
+// fixed).  Souffle writes every output empty.  (A rule reading a relation
+// nothing derives, `C(x) :- B(x).`, is kept.)
 .type T <: number
 .type S <: symbol
 .decl A(t: T, s: S, u: unsigned)
