@@ -1,0 +1,552 @@
+# compare_db.py -q --keys VirtualAssign=0,1,2,3,4,5,6 --schema index_schema.json --schema query_schema.json A B
+# on the databases of the first rep. hints/ and no-hints/ are bench_reps.py's runs, on FlowLog
+# main at f14db3d + #499 (87ed8e8); bench/ is the run in results/bench, on FlowLog fed6293.
+# -q prints only the relations that differ, and the summary.
+
+## syn10: FlowLog with the hints, without vs with #499: bench/syn10/flowlog-j1 vs hints/r1/syn10/flowlog-j1
+summary: 120 equal, 0 different
+
+## syn25: FlowLog with the hints, without vs with #499: bench/syn25/flowlog-j1 vs hints/r1/syn25/flowlog-j1
+summary: 120 equal, 0 different
+
+## syn10: FlowLog without the hints, without vs with #499: bench/syn10/flowlog-noplan-j1 vs no-hints/r1/syn10/flowlog-noplan-j1
+summary: 120 equal, 0 different
+
+## syn25: FlowLog without the hints, without vs with #499: bench/syn25/flowlog-noplan-j1 vs no-hints/r1/syn25/flowlog-noplan-j1
+summary: 120 equal, 0 different
+
+## syn10: FlowLog with the hints without #499 vs without the hints with #499: bench/syn10/flowlog-j1 vs no-hints/r1/syn10/flowlog-noplan-j1
+summary: 120 equal, 0 different
+
+## syn25: FlowLog with the hints without #499 vs without the hints with #499: bench/syn25/flowlog-j1 vs no-hints/r1/syn25/flowlog-noplan-j1
+summary: 120 equal, 0 different
+
+## syn10: FlowLog with the hints, 1 vs 32 workers: hints/r1/syn10/flowlog-j1 vs hints/r1/syn10/flowlog-j32
+summary: 120 equal, 0 different
+
+## syn25: FlowLog with the hints, 1 vs 32 workers: hints/r1/syn25/flowlog-j1 vs hints/r1/syn25/flowlog-j32
+summary: 120 equal, 0 different
+
+## syn10: FlowLog without the hints, 1 vs 32 workers: no-hints/r1/syn10/flowlog-noplan-j1 vs no-hints/r1/syn10/flowlog-noplan-j32
+summary: 120 equal, 0 different
+
+## syn25: FlowLog without the hints, 1 vs 32 workers: no-hints/r1/syn25/flowlog-noplan-j1 vs no-hints/r1/syn25/flowlog-noplan-j32
+summary: 120 equal, 0 different
+
+## syn10: Soufflé with the hints, 1 worker, two runs: bench/syn10/souffle-j1 vs hints/r1/syn10/souffle-j1
+summary: 120 equal, 0 different
+
+## syn25: Soufflé with the hints, 1 worker, two runs: bench/syn25/souffle-j1 vs hints/r1/syn25/souffle-j1
+summary: 120 equal, 0 different
+
+## syn10: Soufflé without the hints, 1 worker, two runs: bench/syn10/souffle-noplan-j1 vs no-hints/r1/syn10/souffle-noplan-j1
+summary: 120 equal, 0 different
+
+## syn25: Soufflé without the hints, 1 worker, two runs: bench/syn25/souffle-noplan-j1 vs no-hints/r1/syn25/souffle-noplan-j1
+summary: 120 equal, 0 different
+
+## syn10: Soufflé with the hints, 1 vs 32 workers: hints/r1/syn10/souffle-j1 vs hints/r1/syn10/souffle-j32
+WITNESS  LostAssign: 76 rows, same choice-domain keys, 21 with another witness
+           - ('Main/call/1', '.f3.f3', 'dest')
+           - ('Main/call/25', '.f3.f3', 'dest')
+           - ('Main/call/9', '.f3.f3', 'dest')
+           - ('f0/call/7', '.g1.f3', 'dest')
+           - ('f0/indirect-call/13', '.g1.f3', 'dest')
+           + ('Main/call/1', '.f1.f3.f3', 'dest')
+           + ('Main/call/25', '.g1.f3', 'dest')
+           + ('Main/call/9', '.f1.f3.f3', 'dest')
+           + ('f0/call/7', '.g0.f3', 'dest')
+           + ('f0/indirect-call/13', '.f3.f3', 'dest')
+WITNESS  VirtualAssign: 22296 rows, same choice-domain keys, 327 with another witness
+           - ('f2/call/0', 'f2/b', '.f2', 'f2/<globals>', '.g1', 'summary', '')
+           - ('f2/call/2', 'f2/b', '.f3', 'f2/b', '.f2', 'summary', '')
+           - ('f2/indirect-call/11', 'f2/b', '.f0', 'f2/b', '.f2', 'summary', '')
+           - ('f2/indirect-call/11', 'f2/b', '.f0.f1', 'f2/b', '.f2', 'summary', '')
+           - ('f2/indirect-call/11', 'f2/b', '.f0.f3', 'f2/b', '.f2', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f0', 'f2/b', '.f2', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f0.f1', 'f2/b', '.f2', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f0.f3', 'f2/b', '.f2', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f1', 'f2/b', '.f0', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f1', 'f2/b', '.f2', 'summary', '')
+DIFF     forward_flow.ReachableEdge: souffle 267246, flowlog 266812, souffle-only 4787, flowlog-only 4353
+           - ('f2/b:.f0.f1:File:restricted:0:', 'f2/b:.f2:File:restricted:0:', 'f2/indirect-call/11', 'move')
+           - ('f2/b:.f0.f1:File:restricted:0:Main#', 'f2/b:.f2:File:restricted:0:Main#', 'f2/indirect-call/11', 'move')
+           - ('f2/b:.f0.f1:Network:restricted:0:', 'f2/b:.f2:Network:restricted:0:', 'f2/indirect-call/11', 'move')
+           - ('f2/b:.f0.f1:Network:restricted:0:Main#', 'f2/b:.f2:Network:restricted:0:Main#', 'f2/indirect-call/11', 'move')
+           - ('f2/b:.f0.f1:Thing:free:0:', 'f2/b:.f2:Thing:free:0:', 'f2/indirect-call/11', 'move')
+           + ('f2/b:.f0.f1:File:restricted:0:', 'f2/b:.f2:File:restricted:0:', 'f2/call/2', 'move')
+           + ('f2/b:.f0.f1:File:restricted:0:Main#', 'f2/b:.f2:File:restricted:0:Main#', 'f2/call/2', 'move')
+           + ('f2/b:.f0.f1:Network:restricted:0:', 'f2/b:.f2:Network:restricted:0:', 'f2/call/2', 'move')
+           + ('f2/b:.f0.f1:Network:restricted:0:Main#', 'f2/b:.f2:Network:restricted:0:Main#', 'f2/call/2', 'move')
+           + ('f2/b:.f0.f1:Thing:free:0:', 'f2/b:.f2:Thing:free:0:', 'f2/call/2', 'move')
+DIFF     natural_flow.ReachableEdge: souffle 267246, flowlog 266812, souffle-only 4787, flowlog-only 4353
+           - ('f2/b:.f0.f1:File:restricted:0::f', 'f2/b:.f2:File:restricted:0::f', 'f2/indirect-call/11', 'move', 'f')
+           - ('f2/b:.f0.f1:File:restricted:0:Main#:f', 'f2/b:.f2:File:restricted:0:Main#:f', 'f2/indirect-call/11', 'move', 'f')
+           - ('f2/b:.f0.f1:Network:restricted:0::f', 'f2/b:.f2:Network:restricted:0::f', 'f2/indirect-call/11', 'move', 'f')
+           - ('f2/b:.f0.f1:Network:restricted:0:Main#:f', 'f2/b:.f2:Network:restricted:0:Main#:f', 'f2/indirect-call/11', 'move', 'f')
+           - ('f2/b:.f0.f1:Thing:free:0::f', 'f2/b:.f2:Thing:free:0::f', 'f2/indirect-call/11', 'move', 'f')
+           + ('f2/b:.f0.f1:File:restricted:0::f', 'f2/b:.f2:File:restricted:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/b:.f0.f1:File:restricted:0:Main#:f', 'f2/b:.f2:File:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           + ('f2/b:.f0.f1:Network:restricted:0::f', 'f2/b:.f2:Network:restricted:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/b:.f0.f1:Network:restricted:0:Main#:f', 'f2/b:.f2:Network:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           + ('f2/b:.f0.f1:Thing:free:0::f', 'f2/b:.f2:Thing:free:0::f', 'f2/call/2', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 267246, flowlog 266812, souffle-only 4787, flowlog-only 4353
+           - ('f2/<globals>:.g1:File:restricted:0::f', 'f2/b:.f2:File:restricted:0::f', 'f2/call/0', 'move', 'f')
+           - ('f2/<globals>:.g1:File:restricted:0:Main#:f', 'f2/b:.f2:File:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           - ('f2/<globals>:.g1:Network:restricted:0::f', 'f2/b:.f2:Network:restricted:0::f', 'f2/call/0', 'move', 'f')
+           - ('f2/<globals>:.g1:Network:restricted:0:Main#:f', 'f2/b:.f2:Network:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           - ('f2/<globals>:.g1:Thing:free:0::f', 'f2/b:.f2:Thing:free:0::f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g1:File:restricted:0::f', 'f2/b:.f2:File:restricted:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g1:File:restricted:0:Main#:f', 'f2/b:.f2:File:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g1:Network:restricted:0::f', 'f2/b:.f2:Network:restricted:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g1:Network:restricted:0:Main#:f', 'f2/b:.f2:Network:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g1:Thing:free:0::f', 'f2/b:.f2:Thing:free:0::f', 'f2/call/2', 'move', 'f')
+summary: 117 equal (2 up to choice-domain witnesses), 3 different
+
+## syn25: Soufflé with the hints, 1 vs 32 workers: hints/r1/syn25/souffle-j1 vs hints/r1/syn25/souffle-j32
+DIFF     LostAssign: souffle 163, flowlog 163, souffle-only 156, flowlog-only 156
+           - ('Main/call/1', '.g2.f0', 'dest')
+           - ('Main/call/13', '.g2.f0', 'dest')
+           - ('Main/call/17', '.g2.f0', 'dest')
+           - ('Main/call/21', '.g2.f0', 'dest')
+           - ('Main/call/25', '.g2.f0', 'dest')
+           + ('Main/call/1', '.g2.f1', 'dest')
+           + ('Main/call/13', '.g2.f1', 'dest')
+           + ('Main/call/17', '.g2.f1', 'dest')
+           + ('Main/call/21', '.g2.f1', 'dest')
+           + ('Main/call/25', '.g2.f1', 'dest')
+WITNESS  VirtualAssign: 265894 rows, same choice-domain keys, 2382 with another witness
+           - ('f0/call/7', 'f0/<globals>', '.g1', 'f0/t3', '.f0.f3', 'summary', '')
+           - ('f0/call/7', 'f0/a', '.f0.f1', 'f0/a', '.f1.f0', 'summary', '')
+           - ('f0/call/7', 'f0/a', '.f0.f1', 'f0/a', '.f2.f3', 'summary', '')
+           - ('f0/call/7', 'f0/a', '.f0.f3', 'f0/<globals>', '.g1', 'summary', '')
+           - ('f0/call/7', 'f0/a', '.f0.f3', 'f0/a', '.f1.f1', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f0.f1', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f1.f0', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g1', 'f0/a', '.f0.f0', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g1', 'f0/a', '.f0.f1', 'summary', '')
+DIFF     forward_flow.ReachableEdge: souffle 17962598, flowlog 17963217, souffle-only 237474, flowlog-only 238093
+           - ('f0/<globals>:.g0:File:free:0:', 'f0/<globals>:.g1:File:free:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g0:File:free:0:', 'f0/a:.f0.f1:File:free:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g0:File:free:0:', 'f0/a:.f1.f0:File:free:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g0:File:free:0:Main#', 'f0/<globals>:.g1:File:free:0:Main#', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g0:File:free:0:Main#', 'f0/a:.f0.f1:File:free:0:Main#', 'f0/indirect-call/5', 'move')
+           + ('f0/<globals>:.g0:File:free:0:', 'f0/<globals>:.g1:File:free:0:', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g0:File:free:0:', 'f0/a:.f0.f1:File:free:0:', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g0:File:free:0:', 'f0/a:.f1.f0:File:free:0:', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g0:File:free:0:Main#', 'f0/<globals>:.g1:File:free:0:Main#', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g0:File:free:0:Main#', 'f0/a:.f0.f1:File:free:0:Main#', 'f0/call/7', 'move')
+DIFF     natural_flow.ReachableEdge: souffle 17962598, flowlog 17963217, souffle-only 237474, flowlog-only 238093
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g1:File:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f0.f1:File:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f1.f0:File:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/<globals>:.g1:File:free:0:Main#:f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/a:.f0.f1:File:free:0:Main#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g1:File:free:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f0.f1:File:free:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f1.f0:File:free:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/<globals>:.g1:File:free:0:Main#:f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/a:.f0.f1:File:free:0:Main#:f', 'f0/call/7', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 17962598, flowlog 17963217, souffle-only 237474, flowlog-only 238093
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g1:File:free:0:f1#:f', 'f0/indirect-call/13', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g2:File:free:0:f1#:f', 'f0/indirect-call/13', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f1:File:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0::f', 'f0/t3:.f0.f3:File:free:0::f', 'f0/indirect-call/13', 'move', 'f')
+           - ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/a:.f1:File:free:0:Main#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g1:File:free:0:f1#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/<globals>:.g2:File:free:0:f1#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/a:.f1:File:free:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0::f', 'f0/t3:.f0.f3:File:free:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:free:0:Main#:f', 'f0/a:.f1:File:free:0:Main#:f', 'f0/call/7', 'move', 'f')
+summary: 116 equal (1 up to choice-domain witnesses), 4 different
+
+## syn10: Soufflé vs FlowLog, with the hints, 1 worker: hints/r1/syn10/souffle-j1 vs hints/r1/syn10/flowlog-j1
+WITNESS  LostAssign: 76 rows, same choice-domain keys, 61 with another witness
+           - ('Main/call/1', '.f3.f3', 'dest')
+           - ('Main/call/13', '.f3.f3', 'dest')
+           - ('Main/call/17', '.f3.f3', 'dest')
+           - ('Main/call/21', '.f3.f3', 'dest')
+           - ('Main/call/25', '.f3.f3', 'dest')
+           + ('Main/call/1', '.g2.f1', 'dest')
+           + ('Main/call/13', '.g1.f0', 'dest')
+           + ('Main/call/17', '.g1.f0', 'dest')
+           + ('Main/call/21', '.g1.f0', 'dest')
+           + ('Main/call/25', '.g1.f0', 'dest')
+WITNESS  VirtualAssign: 22296 rows, same choice-domain keys, 141 with another witness
+           - ('f0/indirect-call/5', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f2/call/2', 'f2/<globals>', '.g1', 'f2/b', '.f2.f2', 'summary', '')
+           - ('f2/call/2', 'f2/b', '.f3', 'f2/<globals>', '.g0', 'summary', '')
+           - ('f2/indirect-call/11', 'f2/b', '.f0', 'f2/b', '.f2', 'summary', '')
+           - ('f2/indirect-call/11', 'f2/b', '.f0.f1', 'f2/b', '.f2', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'summary', '')
+           + ('f2/call/0', 'f2/<globals>', '.g1', 'f2/b', '.f2.f2', 'summary', '')
+           + ('f2/call/0', 'f2/b', '.f3', 'f2/<globals>', '.g0', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f0', 'f2/b', '.f2', 'summary', '')
+           + ('f2/call/2', 'f2/b', '.f0.f1', 'f2/b', '.f2', 'summary', '')
+DIFF     forward_flow.ReachableEdge: souffle 267246, flowlog 267507, souffle-only 1284, flowlog-only 1545
+           - ('f0/<globals>:.g1:File:restricted:0:', 'f0/<globals>:.g0:File:restricted:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g1:Network:restricted:0:', 'f0/<globals>:.g0:Network:restricted:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g1:Thing:free:0:', 'f0/<globals>:.g0:Thing:free:0:', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g1:Thing:free:0:f2#', 'f0/<globals>:.g0:Thing:free:0:f2#', 'f0/indirect-call/5', 'move')
+           - ('f0/<globals>:.g1:Thing:free:0:f3#Main#', 'f0/<globals>:.g0:Thing:free:0:f3#Main#', 'f0/indirect-call/5', 'move')
+           + ('f0/<globals>:.g1:File:restricted:0:', 'f0/<globals>:.g0:File:restricted:0:', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g1:File:restricted:0:Main#', 'f0/<globals>:.g0:File:restricted:0:Main#', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g1:Network:restricted:0:', 'f0/<globals>:.g0:Network:restricted:0:', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g1:Network:restricted:0:Main#', 'f0/<globals>:.g0:Network:restricted:0:Main#', 'f0/call/7', 'move')
+           + ('f0/<globals>:.g1:Thing:free:0:', 'f0/<globals>:.g0:Thing:free:0:', 'f0/call/7', 'move')
+DIFF     natural_flow.ReachableEdge: souffle 267246, flowlog 267507, souffle-only 1284, flowlog-only 1545
+           - ('f0/<globals>:.g1:File:restricted:0::f', 'f0/<globals>:.g0:File:restricted:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g1:Network:restricted:0::f', 'f0/<globals>:.g0:Network:restricted:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g1:Thing:free:0::f', 'f0/<globals>:.g0:Thing:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g1:Thing:free:0:f2#:f', 'f0/<globals>:.g0:Thing:free:0:f2#:f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g1:Thing:free:0:f3#Main#:f', 'f0/<globals>:.g0:Thing:free:0:f3#Main#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g1:File:restricted:0::f', 'f0/<globals>:.g0:File:restricted:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g1:File:restricted:0:Main#:f', 'f0/<globals>:.g0:File:restricted:0:Main#:f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g1:Network:restricted:0::f', 'f0/<globals>:.g0:Network:restricted:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g1:Network:restricted:0:Main#:f', 'f0/<globals>:.g0:Network:restricted:0:Main#:f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g1:Thing:free:0::f', 'f0/<globals>:.g0:Thing:free:0::f', 'f0/call/7', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 267246, flowlog 267507, souffle-only 1284, flowlog-only 1545
+           - ('f0/<globals>:.g0:File:restricted:0::f', 'f0/<globals>:.g1:File:restricted:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:Network:restricted:0::f', 'f0/<globals>:.g1:Network:restricted:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:Thing:free:0::f', 'f0/<globals>:.g1:Thing:free:0::f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:Thing:free:0:f2#:f', 'f0/<globals>:.g1:Thing:free:0:f2#:f', 'f0/indirect-call/5', 'move', 'f')
+           - ('f0/<globals>:.g0:Thing:free:0:f3#Main#:f', 'f0/<globals>:.g1:Thing:free:0:f3#Main#:f', 'f0/indirect-call/5', 'move', 'f')
+           + ('f0/<globals>:.g0:File:restricted:0::f', 'f0/<globals>:.g1:File:restricted:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:File:restricted:0:Main#:f', 'f0/<globals>:.g1:File:restricted:0:Main#:f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:Network:restricted:0::f', 'f0/<globals>:.g1:Network:restricted:0::f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:Network:restricted:0:Main#:f', 'f0/<globals>:.g1:Network:restricted:0:Main#:f', 'f0/call/7', 'move', 'f')
+           + ('f0/<globals>:.g0:Thing:free:0::f', 'f0/<globals>:.g1:Thing:free:0::f', 'f0/call/7', 'move', 'f')
+summary: 117 equal (2 up to choice-domain witnesses), 3 different
+
+## syn25: Soufflé vs FlowLog, with the hints, 1 worker: hints/r1/syn25/souffle-j1 vs hints/r1/syn25/flowlog-j1
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 6, flowlog-only 6
+           - ('LocallyReachable-ctx', '232198')
+           - ('ctx', '32')
+           - ('import-virtual-assign', '265894')
+           - ('summary-flow-ctx', '97770')
+           - ('virtual-alloc-ctx', '1230')
+           + ('LocallyReachable-ctx', '238864')
+           + ('ctx', '35')
+           + ('import-virtual-assign', '265302')
+           + ('summary-flow-ctx', '100609')
+           + ('virtual-alloc-ctx', '1250')
+DIFF     CallEdge: souffle 340, flowlog 340, souffle-only 8, flowlog-only 8
+           - ('f11/indirect-call/11', 'f18', 'f12#f24#f0#')
+           - ('f11/indirect-call/6', 'f18', 'f12#f24#f0#')
+           - ('f12/indirect-call/13', 'f18', 'f24#f0#')
+           - ('f12/indirect-call/8', 'f18', 'f24#f0#')
+           - ('f14/indirect-call/5', 'f11', 'f13#f5#f12#')
+           + ('f11/indirect-call/11', 'f18', 'f12#f24#f7#')
+           + ('f11/indirect-call/6', 'f18', 'f12#f24#f7#')
+           + ('f12/indirect-call/13', 'f18', 'f24#f7#')
+           + ('f12/indirect-call/8', 'f18', 'f24#f7#')
+           + ('f14/indirect-call/5', 'f11', 'f13#f5#f9#')
+DIFF     LostAssign: souffle 163, flowlog 163, souffle-only 159, flowlog-only 159
+           - ('Main/call/1', '.g2.f0', 'dest')
+           - ('Main/call/13', '.g2.f0', 'dest')
+           - ('Main/call/17', '.g2.f0', 'dest')
+           - ('Main/call/21', '.g2.f0', 'dest')
+           - ('Main/call/25', '.g2.f0', 'dest')
+           + ('Main/call/1', '.g2.f1', 'dest')
+           + ('Main/call/13', '.g2.f1', 'dest')
+           + ('Main/call/17', '.g2.f1', 'dest')
+           + ('Main/call/21', '.g2.f1', 'dest')
+           + ('Main/call/25', '.g2.f1', 'dest')
+DIFF     SummaryAlloc: souffle 1680, flowlog 1710, souffle-only 120, flowlog-only 150
+           - ('f11', '-1', '.func', 'f11', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f13', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f16', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f17', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f18', 'f12#f24#f0#')
+           + ('f11', '-1', '.func', 'f11', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f13', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f16', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f17', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f18', 'f12#f24#f7#')
+DIFF     SummaryFlow: souffle 155193, flowlog 158032, souffle-only 10232, flowlog-only 13071
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g0', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g1', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g2', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '0', '', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '0', '.f0', 'f12#f24#f0#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g0', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g1', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g2', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '0', '', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '0', '.f0', 'f12#f24#f7#')
+DIFF     VirtualAlloc: souffle 2593, flowlog 2613, souffle-only 130, flowlog-only 150
+           - ('f11/a', '.func', 'f11', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f13', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f16', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f17', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f18', 'f12#f24#f0#')
+           + ('f11/a', '.func', 'f11', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f13', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f16', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f17', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f18', 'f12#f24#f7#')
+DIFF     VirtualAssign: souffle 265894, flowlog 265302, souffle-only 16887, flowlog-only 16295 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=265894 flowlog=265302]
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g0', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g0', 'f0/t3', '.f1.f0', 'summary', '')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g1', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f0.f1', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f0.f3', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f1.f0', 'summary', '')
+           + ('f0/call/7', 'f0/<globals>', '.g0', 'f0/a', '.f2', 'summary', '')
+DIFF     flow.ReachableVertex: souffle 407845, flowlog 407845, souffle-only 30840, flowlog-only 30840
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f0#', 'f')
+           - ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f0#', 'f')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f7#', 'f')
+           + ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f7#', 'f')
+DIFF     forward_flow.ReachableEdge: souffle 17962598, flowlog 17975571, souffle-only 1666526, flowlog-only 1679499
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#', 'Main/call/25', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#', 'Main/call/25', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#', 'Main/call/25', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#', 'Main/call/25', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+DIFF     forward_flow.ReachableVertex: souffle 407845, flowlog 407845, souffle-only 30840, flowlog-only 30840
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f0#')
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f0#')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f0#')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f0#')
+           - ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f0#')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f7#')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f7#')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f7#')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f7#')
+           + ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f7#')
+DIFF     natural_flow.ReachableEdge: souffle 17962598, flowlog 17975571, souffle-only 1666526, flowlog-only 1679499
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 17962598, flowlog 17975571, souffle-only 1666526, flowlog-only 1679499
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+summary: 108 equal, 12 different
+
+## syn10: Soufflé vs FlowLog, without the hints, 1 worker: no-hints/r1/syn10/souffle-noplan-j1 vs no-hints/r1/syn10/flowlog-noplan-j1
+WITNESS  LostAssign: 76 rows, same choice-domain keys, 61 with another witness
+           - ('Main/call/1', '.f3.f3', 'dest')
+           - ('Main/call/13', '.f3.f3', 'dest')
+           - ('Main/call/17', '.f3.f3', 'dest')
+           - ('Main/call/21', '.f3.f3', 'dest')
+           - ('Main/call/25', '.f3.f3', 'dest')
+           + ('Main/call/1', '.g2.f1', 'dest')
+           + ('Main/call/13', '.g1.f0', 'dest')
+           + ('Main/call/17', '.g1.f0', 'dest')
+           + ('Main/call/21', '.g1.f0', 'dest')
+           + ('Main/call/25', '.g1.f0', 'dest')
+WITNESS  VirtualAssign: 22296 rows, same choice-domain keys, 69 with another witness
+           - ('f2/call/2', 'f2/<globals>', '.g1', 'f2/b', '.f2.f2', 'summary', '')
+           - ('f2/call/2', 'f2/b', '.f2', 'f2/<globals>', '.g1', 'summary', '')
+           - ('f2/call/2', 'f2/b', '.f2.f2', 'f2/<globals>', '.g0', 'summary', '')
+           - ('f2/call/2', 'f2/b', '.f3', 'f2/<globals>', '.g0', 'summary', '')
+           - ('f3/call/13', 'f3/t3', '.f1.f2', 'f3/<globals>', '.g0', 'summary', '')
+           + ('f2/call/0', 'f2/<globals>', '.g1', 'f2/b', '.f2.f2', 'summary', '')
+           + ('f2/call/0', 'f2/b', '.f2', 'f2/<globals>', '.g1', 'summary', '')
+           + ('f2/call/0', 'f2/b', '.f2.f2', 'f2/<globals>', '.g0', 'summary', '')
+           + ('f2/call/0', 'f2/b', '.f3', 'f2/<globals>', '.g0', 'summary', '')
+           + ('f3/call/8', 'f3/t3', '.f1.f2', 'f3/<globals>', '.g0', 'summary', '')
+DIFF     forward_flow.ReachableEdge: souffle 267512, flowlog 267507, souffle-only 566, flowlog-only 561
+           - ('f2/<globals>:.g1:File:restricted:0:', 'f2/b:.f2.f2:File:restricted:0:', 'f2/call/2', 'move')
+           - ('f2/<globals>:.g1:File:restricted:0:Main#', 'f2/b:.f2.f2:File:restricted:0:Main#', 'f2/call/2', 'move')
+           - ('f2/<globals>:.g1:Network:restricted:0:', 'f2/b:.f2.f2:Network:restricted:0:', 'f2/call/2', 'move')
+           - ('f2/<globals>:.g1:Network:restricted:0:Main#', 'f2/b:.f2.f2:Network:restricted:0:Main#', 'f2/call/2', 'move')
+           - ('f2/<globals>:.g1:Thing:free:0:', 'f2/b:.f2.f2:Thing:free:0:', 'f2/call/2', 'move')
+           + ('f2/<globals>:.g1:File:restricted:0:', 'f2/b:.f2.f2:File:restricted:0:', 'f2/call/0', 'move')
+           + ('f2/<globals>:.g1:File:restricted:0:Main#', 'f2/b:.f2.f2:File:restricted:0:Main#', 'f2/call/0', 'move')
+           + ('f2/<globals>:.g1:Network:restricted:0:', 'f2/b:.f2.f2:Network:restricted:0:', 'f2/call/0', 'move')
+           + ('f2/<globals>:.g1:Network:restricted:0:Main#', 'f2/b:.f2.f2:Network:restricted:0:Main#', 'f2/call/0', 'move')
+           + ('f2/<globals>:.g1:Thing:free:0:', 'f2/b:.f2.f2:Thing:free:0:', 'f2/call/0', 'move')
+DIFF     natural_flow.ReachableEdge: souffle 267512, flowlog 267507, souffle-only 566, flowlog-only 561
+           - ('f2/<globals>:.g1:File:restricted:0::f', 'f2/b:.f2.f2:File:restricted:0::f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g1:File:restricted:0:Main#:f', 'f2/b:.f2.f2:File:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g1:Network:restricted:0::f', 'f2/b:.f2.f2:Network:restricted:0::f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g1:Network:restricted:0:Main#:f', 'f2/b:.f2.f2:Network:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g1:Thing:free:0::f', 'f2/b:.f2.f2:Thing:free:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g1:File:restricted:0::f', 'f2/b:.f2.f2:File:restricted:0::f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g1:File:restricted:0:Main#:f', 'f2/b:.f2.f2:File:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g1:Network:restricted:0::f', 'f2/b:.f2.f2:Network:restricted:0::f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g1:Network:restricted:0:Main#:f', 'f2/b:.f2.f2:Network:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g1:Thing:free:0::f', 'f2/b:.f2.f2:Thing:free:0::f', 'f2/call/0', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 267512, flowlog 267507, souffle-only 566, flowlog-only 561
+           - ('f2/<globals>:.g0:File:restricted:0::f', 'f2/b:.f2.f2:File:restricted:0::f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g0:File:restricted:0::f', 'f2/b:.f3:File:restricted:0::f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g0:File:restricted:0:Main#:f', 'f2/b:.f2.f2:File:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g0:File:restricted:0:Main#:f', 'f2/b:.f3:File:restricted:0:Main#:f', 'f2/call/2', 'move', 'f')
+           - ('f2/<globals>:.g0:Network:restricted:0::f', 'f2/b:.f2.f2:Network:restricted:0::f', 'f2/call/2', 'move', 'f')
+           + ('f2/<globals>:.g0:File:restricted:0::f', 'f2/b:.f2.f2:File:restricted:0::f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g0:File:restricted:0::f', 'f2/b:.f3:File:restricted:0::f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g0:File:restricted:0:Main#:f', 'f2/b:.f2.f2:File:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g0:File:restricted:0:Main#:f', 'f2/b:.f3:File:restricted:0:Main#:f', 'f2/call/0', 'move', 'f')
+           + ('f2/<globals>:.g0:Network:restricted:0::f', 'f2/b:.f2.f2:Network:restricted:0::f', 'f2/call/0', 'move', 'f')
+summary: 117 equal (2 up to choice-domain witnesses), 3 different
+
+## syn25: Soufflé vs FlowLog, without the hints, 1 worker: no-hints/r1/syn25/souffle-noplan-j1 vs no-hints/r1/syn25/flowlog-noplan-j1
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 6, flowlog-only 6
+           - ('LocallyReachable-ctx', '232198')
+           - ('ctx', '34')
+           - ('import-virtual-assign', '264246')
+           - ('summary-flow-ctx', '97770')
+           - ('virtual-alloc-ctx', '1230')
+           + ('LocallyReachable-ctx', '238864')
+           + ('ctx', '35')
+           + ('import-virtual-assign', '265302')
+           + ('summary-flow-ctx', '100609')
+           + ('virtual-alloc-ctx', '1250')
+DIFF     CallEdge: souffle 340, flowlog 340, souffle-only 7, flowlog-only 7
+           - ('f11/indirect-call/11', 'f18', 'f12#f24#f0#')
+           - ('f11/indirect-call/6', 'f18', 'f12#f24#f0#')
+           - ('f12/indirect-call/13', 'f18', 'f24#f0#')
+           - ('f12/indirect-call/8', 'f18', 'f24#f0#')
+           - ('f14/indirect-call/5', 'f11', 'f13#f5#f12#')
+           + ('f11/indirect-call/11', 'f18', 'f12#f24#f7#')
+           + ('f11/indirect-call/6', 'f18', 'f12#f24#f7#')
+           + ('f12/indirect-call/13', 'f18', 'f24#f7#')
+           + ('f12/indirect-call/8', 'f18', 'f24#f7#')
+           + ('f14/indirect-call/5', 'f11', 'f13#f5#f9#')
+DIFF     LostAssign: souffle 163, flowlog 163, souffle-only 159, flowlog-only 159
+           - ('Main/call/1', '.g2.f0', 'dest')
+           - ('Main/call/13', '.g2.f0', 'dest')
+           - ('Main/call/17', '.g2.f0', 'dest')
+           - ('Main/call/21', '.g2.f0', 'dest')
+           - ('Main/call/25', '.g2.f0', 'dest')
+           + ('Main/call/1', '.g2.f1', 'dest')
+           + ('Main/call/13', '.g2.f1', 'dest')
+           + ('Main/call/17', '.g2.f1', 'dest')
+           + ('Main/call/21', '.g2.f1', 'dest')
+           + ('Main/call/25', '.g2.f1', 'dest')
+DIFF     SummaryAlloc: souffle 1680, flowlog 1710, souffle-only 90, flowlog-only 120
+           - ('f11', '-1', '.func', 'f11', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f13', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f16', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f17', 'f12#f24#f0#')
+           - ('f11', '-1', '.func', 'f18', 'f12#f24#f0#')
+           + ('f11', '-1', '.func', 'f11', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f13', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f16', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f17', 'f12#f24#f7#')
+           + ('f11', '-1', '.func', 'f18', 'f12#f24#f7#')
+DIFF     SummaryFlow: souffle 155193, flowlog 158032, souffle-only 7440, flowlog-only 10279
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g0', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g1', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '-3', '.g2', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '0', '', 'f12#f24#f0#')
+           - ('f11', '-1', '.f0', 'f11', '0', '.f0', 'f12#f24#f0#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g0', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g1', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '-3', '.g2', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '0', '', 'f12#f24#f7#')
+           + ('f11', '-1', '.f0', 'f11', '0', '.f0', 'f12#f24#f7#')
+DIFF     VirtualAlloc: souffle 2593, flowlog 2613, souffle-only 110, flowlog-only 130
+           - ('f11/a', '.func', 'f11', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f13', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f16', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f17', 'f12#f24#f0#')
+           - ('f11/a', '.func', 'f18', 'f12#f24#f0#')
+           + ('f11/a', '.func', 'f11', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f13', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f16', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f17', 'f12#f24#f7#')
+           + ('f11/a', '.func', 'f18', 'f12#f24#f7#')
+DIFF     VirtualAssign: souffle 264246, flowlog 265302, souffle-only 13751, flowlog-only 14807 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=264246 flowlog=265302]
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g0', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g1', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           - ('f0/indirect-call/13', 'f0/<globals>', '.g2', 'f0/<globals>', '.g0', 'hinline', 'f1#')
+           + ('f0/indirect-call/5', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'hinline', 'f1#')
+           + ('f0/indirect-call/5', 'f0/<globals>', '.g0', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           + ('f0/indirect-call/5', 'f0/<globals>', '.g1', 'f0/<globals>', '.g0', 'hinline', 'f1#')
+           + ('f0/indirect-call/5', 'f0/<globals>', '.g1', 'f0/<globals>', '.g2', 'hinline', 'f1#')
+           + ('f0/indirect-call/5', 'f0/<globals>', '.g2', 'f0/<globals>', '.g0', 'hinline', 'f1#')
+DIFF     flow.ReachableVertex: souffle 407845, flowlog 407845, souffle-only 30840, flowlog-only 30840
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f0#', 'f')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f0#', 'f')
+           - ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f0#', 'f')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f7#', 'f')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f7#', 'f')
+           + ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f7#', 'f')
+DIFF     forward_flow.ReachableEdge: souffle 17958735, flowlog 17975571, souffle-only 1650799, flowlog-only 1667635
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#', 'Main/call/25', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#', 'Main/call/25', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#', 'Main/call/25', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#', 'Main/call/25', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#', 'Main/call/1', 'move')
+DIFF     forward_flow.ReachableVertex: souffle 407845, flowlog 407845, souffle-only 30840, flowlog-only 30840
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f0#')
+           - ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f0#')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f0#')
+           - ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f0#')
+           - ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f0#')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f12#f24#f7#')
+           + ('Main/<globals>', '.g0', 'File', 'free', '0', 'f24#f7#')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f12#f24#f7#')
+           + ('Main/<globals>', '.g0', 'Thing', 'free', '0', 'f24#f7#')
+           + ('Main/<globals>', '.g1', 'File', 'free', '0', 'f12#f24#f7#')
+DIFF     natural_flow.ReachableEdge: souffle 17958735, flowlog 17975571, souffle-only 1650799, flowlog-only 1667635
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 17958735, flowlog 17975571, souffle-only 1650799, flowlog-only 1667635
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f0#:f', 'Main/call/25', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           - ('Main/<globals>:.g0:File:free:0:f12#f24#f0#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f0#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g1:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/<globals>:.g2:File:free:0:f12#f24#f7#:f', 'Main/call/25', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f0:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f1:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+           + ('Main/<globals>:.g0:File:free:0:f12#f24#f7#:f', 'Main/s0:.f0.f2:File:free:0:f12#f24#f7#:f', 'Main/call/1', 'move', 'f')
+summary: 108 equal, 12 different
+
+## CTADL's query reports (--format summary), md5
+syn10: c101cadbede8a8090d8e188ea77abd92: 34 reports (24 here, 10 in results/bench)
+syn25: bfc83cdcced6369bdab188dbd952d167: 34 reports (24 here, 10 in results/bench)
