@@ -701,6 +701,13 @@ are in seconds:
   of other work (the index's takes 0.1–1.2 s);
 - **RSS:** the engine's peak memory.
 
+The runs in this section predate the engine option: the port's standalone driver ran the same
+FlowLog programs and conversions. With the engine, on FlowLog `main` at `b03d2fd`, a run on syn25
+with 32 workers took about as long as the runs below (`results/bench/engine.txt`): FlowLog's index
+engine 13.3 s instead of 13.0 s, its query's computation 10.3 s instead of 10.8 s, and the
+conversion 19.1 s instead of 19.2 s. Soufflé's index and query engines took 12.8 s and 36.9 s
+instead of 12.8 s and 36.7 s.
+
 Soufflé as CTADL runs it, and FlowLog:
 
 | Program | Backend | Workers | Index wall | Index engine | Index RSS | Query wall | Query engine | Query conv. | Query RSS |
