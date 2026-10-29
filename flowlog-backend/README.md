@@ -84,7 +84,7 @@ into CTADL's sqlite layout, which takes about 19 s. Compiling takes 1.2–1.8× 
 binaries are 19–28× larger ([Performance](#performance)).
 
 **FlowLog bugs:** the port found thirteen (B1–B13), each with a minimal repro in `repros/`. Each is
-filed on FlowLog, with a fix PR; the fixes for B1, B2, B4, B6, B7 and B11 are merged ([FlowLog
+filed on FlowLog, with a fix PR; the fixes for B1, B2, B4, B6–B8 and B11 are merged ([FlowLog
 findings](#flowlog-findings)). CTADL's program needs the fix for B1. The translation works around
 the others, except B6 and some shapes of B4, which CTADL's program does not have.
 
@@ -154,9 +154,9 @@ export PATH=$PWD/bin:$PATH FLOWLOG_CARGO_TARGET=$PWD/fltarget
 
 `ctadl-port` is FlowLog's `main` at `b03d2fd`, which has the B1 fix, PR
 [#477](https://github.com/flowlog-rs/flowlog/pull/477). The runs reported here used `main` at
-`84b3a1c` plus #477 as it was before it was merged (`fed6293`). On `b03d2fd`, CTADL's taint-front
-tests, the semantics suite and the `choice-domain` test give the same results. The port needs none
-of FlowLog's open fixes.
+`84b3a1c` plus #477 as it was before it was merged (`fed6293`). On `b03d2fd`, and on `main` at
+`8ce7b5e`, CTADL's taint-front tests, the semantics suite and the `choice-domain` test give the
+same results. The port needs none of FlowLog's open fixes.
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
 analyses and the cargo target dir take a few GB ([Disk usage](#disk-usage)). Put the workspace,
@@ -352,7 +352,7 @@ Soufflé stops a program with an error in three cases:
 FlowLog's operators panic on a zero divisor too, but FlowLog also evaluates expressions on
 bindings Soufflé never reaches:
 
-- it tests a rule's comparisons before its atoms' constants (bug B8);
+- it tests a rule's comparisons before its atoms' constants (bug B8, fixed in `main` by #481);
 - it computes a negated rule's head on the rows the negation removes (B9).
 
 A panic there would stop runs that Soufflé completes. The port's versions (`souffle_to_number`,
@@ -515,7 +515,7 @@ Both backends ran with 32 workers (`-j 32`). That is CTADL's default on the test
 has 64 hardware threads; CTADL uses half the CPUs. The runs used a fresh clone of this branch and
 FlowLog `main` at `84b3a1c` plus #477, with FlowLog's analyses compiled from scratch. An earlier
 round with 4 workers gave the same results, and so do the taint-front tests on `main` at `b03d2fd`
-([Setup](#setup)). Each run's line is in `results/taint-front/summary.txt`,
+and `8ce7b5e` ([Setup](#setup)). Each run's line is in `results/taint-front/summary.txt`,
 `results/corpus-ctadl/summary.txt`, `results/corpus-ctadl-rs/summary.txt` and
 `results/variants/*/summary.txt`.
 
@@ -886,7 +886,9 @@ another FlowLog checkout than the workspace's. The table compares the FlowLog re
 The outputs are in `results/repros/`: `souffle.txt`, `main.txt` and `with-477.txt`.
 `main-b03d2fd.txt` has the results on `main` at `b03d2fd`, which has the fixes for B1, B2, B4, B6,
 B7 and B11: those repros give Soufflé's results there, except `count_all_wild` (B2; [Behaviour
-differences](#behaviour-differences)) and B7's `strlen` and `substr`.
+differences](#behaviour-differences)) and B7's `strlen` and `substr`. `main-8ce7b5e.txt` has the
+results on `main` at `8ce7b5e`, which also has B8's fix: only `filter_order` changes, to Soufflé's
+result.
 
 **Bugs**
 
@@ -911,7 +913,7 @@ FlowLog tests the repetition after the comparison too, but this is not a differe
 Soufflé 2.5 also tests such variables after the comparisons, and stops on `R(1, 2, 0)`.
 
 Each bug is filed on flowlog-rs/flowlog, with its repro rechecked on `84b3a1c`, and has a fix PR.
-The status is as of `main` at `b03d2fd`.
+The status is as of `main` at `8ce7b5e`.
 
 | Bug | Issue | Fix | Status |
 |---|---|---|---|
@@ -922,7 +924,7 @@ The status is as of `main` at `b03d2fd`.
 | B5 | [#468](https://github.com/flowlog-rs/flowlog/issues/468) | [#486](https://github.com/flowlog-rs/flowlog/pull/486) | open |
 | B6 | [#469](https://github.com/flowlog-rs/flowlog/issues/469) | [#479](https://github.com/flowlog-rs/flowlog/pull/479) | merged |
 | B7 | [#470](https://github.com/flowlog-rs/flowlog/issues/470), for `^` only | [#480](https://github.com/flowlog-rs/flowlog/pull/480); [#489](https://github.com/flowlog-rs/flowlog/pull/489) also makes `^` exact for an exponent past `u32` | merged |
-| B8 | [#471](https://github.com/flowlog-rs/flowlog/issues/471) | [#481](https://github.com/flowlog-rs/flowlog/pull/481) | open |
+| B8 | [#471](https://github.com/flowlog-rs/flowlog/issues/471) | [#481](https://github.com/flowlog-rs/flowlog/pull/481) | merged |
 | B9 | [#472](https://github.com/flowlog-rs/flowlog/issues/472) | [#482](https://github.com/flowlog-rs/flowlog/pull/482) | open |
 | B10 | [#473](https://github.com/flowlog-rs/flowlog/issues/473) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) | open |
 | B11 | [#474](https://github.com/flowlog-rs/flowlog/issues/474) | [#487](https://github.com/flowlog-rs/flowlog/pull/487); [#492](https://github.com/flowlog-rs/flowlog/pull/492) does the same for an `as` whose operand is not a literal ([#490](https://github.com/flowlog-rs/flowlog/issues/490)) | merged |
@@ -968,7 +970,8 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
 - **Unsupported:** five repros, none of which CTADL needs. The translator rejects
   `agg_computed`, `agg_body_binding` (B4) and `agg_computed_lifted`. FlowLog fails on
   `agg_shared_join` and `agg_many_readers` (B6). On `main` at `b03d2fd`, these two give Soufflé's
-  results, and the others are unchanged (`results/repros/translated-b03d2fd.txt`).
+  results, and the others are unchanged (`results/repros/translated-b03d2fd.txt`); `8ce7b5e` gives
+  the same results.
 - **The rest:** both engines reject `agg_min_string`, and the driver handles `empty_output`.
   `cast_literal`, `literal_overflow`, `udf_grouped_arg`, `udf_strlen_arg` and the `lattice_*`
   repros are FlowLog programs. The semantics suite's `widths.dl` tests the rewrites for B5, B10,
@@ -995,11 +998,11 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
 
 1. **Native `choice-domain`**, or an aggregate that picks one witness per key and never revises it
    inside recursion. It is the only non-syntactic gap, and it would replace the stateful UDFs.
-2. **Merge the remaining fixes**, for B3, B5, B8–B10, B12 and B13 (those for B1, B2, B4, B6, B7 and
-   B11 are merged). B8 and B9 make FlowLog evaluate expressions on rows that the rule excludes. A
-   port must then make every function total, and stop the run itself where Soufflé would
-   ([Runtime errors](#runtime-errors)). B5, B10, B12 and B13 are rustc lints on the generated code,
-   which the generated crate could allow.
+2. **Merge the remaining fixes**, for B3, B5, B9, B10, B12 and B13 (those for B1, B2, B4, B6–B8 and
+   B11 are merged). B9 makes FlowLog evaluate expressions on rows that a negation removes, as B8
+   did on rows that an atom's constants exclude. A port must then make every function total, and
+   stop the run itself where Soufflé would ([Runtime errors](#runtime-errors)). B5, B10, B12 and
+   B13 are rustc lints on the generated code, which the generated crate could allow.
 3. **String interning that scales with workers**
    ([#498](https://github.com/flowlog-rs/flowlog/issues/498)). With `--str-intern`, the generated
    code interns or resolves strings on every row, at 859 `intern` and 1,024 `resolve` call sites in
@@ -1091,7 +1094,7 @@ driver does, with FlowLog `main` at `84b3a1c` plus #477 (`results/repros/transla
 
 | Component | Version |
 |---|---|
-| FlowLog | `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477, and on `main` at `b03d2fd` (#488), which has #477 merged |
+| FlowLog | `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477, and on `main` at `b03d2fd` (#488) and `8ce7b5e` (#481), which have #477 merged |
 | CTADL | 0.14.1, `4f6f8cb` |
 | ctadl-rs | `7c98b73e` |
 | Soufflé | 2.5 |
