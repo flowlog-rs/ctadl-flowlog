@@ -6,6 +6,8 @@ ex3, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal;
 ex3, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; codeflows ok
 sanitizer1, index-query souffle-flowlog: summary: 120 equal, 0 different; sarif: equal; nocodeflows ok
 sanitizer1, index-query flowlog-souffle: summary: 120 equal, 0 different; sarif: equal; nocodeflows ok
+check-taintfront2, step statuses: souffle 0 0 0 0 0 0 1 1 1 0 0 0 1, flowlog 0 0 0 1 1 0 1 1 1 0 0 0 1: FlowLog refuses the 2 steps with --no-compile-analysis, as expected
+check-taintfront2, outputs: summary: 120 equal, 0 different; sarif: equal; gml: equal (6 nodes, 3 edges)
 --dl fragment, flowlog1: same files as Soufflé (19 rows); summary: 120 equal, 0 different; sarif: equal
 --dl fragment, flowlog2: same files as Soufflé (19 rows); summary: 120 equal, 0 different; sarif: equal
 --dl fragment, FlowLog compilations: 1

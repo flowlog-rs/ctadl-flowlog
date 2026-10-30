@@ -1,11 +1,16 @@
 #!/bin/bash
 # Checks of `ctadl --engine` that run_taintfront.py does not make. The results
-# are Soufflé's when every line says `0 different`, `sarif: equal`, `ok` and
-# `same files as Soufflé`, and the analysis compiles once; the exit status is
-# 1 otherwise.
+# are Soufflé's when every line says `0 different`, `sarif: equal`, `ok`,
+# `as expected`, `gml: equal` and `same files as Soufflé`, and the analysis
+# compiles once; the exit status is 1 otherwise.
 #  - Engines mixed: 4 taint-front tests whose query runs on the other engine's
 #    index, both ways round, compared with Soufflé for both phases (database
 #    and SARIF), and CTADL's checks of the test.
+#  - CTADL's tests/bin/check-taintfront2 with CTADL_ENGINE set to each engine:
+#    its steps, as it runs them, after check-taintfront's for global2. The
+#    script ignores their status; here they must be Soufflé's, but for the
+#    two that run Soufflé's interpreter (--no-compile-analysis), which FlowLog
+#    refuses before touching the index. Then the outputs are compared.
 #  - A --dl query fragment with file inputs and outputs (plain, records,
 #    nullary, a component instance, a subdirectory, further outputs of a
 #    relation, one the query writes to its database) on alias1, run with
@@ -70,6 +75,41 @@ report() {
         "$d/$t.sarif"); $(checks "$d" "$t" | paste -sd ' ')"
     done
   done
+
+  G=$O/taintfront2
+  for e in souffle flowlog; do
+    mkdir -p "$G/$e"
+    (
+      cd "$G/$e" || exit 1
+      export CTADL_ENGINE=$e
+      st() { "$@" >> run.log 2>&1; echo $?; }
+      st ctadl import taint-front "$T/global2.tnt" -o "$G/$e/global2" -f
+      st ctadl --dir "$G/$e/global2" index -f
+      st ctadl --dir "$G/$e/global2" query --format sarif -o "$G/$e/global2.sarif"
+      # check-taintfront2's steps; its 4th to 6th and its last expect a failure
+      st ctadl --dir "$G/$e/global2" index -f --no-compile-analysis
+      st ctadl --dir "$G/$e/global2" query --no-compile-analysis --format sarif -o global2.sarif
+      st python3 "$CTADL/tests/bin/sarif_has_code_flows.py" global2.sarif
+      st ctadl --dir "$G/$e/global2" index
+      st ctadl index -f facts2
+      rm -f ctadlir.db
+      st ctadl query
+      st ctadl --dir "$G/$e/global2" index -vv -f --no-interprocedural-data-flow
+      st ctadl --dir "$G/$e/global2" export --format gml -o global2.gml
+      st ctadl --dir "$G/$e/global2" query --format sarif -o global2.sarif
+      st python3 "$CTADL/tests/bin/sarif_has_code_flows.py" "$G/$e/global2/global2.sarif"
+    ) | paste -sd ' ' > "$G/$e.txt"
+  done
+  s=$(< "$G/souffle.txt") f=$(< "$G/flowlog.txt")
+  if [ "$s" = "0 0 0 0 0 0 1 1 1 0 0 0 1" ] && [ "$f" = "0 0 0 1 1 0 1 1 1 0 0 0 1" ]; then
+    v="FlowLog refuses the 2 steps with --no-compile-analysis, as expected"
+  else
+    v="UNEXPECTED (logs: $G/*/run.log)"
+  fi
+  echo "check-taintfront2, step statuses: souffle $s, flowlog $f: $v"
+  echo "check-taintfront2, outputs: $(compare_db "$G/souffle/global2/ctadlir.db" "$G/flowlog/global2/ctadlir.db");" \
+    "$(compare_sarif "$G/souffle/global2/global2.sarif" "$G/flowlog/global2/global2.sarif");" \
+    "$(python3 "$HERE/compare_gml.py" "$G/souffle/global2/global2.gml" "$G/flowlog/global2/global2.gml" 2>&1)"
 
   F=$O/frag
   mkdir -p "$F"
@@ -158,6 +198,7 @@ END
 }
 
 report | tee "$O/summary.txt"
-! grep -q -e FAILED -e DIFFER -e MISSING "$O/summary.txt" &&
-  [ "$(grep -c ', 0 different; sarif: equal' "$O/summary.txt")" = 10 ] &&
+! grep -q -e FAILED -e DIFFER -e MISSING -e UNEXPECTED "$O/summary.txt" &&
+  [ "$(grep -c ', 0 different; sarif: equal' "$O/summary.txt")" = 11 ] &&
+  grep -q '^check-taintfront2, outputs: .*; gml: equal (' "$O/summary.txt" &&
   grep -q '^--dl fragment, FlowLog compilations: 1$' "$O/summary.txt"

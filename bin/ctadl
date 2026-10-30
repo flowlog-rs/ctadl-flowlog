@@ -944,9 +944,6 @@ def build_analysis(
     With --engine flowlog, the analysis is compiled with FlowLog instead"""
 
     if args.engine == "flowlog":
-        if args.souffle_arg or not args.compile_analysis_opt:
-            error("--souffle-arg and --no-compile-analysis need --engine souffle")
-            exit(1)
         from ctadl import flowlog
 
         return FlowLogCompiledAnalysis(flowlog.FlowLogAnalysis(Path(src)))
@@ -1359,6 +1356,19 @@ def engine_name(name: str) -> str:
             f"unknown engine '{name}' (choose from {', '.join(ENGINES)}; check CTADL_ENGINE)"
         )
     return name
+
+
+def check_engine_args(args: Namespace) -> None:
+    """Rejects Soufflé-only options with --engine flowlog, before a command
+    touches its outputs (index -f first deletes the index)"""
+    if getattr(args, "engine", None) == "flowlog" and (
+        args.souffle_arg or not args.compile_analysis_opt
+    ):
+        error(
+            "error: --souffle-arg and --no-compile-analysis need --engine souffle",
+            remediations="try '--engine souffle'; CTADL_ENGINE sets the default",
+        )
+        exit(1)
 
 
 def make_parser_with_common_options(parser, overwrite=True):
@@ -2362,6 +2372,7 @@ def main(argv):
         parser.print_help(sys.stderr)
         exit(1)
     args = parser.parse_args()
+    check_engine_args(args)
     if "input_index" not in args:
         args.input_index = "ctadlir.db"
     if "output_index" not in args:
