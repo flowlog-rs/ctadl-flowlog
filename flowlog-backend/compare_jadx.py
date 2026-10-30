@@ -23,7 +23,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import compare_db as c  # noqa: E402
 
-KEY = re.compile(r"\.intent\[([^\]]*)\]\.(\d+)")
+KEY = re.compile(r"\.intent\[([^\[\]]*(?:\[\])*)\]\.(\d+)")
+NUMBER = re.compile(r"/(\d+)(?!\d)")
 orig_rows = c.rows
 maps: dict = {}
 
@@ -50,9 +51,18 @@ def build(db) -> tuple:
     if len(set(keys.values())) != len(keys):
         sys.exit("intent key renaming is not injective")
     print(f"renamed {len(objs)} MakeObjectID objects, {len(keys)} intent keys", file=sys.stderr)
-    alts = sorted(objs, key=len, reverse=True)
-    obj_re = re.compile("|".join(re.escape(o) + r"(?!\d)" for o in alts)) if objs else None
-    return obj_re, objs, keys
+    # {number: [(type, renamed object)], longest type first}: rename() finds
+    # an object by the `/<number>` it ends with, in time linear in the text.
+    # One regex alternating over all objects tries each of them at every
+    # position: comparing netguard (5,005 objects) took over 28 minutes with
+    # it, 48 s without.
+    types: dict = {}
+    for obj, new in objs.items():
+        type_, _, number = obj.rpartition("/")
+        types.setdefault(number, []).append((type_, new))
+    for ts in types.values():
+        ts.sort(key=lambda t: len(t[0]), reverse=True)
+    return types, keys
 
 
 def ords(db) -> dict:
@@ -107,9 +117,19 @@ def ords(db) -> dict:
 
 
 def rename(text: str, maps: tuple) -> str:
-    obj_re, objs, keys = maps
-    if obj_re is not None:
-        text = obj_re.sub(lambda m: objs[m.group(0)], text)
+    """Renames each object leftmost first, the longest at a position, like
+    a regex alternating over the objects, longest first: an object starts
+    with a JVM type, which holds no `/<number>` that ends an object."""
+    types, keys = maps
+    parts, done = [], 0
+    for m in NUMBER.finditer(text):
+        for type_, new in types.get(m.group(1), ()):
+            start = m.start() - len(type_)
+            if start >= done and text.startswith(type_, start):
+                parts += (text[done:start], new)
+                done = m.end()
+                break
+    text = "".join(parts) + text[done:]
     return KEY.sub(
         lambda m: f".intent[{m.group(1)}].{keys.get(m.group(2), '?' + m.group(2))}", text
     )
