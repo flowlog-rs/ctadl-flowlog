@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict, deque
 from enum import Enum
-from typing import Generic, Iterator, Optional, TypeVar
+from typing import Generic, Iterator, KeysView, Optional, TypeVar
 
 from .functions import Dict
 
@@ -62,11 +62,14 @@ class BfsQueue:
 
 class AdjacencyGraph1(Generic[NodeTy]):
     """
-    Graph with an adjacency list representation. Keeps successors only
+    Graph with an adjacency list representation. Keeps successors only, in the
+    order in which their edges were added, so that searches visit them in that
+    order
     """
 
     def __init__(self):
-        self._successors: defaultdict[NodeTy, set[NodeTy]] = defaultdict(set)
+        # The keys of a dict are a set that keeps insertion order
+        self._successors: defaultdict[NodeTy, dict[NodeTy, None]] = defaultdict(dict)
 
     def add_node(self, node: NodeTy) -> NodeTy:
         self._successors[node]
@@ -77,12 +80,12 @@ class AdjacencyGraph1(Generic[NodeTy]):
         Adds an edge from src to dst to the graph.
         """
 
-        self._successors[src].add(dst)
+        self._successors[src][dst] = None
         self._successors[dst]
 
     def remove_edge(self, *, src: NodeTy, dst: NodeTy) -> None:
         logger.debug(f"remove_edge {src} -> {dst}")
-        self._successors[src].remove(dst)
+        del self._successors[src][dst]
         if not self._successors[src]:
             del self._successors[src]
 
@@ -103,8 +106,8 @@ class AdjacencyGraph1(Generic[NodeTy]):
     def freeze(self) -> None:
         self._successors.default_factory = None  # freeze
 
-    def successors(self, node: NodeTy) -> set[NodeTy]:
-        return self._successors.get(node, set())
+    def successors(self, node: NodeTy) -> KeysView[NodeTy]:
+        return self._successors.get(node, {}).keys()
 
 
 class VertexState(Enum):

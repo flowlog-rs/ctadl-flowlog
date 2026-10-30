@@ -994,30 +994,52 @@ def _load_taint_set(cx: Context):
 
 
 def _load_taint_graph(cx: Context, dir: SliceDirection):
-    """Loads either the forward or backward graph"""
+    """Loads either the forward or backward graph
+
+    Vertex ids come from `ord`, so their order depends on the engine and, with
+    several threads, on timing. The path search breaks ties in the order in
+    which it meets vertices, and that decides how many paths it finds. So the
+    graph adds edges, and lists sources and sinks, in the order of the
+    vertices' contents instead.
+    """
     cur = cx.conn.cursor()
     flow = "forward_flow" if dir.is_forward() else "backward_flow"
-    edge_iter = (
-        TaintGraphEdgeInput(src=row["src"], dst=row["dst"])
-        for row in execute(
-            cur,
-            (
+    rank = {
+        id: i
+        for i, (id,) in enumerate(
+            execute(
+                cur,
                 f"""
-                SELECT vertex_from AS src, vertex_to AS dst
-                FROM "forward_flow.ReachableEdge"
-                """
-                if dir.is_forward()
-                # Reverses the edge direction when selecting from backward_flow
-                # so that all edges end up in the "natural", code-execution
-                # direction
-                else f"""
-                SELECT vertex_to AS src, vertex_from AS dst
-                FROM "backward_flow.ReachableEdge"
-                """
-            ),
+                SELECT id FROM "{flow}.ReachableVertex"
+                ORDER BY v1, p1, label, call_state, ctx
+                """,
+            )
         )
+    }
+    edges = sorted(
+        (
+            TaintGraphEdgeInput(src=row["src"], dst=row["dst"])
+            for row in execute(
+                cur,
+                (
+                    f"""
+                    SELECT vertex_from AS src, vertex_to AS dst
+                    FROM "forward_flow.ReachableEdge"
+                    """
+                    if dir.is_forward()
+                    # Reverses the edge direction when selecting from
+                    # backward_flow so that all edges end up in the "natural",
+                    # code-execution direction
+                    else f"""
+                    SELECT vertex_to AS src, vertex_from AS dst
+                    FROM "backward_flow.ReachableEdge"
+                    """
+                ),
+            )
+        ),
+        key=lambda edge: (rank[edge.src], rank[edge.dst]),
     )
-    g = TaintGraph(direction=dir, edges=edge_iter)
+    g = TaintGraph(direction=dir, edges=edges)
     source_vertices = set(
         id
         for (id,) in execute(
@@ -1047,8 +1069,8 @@ def _load_taint_graph(cx: Context, dir: SliceDirection):
         )
     # Removes sources that are sinks so that we don't get length-1 paths
     source_vertices.difference_update(sink_vertices)
-    g.set_root_vertices(list(source_vertices))
-    g.set_goal_vertices(list(sink_vertices))
+    g.set_root_vertices(sorted(source_vertices, key=rank.__getitem__))
+    g.set_goal_vertices(sorted(sink_vertices, key=rank.__getitem__))
     return g
 
 
