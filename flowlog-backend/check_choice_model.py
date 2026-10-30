@@ -27,7 +27,14 @@ these choices: the FlowLog database is one of the program's choice models.
 Every choice relation that is forced must be in the FlowLog database, so run
 the index with `--all-outputs`.
 
+When the program's results depend on `ord` (JADX numbers allocation sites,
+unnamed variables and intent keys by it), Souffle must also number symbols as
+FlowLog did: `--ord-map TSV` (symbol, number; `compare_jadx.py ords` writes it
+for JADX) replaces each `ord(x)` by `@oord(x)` (ord_oracle.cpp), which returns
+the map's number for x and numbers other symbols past the map's.
+
   check_choice_model.py PROGRAM.dl FACTS_DIR FLOWLOG_DB OUT_DIR [-j N]
+                        [--ord-map TSV]
     PROGRAM.dl   the preprocessed analysis (index.dl in the CTADL directory)
     FACTS_DIR    its fact directory (facts/ in the CTADL directory)
     FLOWLOG_DB   ctadlir.db of the FlowLog run
@@ -38,6 +45,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -137,10 +145,9 @@ class Program:
         self.comps: dict[str, tuple[int, int]] = {}
         for c in re.finditer(r"\.comp\s+(\w+)[^{]*\{", m):
             self.comps[c.group(1)] = (c.end() - 1, matching(m, c.end() - 1))
-        self.inits: dict[str, list[str]] = {}  # component -> top-level instances
+        self.inits: dict[tuple, str] = {}  # (scope, instance) -> component
         for c in re.finditer(r"\.init\s+(\w+)\s*=\s*(\w+)", m):
-            if self.scope_at(c.start()) is None:
-                self.inits.setdefault(c.group(2), []).append(c.group(1))
+            self.inits[(self.scope_at(c.start()), c.group(1))] = c.group(2)
         self.decls: dict[tuple, int] = {}  # (scope, name) -> offset of `.decl`
         for d in re.finditer(r"\.decl\s+(\w+)\s*\(", m):
             self.decls[(self.scope_at(d.start()), d.group(1))] = d.start()
@@ -152,13 +159,33 @@ class Program:
                 best = name
         return best
 
+    def scopes_at(self, pos: int) -> list:
+        """The components enclosing `pos`, innermost first, then None."""
+        out = [self.scope_at(pos)]
+        while out[-1] is not None:
+            out.append(self.scope_at(self.comps[out[-1]][0]))
+        return out
+
     def resolve(self, name: str, pos: int) -> tuple:
-        if "." in name:
-            inst, base = name.rsplit(".", 1)
-            comp = next((c for c, insts in self.inits.items() if inst in insts), None)
-            return (comp, base)
-        scope = self.scope_at(pos)
-        return (scope, name) if (scope, name) in self.decls else (None, name)
+        """(component, relation) that `name`, used at `pos`, denotes: a name
+        is the innermost enclosing scope's, and `i.R` is R of the component
+        that instance i, of the innermost scope that has one, instantiates."""
+        *path, base = name.split(".")
+        scopes = self.scopes_at(pos)
+        if not path:
+            return next(((s, base) for s in scopes if (s, base) in self.decls), (None, base))
+        comp = next((self.inits[(s, path[0])] for s in scopes if (s, path[0]) in self.inits), None)
+        for inst in path[1:]:
+            comp = self.inits.get((comp, inst)) if comp is not None else None
+        if comp is None:
+            raise SystemExit(f"cannot resolve {name} at offset {pos}")
+        return (comp, base)
+
+    def instances(self, comp: str) -> list[str]:
+        """The full names of the instances of a component."""
+        return [inst if scope is None else f"{outer}.{inst}"
+                for (scope, inst), c in self.inits.items() if c == comp
+                for outer in ([None] if scope is None else self.instances(scope))]
 
     def choice_relations(self) -> list[dict]:
         out = []
@@ -188,16 +215,20 @@ class Program:
             if scope is None:
                 names.append(o.group(1))
             else:
-                names += [f"{inst}.{o.group(1)}" for inst in self.inits.get(scope, [])]
+                names += [f"{inst}.{o.group(1)}" for inst in self.instances(scope)]
         return names
 
-    def rewrite(self, rels: list[dict]) -> tuple[str, int]:
-        """The program with the given choice relations restricted; also the
-        number of renamed clause heads."""
+    def rewrite(self, rels: list[dict], oord: bool = False) -> tuple[str, int]:
+        """The program with the given choice relations restricted, and with
+        `ord` replaced by the functor `oord` if asked; also the number of
+        renamed clause heads."""
         ids = {(r["scope"], r["name"]): r for r in rels}
         edits = []  # (offset, length, replacement)
+        if oord:
+            edits.append((0, 0, ".functor oord(x: symbol): number\n"))
+            edits += [(o.start(), 3, "@oord") for o in re.finditer(r"(?<![\w.@])ord(?=\s*\()", self.m)]
         names = sorted({r["name"] for r in rels})
-        pat = re.compile(r"(?<![\w.@])((?:\w+\.)?(?:%s))\s*\(" % "|".join(map(re.escape, names)))
+        pat = re.compile(r"(?<![\w.@])((?:\w+\.)*(?:%s))\s*\(" % "|".join(map(re.escape, names)))
         heads = 0
         for a in pat.finditer(self.m):
             if re.search(r"\.(decl|output|input|printsize|limitsize)\s+$", self.m[:a.start()]):
@@ -232,14 +263,24 @@ def main() -> int:
     ap.add_argument("--functional", action="append", default=["ReachableVertex"],
                     help="choice relations whose dependent columns are functions of the key (not forced)")
     ap.add_argument("--libdir", type=Path, default=DEFAULT_LIBDIR, help="directory of libfunctors.so")
+    ap.add_argument("--ord-map", type=Path, help="FlowLog's `ord` of each symbol (TSV: symbol, number)")
     ap.add_argument("--schema", action="append", default=[], help="passed to compare_db.py")
     args = ap.parse_args()
 
     prog = Program(args.program.read_text())
     rels = [r for r in prog.choice_relations() if r["name"] not in args.functional]
-    text, heads = prog.rewrite(rels)
+    text, heads = prog.rewrite(rels, oord=args.ord_map is not None)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "restricted.dl").write_text(text)
+    env = dict(os.environ)
+    if args.ord_map:
+        # CTADL's functors and oord in one library, as ord_oracle.sh builds it
+        inc = Path(shutil.which("souffle") or "souffle").resolve().parent.parent / "include"
+        subprocess.run(["c++", "-O2", "--std=c++17", "-shared", "-fPIC", "-I", str(inc),
+                        "-I", str(inc / "souffle"), str(HERE.parent / "src/ctadl/souffle-logic/functors.cpp"),
+                        str(HERE / "ord_oracle.cpp"), "-o", str(args.out / "libfunctors.so")], check=True)
+        args.libdir = args.out
+        env["OORD_MAP"] = str(args.ord_map.resolve())
 
     facts = args.out / "facts"
     facts.mkdir(exist_ok=True)
@@ -250,7 +291,7 @@ def main() -> int:
     db = sqlite3.connect(args.flowlog_db)
     have = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type IN ('table', 'view')")}
     for r in rels:
-        insts = [""] if r["scope"] is None else [f"{i}." for i in prog.inits.get(r["scope"], [])]
+        insts = [""] if r["scope"] is None else [f"{i}." for i in prog.instances(r["scope"])]
         for inst in insts:
             rel = f"{inst}{r['name']}"
             if rel not in have:
@@ -270,7 +311,7 @@ def main() -> int:
     (dbdir / "ctadlir.db").unlink(missing_ok=True)
     cmd = ["souffle", "-F", str(facts), "-D", str(dbdir), "-L", str(args.libdir), "-l", "functors",
            "-j", str(args.jobs), str(args.out / "restricted.dl")]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(cmd, capture_output=True, text=True, env=env)
     (args.out / "souffle.log").write_text(res.stdout + res.stderr)
     if res.returncode != 0:
         print(res.stderr[-3000:], file=sys.stderr)
