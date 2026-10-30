@@ -377,6 +377,12 @@ def create_taint_indexes(conn: sqlite3.Connection):
 
 
 class DB:
+    # after_index gives the index 64 KiB pages, and SQLite's default page
+    # cache, 2000 KiB, holds 31 of them, so lookups that jump around the file,
+    # as the SARIF output's do, read the same pages from the file again and
+    # again. The cache grows as pages are read, up to this size.
+    CACHE_KIB = 256 * 1024
+
     def __init__(self, path, optimize_on_close=True):
         self.path = path
         self.db = None
@@ -385,6 +391,7 @@ class DB:
     def __enter__(self):
         self.db = sqlite3.connect(self.path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.db.row_factory = sqlite3.Row
+        self.db.execute(f"PRAGMA cache_size = -{self.CACHE_KIB}")
         return self.db
 
     def __exit__(self, exc_type, exc_value, traceback):
