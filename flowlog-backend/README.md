@@ -327,7 +327,10 @@ It works in three steps (`ctadl.flowlog`):
 
    Both conversions are `INSERT ... SELECT` statements that SQLite runs on the two databases,
    attached to one connection. They intern the symbols with `INSERT OR IGNORE`, then fill each
-   table through lookups in the symbol table's unique index; no rows pass through Python.
+   table through lookups in the symbol table's unique index; no rows pass through Python. Each
+   is one transaction, with SQLite's default rollback journal: an error, Ctrl-C or kill leaves
+   CTADL's database as it was. (Soufflé's sqlite I/O keeps the journal in memory, which a kill
+   loses.)
 
 <a id="translation"></a>
 ### Translation
@@ -1392,6 +1395,8 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
   engine would never reuse one, and each would keep about 1 GB, so it passes none: the compiler
   then builds in a scratch directory next to its output and deletes it after a successful build.
 - **Run databases:** the runners' `--prune` deletes the databases of identical runs.
+- **Rollback journal:** a query that replaces the results of an earlier one keeps their old
+  pages in a journal next to CTADL's database until it commits (1.0 GB on syn25).
 
 ## Versions
 

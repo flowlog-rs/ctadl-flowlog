@@ -13,7 +13,9 @@ Both directions are driven by the schema manifest that souffle2flowlog.py
 writes with --schema (its "outputs"/"inputs" entries list the sqlite
 relations with their original and FlowLog column names and types). Each is a
 few INSERT ... SELECT statements per relation, run by SQLite on the two
-databases attached to one connection; no rows pass through Python.
+databases attached to one connection; no rows pass through Python. Each is
+one transaction: an error, Ctrl-C or kill leaves the DB it writes (with
+--append, CTADL's index) as it was.
 
   to-souffle FLDB OUTDB --schema S.json [--append]
       Copy the manifest's outputs from the FlowLog DB into OUTDB in Souffle's
@@ -41,7 +43,8 @@ import json
 import os
 import sqlite3
 import sys
-from typing import Iterable
+from contextlib import contextmanager
+from typing import Iterable, Iterator
 
 SQL_TYPE = {
     "symbol": "TEXT",
@@ -83,16 +86,27 @@ def existing_relations(conn: sqlite3.Connection, schema: str = "main") -> set:
     }
 
 
-def connect(path: str, attach: str, alias: str) -> sqlite3.Connection:
+@contextmanager
+def transaction(path: str, attach: str, alias: str) -> Iterator[sqlite3.Connection]:
     """Opens PATH (which is written) with ATTACH attached as ALIAS (which is
-    only read), in autocommit mode: the callers make one transaction."""
+    only read), for one transaction: committed if the block completes, and
+    otherwise rolled back, when the connection closes or, if the process was
+    killed, by the next one to open PATH. That takes SQLite's default,
+    on-disk rollback journal: Souffle's sqlite I/O keeps it in memory, where
+    a kill loses it, and where it holds the old pages of the relations it
+    replaces."""
     conn = sqlite3.connect(path, isolation_level=None)
-    conn.execute("PRAGMA journal_mode = OFF")
-    conn.execute("PRAGMA synchronous = OFF")
-    conn.execute("ATTACH DATABASE ? AS " + alias, (attach,))
-    for schema in ("main", alias):
-        conn.execute(f"PRAGMA {schema}.cache_size = -{CACHE_KIB}")
-    return conn
+    try:
+        # no fsync: a kill is rolled back, an OS crash may not be
+        conn.execute("PRAGMA synchronous = OFF")
+        conn.execute("ATTACH DATABASE ? AS " + alias, (attach,))
+        for schema in ("main", alias):
+            conn.execute(f"PRAGMA {schema}.cache_size = -{CACHE_KIB}")
+        conn.execute("BEGIN")
+        yield conn
+        conn.execute("COMMIT")
+    finally:
+        conn.close()
 
 
 def record_json(col: dict, alias: str) -> str:
@@ -120,26 +134,24 @@ def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) 
     """Returns {relation: row count}."""
     if not append and os.path.exists(out_path):
         os.unlink(out_path)
-    # Without FlowLog's DB every output is created empty.
-    out = connect(out_path, fl_path if os.path.exists(fl_path) else ":memory:", "fl")
-    have = existing_relations(out, "fl")
-    out.execute("BEGIN")
-    out.execute(
-        f"CREATE TABLE IF NOT EXISTS {q(SYMBOL_TABLE)} (id INTEGER PRIMARY KEY, symbol TEXT UNIQUE)"
-    )
     counts: dict = {}
-    for rel in schema["outputs"]:
-        name, cols = rel["name"], rel["columns"]
-        shadow = "_" + name
-        out.execute(f"DROP VIEW IF EXISTS main.{dq(name)}")
-        out.execute(f"DROP TABLE IF EXISTS main.{dq(shadow)}")
+    # Without FlowLog's DB every output is created empty.
+    fl = fl_path if os.path.exists(fl_path) else ":memory:"
+    with transaction(out_path, fl, "fl") as out:
+        have = existing_relations(out, "fl")
         out.execute(
-            f"CREATE TABLE main.{q(shadow)} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})"
+            f"CREATE TABLE IF NOT EXISTS {q(SYMBOL_TABLE)} (id INTEGER PRIMARY KEY, symbol TEXT UNIQUE)"
         )
-        counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
-        out.execute(souffle_view_sql(name, cols))
-    out.execute("COMMIT")
-    out.close()
+        for rel in schema["outputs"]:
+            name, cols = rel["name"], rel["columns"]
+            shadow = "_" + name
+            out.execute(f"DROP VIEW IF EXISTS main.{dq(name)}")
+            out.execute(f"DROP TABLE IF EXISTS main.{dq(shadow)}")
+            out.execute(
+                f"CREATE TABLE main.{q(shadow)} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})"
+            )
+            counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
+            out.execute(souffle_view_sql(name, cols))
     return counts
 
 
@@ -192,59 +204,60 @@ def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:
     ValueError if an input cannot be converted."""
     if os.path.exists(fl_path):
         os.unlink(fl_path)
-    dst = connect(fl_path, in_path, "src")
-    have = existing_relations(dst, "src")
-    dst.execute("BEGIN")
     counts: dict = {}
-    for rel in schema["inputs"]:
-        name, cols = rel["name"], rel["columns"]
-        read = rel.get("read", True)
-        if read and name not in have:
-            counts[name] = -1
-            continue
-        defs = []
-        for col in cols:
-            kinds = col.get("fl_kinds", [col["kind"]])
-            defs.extend(
-                f"{dq(c)} {SQL_TYPE[k]} NOT NULL" for c, k in zip(col["fl"], kinds)
-            )
-        dst.execute(f"CREATE TABLE main.{dq(name)} ({', '.join(defs)})")
-        if not read:
-            # no rule reads it (see souffle2flowlog.py's record_io)
-            counts[name] = 0
-            continue
-        src_cols = [r[1] for r in dst.execute(f"PRAGMA src.table_info({dq(name)})")]
-        if len(src_cols) != len(cols):
-            raise ValueError(
-                f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}"
-            )
-        if any(col["kind"] == "record" for col in cols) and RECORD_TABLE not in have:
-            if dst.execute(f"SELECT EXISTS (SELECT 1 FROM src.{dq(name)})").fetchone()[
-                0
-            ]:
-                raise ValueError(
-                    f"{name}: {in_path} does not store record contents (it has no "
-                    f"{RECORD_TABLE}; Souffle writes record columns as ids that are "
-                    "only meaningful to the process that wrote them)"
-                )
-            counts[name] = 0
-            continue
-        sel, frm = [], [f"src.{dq(name)} AS r"]
-        for i, (col, sc) in enumerate(zip(cols, src_cols)):
-            v = f"r.{dq(sc)}"
-            if col["kind"] != "record":
-                sel.append(v)
+    with transaction(fl_path, in_path, "src") as dst:
+        have = existing_relations(dst, "src")
+        for rel in schema["inputs"]:
+            name, cols = rel["name"], rel["columns"]
+            read = rel.get("read", True)
+            if read and name not in have:
+                counts[name] = -1
                 continue
-            check_records(dst, in_path, name, v)
-            frm.append(f"JOIN src.{dq(RECORD_TABLE)} AS t{i} ON t{i}.id = {v}")
-            sel.extend(
-                f"json_extract(t{i}.fields, '$[{k}]')" for k in range(len(col["fl"]))
-            )
-        counts[name] = dst.execute(
-            f"INSERT INTO main.{dq(name)} SELECT {', '.join(sel)} FROM {' '.join(frm)}"
-        ).rowcount
-    dst.execute("COMMIT")
-    dst.close()
+            defs = []
+            for col in cols:
+                kinds = col.get("fl_kinds", [col["kind"]])
+                defs.extend(
+                    f"{dq(c)} {SQL_TYPE[k]} NOT NULL" for c, k in zip(col["fl"], kinds)
+                )
+            dst.execute(f"CREATE TABLE main.{dq(name)} ({', '.join(defs)})")
+            if not read:
+                # no rule reads it (see souffle2flowlog.py's record_io)
+                counts[name] = 0
+                continue
+            src_cols = [r[1] for r in dst.execute(f"PRAGMA src.table_info({dq(name)})")]
+            if len(src_cols) != len(cols):
+                raise ValueError(
+                    f"{name}: {len(src_cols)} columns in {in_path}, expected {len(cols)}"
+                )
+            if (
+                any(col["kind"] == "record" for col in cols)
+                and RECORD_TABLE not in have
+            ):
+                if dst.execute(
+                    f"SELECT EXISTS (SELECT 1 FROM src.{dq(name)})"
+                ).fetchone()[0]:
+                    raise ValueError(
+                        f"{name}: {in_path} does not store record contents (it has no "
+                        f"{RECORD_TABLE}; Souffle writes record columns as ids that are "
+                        "only meaningful to the process that wrote them)"
+                    )
+                counts[name] = 0
+                continue
+            sel, frm = [], [f"src.{dq(name)} AS r"]
+            for i, (col, sc) in enumerate(zip(cols, src_cols)):
+                v = f"r.{dq(sc)}"
+                if col["kind"] != "record":
+                    sel.append(v)
+                    continue
+                check_records(dst, in_path, name, v)
+                frm.append(f"JOIN src.{dq(RECORD_TABLE)} AS t{i} ON t{i}.id = {v}")
+                sel.extend(
+                    f"json_extract(t{i}.fields, '$[{k}]')"
+                    for k in range(len(col["fl"]))
+                )
+            counts[name] = dst.execute(
+                f"INSERT INTO main.{dq(name)} SELECT {', '.join(sel)} FROM {' '.join(frm)}"
+            ).rowcount
     return counts
 
 

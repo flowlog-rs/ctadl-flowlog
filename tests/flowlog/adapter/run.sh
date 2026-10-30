@@ -11,7 +11,9 @@
 #   - an empty record relation needs no record table, both ways;
 #   - without FlowLog's DB, to-souffle creates every output empty;
 #   - an input missing from the DB is not created (FlowLog, like Soufflé,
-#     fails if it reads it).
+#     fails if it reads it);
+#   - an append (to-souffle --append, as to CTADL's index) interrupted by
+#     Ctrl-C, or killed, leaves the DB as it was.
 # And facts.py, on a program with component instances (Soufflé names their
 # relations, and files, `i.A`, `o.in.A`): the inputs get their files in
 # FlowLog's layout (record columns flattened, as Soufflé reads them; an
@@ -184,6 +186,58 @@ counts = A.to_flowlog(f"{W}/none.sqlite", f"{W}/fl6.db", read)
 tables = {r[0] for r in sqlite3.connect(f"{W}/fl6.db").execute("SELECT name FROM sqlite_master")}
 check("an input missing from the DB is not created (the unread Name still is)",
       counts == {"Call": -1, "Name": 0} and tables == {"Name"})
+
+# an append interrupted after writing (part of) the DB: Ctrl-C rolls it back
+# when the connection closes, and after a kill the next connection rolls it
+# back from the journal (Soufflé's in-memory one would be lost)
+import os, signal
+fl = sqlite3.connect(f"{W}/fl_big.db")
+fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
+fl.execute("CREATE TABLE Name (s)")
+fl.executemany("INSERT INTO Name VALUES (?)", ((f"symbol {i}",) for i in range(20000)))
+fl.commit()
+fl.close()
+A.to_souffle(f"{W}/fl_out.db", f"{W}/idx.sqlite", out, False)
+before = list(sqlite3.connect(f"{W}/idx.sqlite").iterdump())
+
+def append_and(stop):
+    """Appends fl_big.db's outputs to idx.sqlite, and calls STOP after Name's rows."""
+    copy, cache = A.copy_to_souffle, A.CACHE_KIB
+    def copy_and_stop(conn, name, cols):
+        n = copy(conn, name, cols)
+        if name == "Name":
+            stop()
+        return n
+    A.copy_to_souffle = copy_and_stop
+    A.CACHE_KIB = 1  # so that SQLite writes the DB before the commit
+    try:
+        A.to_souffle(f"{W}/fl_big.db", f"{W}/idx.sqlite", out, True)
+    finally:
+        A.copy_to_souffle, A.CACHE_KIB = copy, cache
+
+def intact(db):
+    try:
+        c = sqlite3.connect(db, timeout=0)
+        return c.execute("PRAGMA integrity_check").fetchone() == ("ok",) and list(c.iterdump()) == before
+    except sqlite3.Error as e:  # e.g. still locked
+        print(f"  {db}: {e}")
+        return False
+
+def interrupt():
+    raise KeyboardInterrupt
+try:
+    append_and(interrupt)
+    check("an append is interrupted", False)
+except KeyboardInterrupt:
+    check("an append interrupted by Ctrl-C leaves the DB as it was", intact(f"{W}/idx.sqlite"))
+sys.stdout.flush()
+pid = os.fork()
+if pid == 0:
+    append_and(lambda: os.kill(os.getpid(), signal.SIGKILL))
+    os._exit(0)
+status = os.waitpid(pid, 0)[1]
+check("as does one killed, from the journal it leaves",
+      os.WIFSIGNALED(status) and os.path.exists(f"{W}/idx.sqlite-journal") and intact(f"{W}/idx.sqlite"))
 
 # facts.py on comp.dl
 import os, shutil
