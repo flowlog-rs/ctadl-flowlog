@@ -13,7 +13,11 @@ date (`properties.day`) and paths of the run directories are dropped, and
 arrays are compared as multisets, except thread-flow locations, which are
 paths.
 Exit status 0 iff the normalized reports are equal; otherwise the places where
-they differ are listed, with a few example items of arrays that differ.
+they differ are listed, with a few example items of arrays that differ, and
+the verdict says whether the results are equal without their code flows. A
+code flow is one source-to-sink path, through the instructions that CTADL's
+choice-domain relations pick as witnesses (VirtualAssign's `insn`), which
+may differ between engines and runs.
 """
 from __future__ import annotations
 
@@ -172,6 +176,13 @@ def differences(a, b, path: str, out: list, examples: int = 3) -> None:
     out.append(f"{path}: {json.dumps(a)[:200]} != {json.dumps(b)[:200]}")
 
 
+def findings(doc: dict) -> list:
+    """Each run's results without their code flows, as a multiset."""
+    return [Counter(json.dumps({k: v for k, v in r.items() if k != "codeFlows"}, sort_keys=True)
+                    for r in run.get("results", []))
+            for run in doc.get("runs", [])]
+
+
 def main() -> int:
     docs = [json.load(open(p)) for p in sys.argv[1:3]]
     for d in docs:
@@ -184,7 +195,8 @@ def main() -> int:
     differences(a, b, "", out)
     print(f"A: {sys.argv[1]}\nB: {sys.argv[2]}")
     print("\n".join(out[:60]))
-    print(f"sarif: different ({sum(not l.startswith(' ') for l in out)} places)")
+    same = "; same results up to code flows" if findings(a) == findings(b) else ""
+    print(f"sarif: different ({sum(not l.startswith(' ') for l in out)} places){same}")
     return 1
 
 
