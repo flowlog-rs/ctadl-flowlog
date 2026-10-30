@@ -697,10 +697,12 @@ class Facts:
                 pass
             return
         assert self.is_sqlite_db
-        with sqlite3.connect(self.path) as conn:
+        with contextlib.closing(sqlite3.connect(self.path)) as conn, conn:
+            # One transaction: sqlite3 opens none for DDL, which then commits
+            # (and syncs) statement by statement
+            conn.execute("BEGIN")
             conn.execute(f'DROP VIEW IF EXISTS "{name}"')
             conn.execute(f'DROP TABLE IF EXISTS "_{name}"')
-            conn.commit()
             symtab_schema = ", ".join(
                 f'"{i}" INTEGER NOT NULL' for i, _ in enumerate(cols)
             )
@@ -739,7 +741,6 @@ class Facts:
                 WHERE {wherecols}
                 """,
             )
-            conn.commit()
 
     def _open_facts_dir_relation(self, name: str, mode="a", **kwargs):
         return open(
@@ -753,9 +754,15 @@ class Facts:
 
     @contextlib.contextmanager
     def writer(self):
-        fps = {}
-        if self.is_fact_dir:
-            fps = {name: self._open_facts_dir_relation(name) for name in self.relations}
+        """Yields the writer that 'write' takes: a file per relation of a facts
+        dir, or a connection to the sqlite database, whose writes are one
+        transaction, committed when the context exits (rolled back if it
+        raises)"""
+        if self.is_sqlite_db:
+            with contextlib.closing(sqlite3.connect(self.path)) as conn, conn:
+                yield conn
+            return
+        fps = {name: self._open_facts_dir_relation(name) for name in self.relations}
         try:
             yield fps
         finally:
@@ -773,30 +780,19 @@ class Facts:
                 file=writers[name],
             )
         else:
-            with sqlite3.connect(self.path) as db:
-                db.executemany(
-                    f'INSERT OR IGNORE INTO "__SymbolTable" ("symbol") VALUES (?)',
-                    list((col,) for col in list(cols) if isinstance(col, str)),
+            writers.executemany(
+                'INSERT OR IGNORE INTO "__SymbolTable" ("symbol") VALUES (?)',
+                [(col,) for col in cols if isinstance(col, str)],
+            )
+            values = ", ".join(
+                (
+                    '(SELECT id FROM "__SymbolTable" WHERE symbol = ?)'
+                    if isinstance(col, str)
+                    else "?"
                 )
-                db.commit()
-                wherespec = " OR ".join(
-                    f"symbol = '{col}'" for col in list(cols) if isinstance(col, str)
-                )
-                symbolid = {
-                    row[1]: row[0]
-                    for row in db.execute(
-                        f'SELECT id, symbol FROM "__SymbolTable" WHERE {wherespec}'
-                    ).fetchall()
-                }
-                valuespec = ", ".join(["?"] * len(cols))
-                db.execute(
-                    f'INSERT INTO "_{name}" VALUES ({valuespec})',
-                    tuple(
-                        (symbolid[col] if isinstance(col, str) else col)
-                        for col in list(cols)
-                    ),
-                )
-                db.commit()
+                for col in cols
+            )
+            writers.execute(f'INSERT INTO "_{name}" VALUES ({values})', cols)
 
 
 def create_tainted_arg_unresolved(
