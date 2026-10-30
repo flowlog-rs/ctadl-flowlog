@@ -1,0 +1,10 @@
+s,a,ok
+s,b,blocked
+a,c,ok
+b,c,ok
+b,d,ok
+c,d,ok
+d,t,ok
+c,t,blocked
+a,e,blocked
+e,f,ok

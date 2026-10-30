@@ -1,0 +1,11 @@
+// Divisions only in the body, in a constraint and in a negation.
+.decl N(x: number)
+N(5). N(0).
+.decl M(x: number)
+M(1).
+.decl O(x: number)
+.output O
+O(x) :- N(x), 100 / x > 1. // unchecked
+.decl P(x: number)
+.output P
+P(x) :- N(x), !M(100 / x). // unchecked

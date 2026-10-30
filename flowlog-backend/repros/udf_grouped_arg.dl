@@ -1,0 +1,9 @@
+// Bug B5, grouped expressions: a variable FlowLog substitutes by its
+// arithmetic definition, as the argument of a UDF (FlowLog syntax;
+// check.sh passes udf_grouped_arg.rs).
+.extern fn id(a: int32) -> int32
+.decl P(a: int32)
+P(1).
+.decl O(y: int32)
+.output O
+O(id(y)) :- P(a), y = a + 1.

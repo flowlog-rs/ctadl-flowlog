@@ -1,0 +1,8 @@
+// Inline relations.
+.decl R(a: number)
+R(1).
+.decl I(a: number) inline
+I(a) :- R(a).
+.decl O(a: number)
+.output O
+O(a) :- I(a).

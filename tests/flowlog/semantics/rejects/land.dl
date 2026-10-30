@@ -1,0 +1,6 @@
+// FlowLog has no logical operators on numbers.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+O(x land 1) :- P(x).

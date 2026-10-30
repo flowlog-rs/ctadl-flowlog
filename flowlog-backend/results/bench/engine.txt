@@ -1,0 +1,48 @@
+bench.py with ctadl --engine flowlog, on FlowLog main at b03d2fd; Soufflé 2.5. Analyses compiled beforehand.
+$ python3 $P/bench.py --jobs 32 --backend souffle,flowlog --schema $P/index_schema.json --schema $P/query_schema.json --drop-dbs --out runs/bench-engine bench/syn25.tnt
+
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+syn25      souffle  32 |   14.70    12.78   12.78    356M |   71.56    36.95   36.95   1346M | (reference)
+syn25      flowlog  32 |   16.39    14.53   13.31   2678M |   85.98    40.86   21.74   3476M | summary: 108 equal, 12 different
+
+The query reports (summary.txt) of the two runs are identical.
+
+== souffle-j32/index.log
+$ bench.py --shim souffle --directory runs/bench-engine/syn25/souffle-j32 index -f -j 32
+^^ warning: omitting model validation, jsonschema not found
+[bench] analyze=12.783 rss=356
+index written to 'runs/bench-engine/syn25/souffle-j32/ctadlir.db'
+[bench] after_index=1.777
+
+== souffle-j32/query.log
+$ bench.py --shim souffle --directory runs/bench-engine/syn25/souffle-j32 query -j 32 --format summary -o runs/bench-engine/syn25/souffle-j32/summary.txt
+[bench] analyze=36.949 rss=1346
+[bench] after_query=20.181
+results written to 'runs/bench-engine/syn25/souffle-j32/ctadlir.db'
+>> hint: to see paths, use: --format=sarif
+[bench] visualize_query_results=13.087
+
+== flowlog-j32/index.log
+$ bench.py --shim flowlog --directory runs/bench-engine/syn25/flowlog-j32 index -f -j 32
+^^ warning: omitting model validation, jsonschema not found
+[flowlog] prepare inputs: 0.01s
+[flowlog] FlowLog run: 13.31s
+[flowlog]   242.645492ms:	Dataflow assembled
+[flowlog]   12.836011733s:	Dataflow executed
+[flowlog] write results: 1.20s
+[bench] analyze=14.526 rss=2678
+index written to 'runs/bench-engine/syn25/flowlog-j32/ctadlir.db'
+[bench] after_index=1.712
+
+== flowlog-j32/query.log
+$ bench.py --shim flowlog --directory runs/bench-engine/syn25/flowlog-j32 query -j 32 --format summary -o runs/bench-engine/syn25/flowlog-j32/summary.txt
+[flowlog] prepare inputs: 0.46s
+[flowlog] FlowLog run: 21.74s
+[flowlog]   100.624978ms:	Dataflow assembled
+[flowlog]   10.289377976s:	Dataflow executed
+[flowlog] write results: 18.52s
+[bench] analyze=40.859 rss=3476
+[bench] after_query=24.447
+results written to 'runs/bench-engine/syn25/flowlog-j32/ctadlir.db'
+>> hint: to see paths, use: --format=sarif
+[bench] visualize_query_results=19.225

@@ -1,0 +1,9 @@
+// An aggregate correlated through a variable bound by computation.
+.decl R(a: symbol)
+R("x").
+R("z").
+.decl S(a: symbol)
+S("xy").
+.decl O(a: symbol, n: number)
+.output O
+O(a, n) :- R(a), t = cat(a, "y"), n = count : { S(t) }.

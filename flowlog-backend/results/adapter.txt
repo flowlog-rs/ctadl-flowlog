@@ -1,0 +1,19 @@
+  ok   the translator marks Call unread when no rule reads it
+  ok   and read when a rule does
+  ok   Souffle's DB: the unread Call is created empty
+  ok   and Name is converted
+  ok   Souffle's DB: reading Call's records fails: Call: $TMPDIR/tmp.XXXXXXXXXX/db.sqlite does not store record contents (it has no __FlowLogRecord; Souffle writes record columns as ids that are only meaningful to the process that wrote them)
+  ok   the port's DB: Call's records round-trip
+  ok   a nil record id fails: Call: record id 0 is nil or unknown in $TMPDIR/tmp.XXXXXXXXXX/port.sqlite (nil records are not supported)
+  ok   without FlowLog's DB, every output is created empty
+  ok   an empty record relation is converted (with no record table)
+  ok   and read back empty
+  ok   an input missing from the DB is not created (the unread Name still is)
+  ok   the manifest lists the file inputs of each component instance
+  ok   inputs are linked, or converted where they have record columns
+  ok   records are read as Soufflé reads them, also nested ones
+  ok   a malformed record fails: $TMPDIR/tmp.XXXXXXXXXX/facts/i.Rec.facts:1: expected ']' at offset 2 of record '[1, "x"]'
+  ok   an input no rule reads is created empty
+  ok   a missing fact file is left out
+  ok   output files are placed as Souffle writes them, also the pruned and nullary ones
+adapter exit=0

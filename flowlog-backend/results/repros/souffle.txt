@@ -1,0 +1,36 @@
+agg_body_binding: ok: O={x	1}
+agg_computed: ok: O={x	1}
+agg_computed_lifted: ok: O={x	1 z	0}
+agg_many_readers: ok: W={1 10 100 11 12 2 3 4 5 6 7 8 9}
+agg_min_string: FAILED: Error: Unable to deduce type for variable m in file prog.dl at line 9
+agg_shared_join: ok: O={b	1 m	2}
+antijoin_projection: ok: A={25}
+cast_literal: FAILED: Error: Undefined type in attribute x:int64 in file prog.dl at line 5
+choice_domain: ok: C={1	2}
+computed_body_only: ok: C={ab}
+computed_fact: ok: C={ab}
+count_all_wild: ok: C={2}
+dup_output: ok: R={1} R2={1}
+empty_dataflow: ok: A={}
+empty_output: ok: Empty={} O={1}
+filter_order: ok: O={6	2}
+functor_decl: FAILED: souffle: /souffle/src/include/souffle/utility/MiscUtil.h:245: void souffle::fatal(const char*, const Args& ...) [with Args = {std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >}]: Assertion `false && "fatal error; see std err"' failed.
+inline_rel: ok: O={1}
+keyword_fn: ok: O={f}
+lattice_in_loop: FAILED: Error: syntax error, unexpected min aggregator, expecting identifier in file prog.dl at line 11
+lattice_min_string: FAILED: Error: syntax error, unexpected min aggregator, expecting identifier in file prog.dl at line 7
+literal_overflow: FAILED: Error: Undefined type in attribute x:int64 in file prog.dl at line 6
+neg_computed: ok: O={}
+neg_computed_lifted: ok: O={z}
+neg_only_body: ok: A={1}
+nested_comp: ok: Out={1}
+pragma: ok: O={1}
+range_gen: ok: O={0 1 2}
+record_type: ok: O={1}
+souffle_builtins: ok: O={(-1)^-1	-1 1^-1	1 2^-1	0 strlen(é)	2} S={substr(aéb,1,2)	é}
+string_constraint_literal: ok: O={abc}
+true_false: ok: O={1}
+type_limit_cmp: ok: A={3}
+udf_grouped_arg: FAILED: Error: syntax error, unexpected identifier, expecting ( or . in file prog.dl at line 6
+udf_strlen_arg: FAILED: Error: syntax error, unexpected identifier, expecting ( or . in file prog.dl at line 5
+variadic_cat: ok: O={x-x}

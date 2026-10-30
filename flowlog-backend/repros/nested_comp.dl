@@ -1,0 +1,15 @@
+// A `.comp` declared and instantiated inside another `.comp`.
+// Souffle accepts this; CTADL's analysis uses it.
+.comp Outer {
+  .comp Inner {
+    .decl X(a: number)
+    X(1).
+  }
+  .init inner = Inner
+  .decl Y(a: number)
+  Y(a) :- inner.X(a).
+}
+.init o = Outer
+.decl Out(a: number)
+.output Out
+Out(a) :- o.Y(a).

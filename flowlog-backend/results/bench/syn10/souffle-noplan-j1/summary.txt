@@ -1,0 +1,9 @@
+summary of query results:
+47 sink vertexes reached by sources
+0 source vertexes reached by sinks
+3 source taint labels across 11 taint sources
+3 sink taint labels across 23 taint sinks
+116 instructions in forward source-slice
+0 instructions in backward sink-slice
+11 functions in forward sink-slice
+0 functions in backward sink-slice

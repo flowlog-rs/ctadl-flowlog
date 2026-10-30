@@ -1,0 +1,6 @@
+// two outputs of a relation to one file
+// expect: two outputs of the relation write 'R.csv'
+.decl R(x: number)
+R(1).
+.output R
+.output R(delimiter=",")

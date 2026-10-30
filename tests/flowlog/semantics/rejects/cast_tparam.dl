@@ -1,0 +1,13 @@
+// A cast of a variable of a component type parameter: the translation does
+// not know the instances' types, so it cannot tell an identity cast (as
+// here, Soufflé: O = {"x"}) from one that reinterprets the value.
+.comp C<T> {
+  .decl r(a: T)
+  .decl o(a: symbol)
+  o(as(a, symbol)) :- r(a).
+}
+.init c = C<symbol>
+c.r("x").
+.decl O(a: symbol)
+O(a) :- c.o(a).
+.output O

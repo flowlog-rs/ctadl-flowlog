@@ -1,0 +1,188 @@
+case aggregates
+  -w 1: same as Soufflé (5 relations, 92 rows)
+  -w 4: same as Soufflé (5 relations, 92 rows)
+  -w 32: same as Soufflé (5 relations, 92 rows)
+case aliases
+  -w 1: same as Soufflé (4 relations, 13 rows)
+  -w 4: same as Soufflé (4 relations, 13 rows)
+  -w 32: same as Soufflé (4 relations, 13 rows)
+case arith
+  -w 1: same as Soufflé (5 relations, 177 rows)
+  -w 4: same as Soufflé (5 relations, 177 rows)
+  -w 32: same as Soufflé (5 relations, 177 rows)
+case choice
+  -w 1: same as Soufflé (4 relations, 10 rows)
+  -w 4: same as Soufflé (4 relations, 10 rows)
+  -w 32: same as Soufflé (4 relations, 10 rows)
+case choice_default
+  -w 1: same as Soufflé (1 relations, 1 rows)
+  -w 4: same as Soufflé (1 relations, 1 rows)
+  -w 32: same as Soufflé (1 relations, 1 rows)
+case comp_scope
+  -w 1: same as Soufflé (4 relations, 13 rows)
+  -w 4: same as Soufflé (4 relations, 13 rows)
+  -w 32: same as Soufflé (4 relations, 13 rows)
+case no_derivation
+  -w 1: same as Soufflé (3 relations, 0 rows)
+  -w 4: same as Soufflé (3 relations, 0 rows)
+  -w 32: same as Soufflé (3 relations, 0 rows)
+case no_derivation_comp
+  -w 1: same as Soufflé (3 relations, 0 rows)
+  -w 4: same as Soufflé (3 relations, 0 rows)
+  -w 32: same as Soufflé (3 relations, 0 rows)
+case outputs
+  -w 1: same as Soufflé (6 relations, 7 rows)
+  -w 4: same as Soufflé (6 relations, 7 rows)
+  -w 32: same as Soufflé (6 relations, 7 rows)
+case partial
+  -w 1: same as Soufflé (12 relations, 23 rows)
+  -w 4: same as Soufflé (12 relations, 23 rows)
+  -w 32: same as Soufflé (12 relations, 23 rows)
+case partial_types
+  -w 1: same as Soufflé (3 relations, 7 rows)
+  -w 4: same as Soufflé (3 relations, 7 rows)
+  -w 32: same as Soufflé (3 relations, 7 rows)
+case plans
+  -w 1: same as Soufflé (6 relations, 99 rows)
+  -w 4: same as Soufflé (6 relations, 99 rows)
+  -w 32: same as Soufflé (6 relations, 99 rows)
+case pow
+  -w 1: same as Soufflé (1 relations, 14 rows)
+  -w 4: same as Soufflé (1 relations, 14 rows)
+  -w 32: same as Soufflé (1 relations, 14 rows)
+case ranges
+  -w 1: same as Soufflé (3 relations, 89 rows)
+  -w 4: same as Soufflé (3 relations, 89 rows)
+  -w 32: same as Soufflé (3 relations, 89 rows)
+case records
+  -w 1: same as Soufflé (2 relations, 28 rows)
+  -w 4: same as Soufflé (2 relations, 28 rows)
+  -w 32: same as Soufflé (2 relations, 28 rows)
+case rules
+  -w 1: same as Soufflé (16 relations, 91 rows)
+  -w 4: same as Soufflé (16 relations, 91 rows)
+  -w 32: same as Soufflé (16 relations, 91 rows)
+case scoping
+  -w 1: same as Soufflé (6 relations, 94 rows)
+  -w 4: same as Soufflé (6 relations, 94 rows)
+  -w 32: same as Soufflé (6 relations, 94 rows)
+case strings
+  -w 1: same as Soufflé (15 relations, 340 rows)
+  -w 4: same as Soufflé (15 relations, 340 rows)
+  -w 32: same as Soufflé (15 relations, 340 rows)
+case tparams
+  -w 1: same as Soufflé (5 relations, 14 rows)
+  -w 4: same as Soufflé (5 relations, 14 rows)
+  -w 32: same as Soufflé (5 relations, 14 rows)
+case widths
+  -w 1: same as Soufflé (13 relations, 89 rows)
+  -w 4: same as Soufflé (13 relations, 89 rows)
+  -w 32: same as Soufflé (13 relations, 89 rows)
+reject adt: ok, error: line 4: algebraic data type constructors are not supported
+reject agg_inline_relation: ok, error: inline relation I is used inside an aggregate (Souffle rejects this too)
+reject agg_local_types: ok, error: line 9: variable `x` is typed both number and symbol (one name in several disjuncts or aggregates); rename one of them
+reject agg_minmax_const: ok, error: line 7: min of an expression without local variables is not supported
+reject agg_negation: ok, error: line 8: negation inside an aggregate body is not supported by FlowLog
+reject alias_order: ok, error: line 8: Souffle computes `x - 10 < 0` on unsigned or on number, as its alias resolution leaves `x` or replaces it by its constant 3 (which depends on the order of the equalities and on aggregate materialization); write the constant or an atom-bound variable in place of `x` there
+reject alias_order_agg: ok, error: line 7: Souffle computes `u - 10 < 0` on unsigned or on number, as its alias resolution leaves `u` or replaces it by its constant 3 (which depends on the order of the equalities and on aggregate materialization); write the constant or an atom-bound variable in place of `u` there
+reject alias_several: ok, error: line 7: `y` is equated to several expressions (x bshr 62, 0 - 2); Souffle keeps one, chosen by the order of the equalities, and types its copies by where they land — equate it to one only
+reject attr_collision: ok, error: two attributes are both spelled `fn_k` once records are flattened and names are spelled for FlowLog
+reject autoinc: ok, error: builtin autoinc is not supported by FlowLog
+reject bnot: ok, error: unary bnot not supported
+reject cast_symbol: ok, error: line 7: as(..., symbol) is supported only between types of the same base type
+reject cast_tparam: ok, error: line 7: as(..., symbol) is supported only between types of the same base type
+reject comp_scope_choice: ok, error: R in component A_B names a relation of an enclosing instance with a choice-domain or a type parameter (not supported)
+reject comp_scope_mixed: ok, error: R in component B names different relations in its instances (not supported)
+reject comp_scope_tparam: ok, error: R in component B names a relation of an enclosing instance with a choice-domain or a type parameter (not supported)
+reject disjunct_types: ok, error: line 10: variable `p` is typed both A and B (one name in several disjuncts or aggregates); rename one of them
+reject eqrel: ok, error: eqrel relation ['Eq'] is not supported
+reject float_literal: ok, error: float literal 1.5 is not supported
+reject float_type: ok, error: type float is not supported
+reject inheritance: ok, error: component inheritance (Sub : Base) is not supported
+reject land: ok, error: operator land not supported
+reject limitsize: ok, error: .limitsize O is not supported (it truncates the relation)
+reject lnot: ok, error: unary lnot not supported
+reject min_functor: ok, error: builtin min is not supported by FlowLog
+reject nil_record: ok, error: recursive record type L is not supported
+reject output_kinds: ok, error: .output R: two outputs of the relation are not to a file
+reject output_same_file: ok, error: .output R: two outputs of the relation write 'R.csv'
+reject override: ok, error: component inheritance (Sub : Base) is not supported
+reject pow_unsigned: ok, error: line 6: operator ^ over type unsigned is not supported
+reject range_head: ok, error: line 6: range is supported only as `v = range(lo, hi)` in a rule body
+reject range_step: ok, error: range with a step is not supported
+reject range_unsigned: ok, error: range over unsigned is not supported
+reject record_attr_collision: ok, error: two attributes are both spelled `p_a` once records are flattened and names are spelled for FlowLog
+reject record_delimiter: ok, error: .input R: record columns in a file need the tab delimiter
+reject record_neq: ok, error: line 7: record comparison `!=` is not supported
+reject record_targ: ok, error: .init b: record type argument P is not supported
+reject reserved_name: ok, error: relation name FlowlogUnit is reserved by the translation
+reject to_unsigned: ok, error: builtin to_unsigned is not supported by FlowLog
+reject tparam_shadow: ok, error: component type parameter Node has the name of a type
+reject unknown_type: ok, error: unknown type int32
+invalid arity_aggregate: ok, error: line 8: mismatching arity of relation K (expected 1, got 2); Soufflé: Error: Mismatching arity of relation K (expected 1, got 2) in file arity_aggregate.dl at line 8
+invalid arity_dropped: ok, error: line 8: mismatching arity of relation K (expected 1, got 2); Soufflé: Error: Mismatching arity of relation K (expected 1, got 2) in file arity_dropped.dl at line 8
+invalid undefined_component: ok, error: line 7: undefined relation Z; Soufflé: Error: Undefined relation Z in file undefined_component.dl at line 7
+invalid undefined_dropped: ok, error: line 8: undefined relation Z; Soufflé: Error: Undefined relation Z in file undefined_dropped.dl at line 8
+invalid undefined_inline: ok, error: line 6: undefined relation Z; Soufflé: Error: Undefined relation Z in file undefined_inline.dl at line 6
+invalid undefined_printsize: ok, error: .printsize of undefined relation Z; Soufflé: Error: Undefined relation Z in file undefined_printsize.dl at line 7
+invalid undefined_qualified: ok, error: line 13: undefined relation c.S; Soufflé: Error: Undefined relation c.S in file undefined_qualified.dl at line 13
+abort div_overflow
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: -9223372036854775808 / -1 overflows `number`
+  -w 4: ok, exit 1, error: -9223372036854775808 / -1 overflows `number`
+  -w 32: ok, exit 1, error: -9223372036854775808 / -1 overflows `number`
+abort div_zero
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: 1 / 0: division by zero
+  -w 4: ok, exit 1, error: 1 / 0: division by zero
+  -w 32: ok, exit 1, error: 1 / 0: division by zero
+abort div_zero_fact
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: 1 / 0: division by zero
+  -w 4: ok, exit 1, error: 1 / 0: division by zero
+  -w 32: ok, exit 1, error: 1 / 0: division by zero
+abort div_zero_read
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: 100 / 0: division by zero
+  -w 4: ok, exit 1, error: 100 / 0: division by zero
+  -w 32: ok, exit 1, error: 100 / 0: division by zero
+abort mod_overflow
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: -9223372036854775808 % -1 overflows `number`
+  -w 4: ok, exit 1, error: -9223372036854775808 % -1 overflows `number`
+  -w 32: ok, exit 1, error: -9223372036854775808 % -1 overflows `number`
+abort mod_zero
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: 1 % 0: division by zero
+  -w 4: ok, exit 1, error: 1 % 0: division by zero
+  -w 32: ok, exit 1, error: 1 % 0: division by zero
+abort to_number_binary
+  Soufflé: exit 1, error: wrong string provided by `to_number("0b2")` functor.; O = {}
+  -w 1: ok, exit 1, error: wrong string provided by `to_number("0b2")` functor.
+  -w 4: ok, exit 1, error: wrong string provided by `to_number("0b2")` functor.
+  -w 32: ok, exit 1, error: wrong string provided by `to_number("0b2")` functor.
+abort to_number_config
+  Soufflé: exit 1, error: wrong string provided by `to_number("x")` functor.; O = {}
+  -w 1: ok, exit 1, error: wrong string provided by `to_number("x")` functor.
+  -w 4: ok, exit 1, error: wrong string provided by `to_number("x")` functor.
+  -w 32: ok, exit 1, error: wrong string provided by `to_number("x")` functor.
+abort to_number_invalid
+  Soufflé: exit 1, error: wrong string provided by `to_number("abc")` functor.; O = {}
+  -w 1: ok, exit 1, error: wrong string provided by `to_number("abc")` functor.
+  -w 4: ok, exit 1, error: wrong string provided by `to_number("abc")` functor.
+  -w 32: ok, exit 1, error: wrong string provided by `to_number("abc")` functor.
+abort to_number_overflow
+  Soufflé: exit 1, error: wrong string provided by `to_number("9223372036854775808")` functor.; O = {}
+  -w 1: ok, exit 1, error: wrong string provided by `to_number("9223372036854775808")` functor.
+  -w 4: ok, exit 1, error: wrong string provided by `to_number("9223372036854775808")` functor.
+  -w 32: ok, exit 1, error: wrong string provided by `to_number("9223372036854775808")` functor.
+abort udiv_zero
+  Soufflé: exit 1, Floating-point arithmetic exception signal in rule:; O = {}
+  -w 1: ok, exit 1, error: 1 / 0: division by zero
+  -w 4: ok, exit 1, error: 1 / 0: division by zero
+  -w 32: ok, exit 1, error: 1 / 0: division by zero
+warn body: ok, Soufflé exit 1; 2 of 2 partial calls are not fully checked (Souffle may stop on them where the translation completes): line 8: 100 / x; line 11: 100 / x
+warn recursive: ok, Soufflé exit 1; 1 of 1 partial calls are not fully checked (Souffle may stop on them where the translation completes): line 7: 100 / (x - 5)
+warn repeated_var: ok, Soufflé exit 1; 1 of 1 partial calls are not fully checked (Souffle may stop on them where the translation completes): line 8: x / b
+all passed
+exit=0

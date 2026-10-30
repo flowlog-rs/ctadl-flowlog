@@ -1,0 +1,8 @@
+// An aggregated atom over a computed value.
+.decl R(a: symbol)
+R("x").
+.decl S(a: symbol)
+S("xy").
+.decl O(a: symbol, n: number)
+.output O
+O(a, n) :- R(a), n = count : { S(cat(a, "y")) }.

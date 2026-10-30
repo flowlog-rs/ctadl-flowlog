@@ -1,0 +1,124 @@
+runs/bench-499/hints: reps ['r1', 'r2', 'r3']
+runs/bench-499/no-hints: reps ['r1', 'r2', 'r3']
+
+## Per-rep engine seconds, index / query
+syn10 souffle         j1    1.12 /   0.97     1.12 /   0.97     1.12 /   0.97
+syn10 souffle         j32   0.61 /   0.82     0.61 /   0.77     0.56 /   0.77
+syn10 flowlog         j1    1.48 /   1.09     1.48 /   1.08     1.47 /   1.07
+syn10 flowlog         j32   1.30 /   2.55     1.27 /   2.42     1.35 /   2.50
+syn25 souffle         j1   44.42 /  54.68    44.39 /  54.35    44.19 /  54.51
+syn25 souffle         j32  13.07 /  36.90    12.73 /  36.57    12.92 /  36.65
+syn25 flowlog         j1   20.96 /  46.99    20.86 /  47.42    20.89 /  48.69
+syn25 flowlog         j32   3.34 /  16.93     3.33 /  25.73     3.43 /  16.70
+syn10 souffle-noplan  j1    3.67 /   1.02     3.72 /   0.97     3.67 /   0.97
+syn10 souffle-noplan  j32   0.77 /   0.77     0.71 /   0.77     0.72 /   0.77
+syn10 flowlog-noplan  j1    2.54 /   1.07     2.56 /   1.07     2.57 /   1.09
+syn10 flowlog-noplan  j32   1.45 /   2.36     1.37 /   2.36     1.37 /   2.33
+syn25 souffle-noplan  j1  121.96 /  54.30   121.88 /  54.33   122.83 /  54.94
+syn25 souffle-noplan  j32  20.73 /  36.01    20.80 /  36.35    21.07 /  36.15
+syn25 flowlog-noplan  j1   44.25 /  49.45    44.51 /  46.92    44.08 /  46.59
+syn25 flowlog-noplan  j32   4.70 /  17.68     4.67 /  16.45     4.52 /  16.80
+
+## Engine seconds, medians, 1 / 32 workers
+| Program | Phase | Soufflé, CTADL's hints | FlowLog, their version 0 | Soufflé, no hints | FlowLog, no hints |
+|---|---|---|---|---|---|
+| syn10 | index | 1.1 / 0.6 | 1.5 / 1.3 | 3.7 / 0.7 | 2.6 / 1.4 |
+| syn10 | query | 1.0 / 0.8 | 1.1 / 2.5 | 1.0 / 0.8 | 1.1 / 2.4 |
+| syn25 | index | 44.4 / 12.9 | 20.9 / 3.3 | 122.0 / 20.8 | 44.3 / 4.7 |
+| syn25 | query | 54.5 / 36.7 | 47.4 / 16.9 | 54.3 / 36.2 | 46.9 / 16.8 |
+
+## Wall seconds, medians, 1 / 32 workers
+| Program | Phase | Soufflé, CTADL's hints | FlowLog, their version 0 | Soufflé, no hints | FlowLog, no hints |
+|---|---|---|---|---|---|
+| syn10 | index | 3.0 / 2.5 | 3.6 / 3.4 | 5.3 / 2.3 | 4.2 / 3.1 |
+| syn10 | query | 3.9 / 3.7 | 4.3 / 5.9 | 3.5 / 3.3 | 3.8 / 5.3 |
+| syn25 | index | 46.7 / 15.4 | 24.5 / 7.1 | 124.2 / 22.9 | 47.5 / 7.9 |
+| syn25 | query | 90.2 / 72.4 | 103.3 / 82.8 | 89.6 / 71.4 | 101.8 / 79.2 |
+
+## Peak RSS, medians, 1 / 32 workers
+| Program | Phase | Soufflé, CTADL's hints | FlowLog, their version 0 | Soufflé, no hints | FlowLog, no hints |
+|---|---|---|---|---|---|
+| syn10 | index | 34 MB / 32 MB | 174 MB / 2.0 GB | 37 MB / 34 MB | 245 MB / 2.1 GB |
+| syn10 | query | 40 MB / 38 MB | 144 MB / 1.5 GB | 40 MB / 38 MB | 144 MB / 1.5 GB |
+| syn25 | index | 350 MB / 358 MB | 788 MB / 2.6 GB | 339 MB / 352 MB | 1.7 GB / 4.2 GB |
+| syn25 | query | 1.4 GB / 1.3 GB | 2.2 GB / 3.8 GB | 1.4 GB / 1.3 GB | 2.3 GB / 3.8 GB |
+
+## FlowLog's time, medians: engine = dataflow (load and compute) + write to sqlite; the query's conversions
+flowlog         syn10 j1 : index dataflow 1.39 write 0.09; query dataflow 0.88 write 0.20 convert in 0.06 out 0.27
+flowlog         syn10 j32: index dataflow 1.18 write 0.12; query dataflow 2.25 write 0.24 convert in 0.06 out 0.27
+flowlog         syn25 j1 : index dataflow 20.46 write 0.42; query dataflow 35.29 write 12.13 convert in 0.40 out 18.42
+flowlog         syn25 j32: index dataflow 2.89 write 0.45; query dataflow 5.43 write 11.50 convert in 0.45 out 18.62
+flowlog-noplan  syn10 j1 : index dataflow 2.47 write 0.08; query dataflow 0.87 write 0.20 convert in 0.06 out 0.28
+flowlog-noplan  syn10 j32: index dataflow 1.27 write 0.10; query dataflow 2.14 write 0.22 convert in 0.06 out 0.27
+flowlog-noplan  syn25 j1 : index dataflow 43.86 write 0.39; query dataflow 35.15 write 11.44 convert in 0.40 out 18.16
+flowlog-noplan  syn25 j32: index dataflow 4.21 write 0.46; query dataflow 5.26 write 11.42 convert in 0.45 out 18.54
+
+## CTADL's steps after the analysis, medians: after_index; after_query, report
+souffle         syn10 j1 : 1.77; 0.92, 0.27
+souffle         syn10 j32: 1.78; 0.91, 0.27
+souffle         syn25 j1 : 2.37; 20.46, 13.16
+souffle         syn25 j32: 2.29; 20.86, 13.24
+flowlog         syn10 j1 : 1.83; 0.91, 0.26
+flowlog         syn10 j32: 1.87; 0.94, 0.33
+flowlog         syn25 j1 : 2.25; 21.98, 12.00
+flowlog         syn25 j32: 2.33; 26.66, 17.56
+souffle-noplan  syn10 j1 : 1.45; 0.79, 0.26
+souffle-noplan  syn10 j32: 1.47; 0.82, 0.26
+souffle-noplan  syn25 j1 : 2.00; 20.44, 12.96
+souffle-noplan  syn25 j32: 1.87; 20.43, 12.89
+flowlog-noplan  syn10 j1 : 1.38; 0.74, 0.24
+flowlog-noplan  syn10 j32: 1.43; 0.80, 0.32
+flowlog-noplan  syn25 j1 : 1.94; 22.70, 11.83
+flowlog-noplan  syn25 j32: 1.90; 24.95, 17.26
+
+## Ratios of medians (Soufflé engine / FlowLog engine; > 1 means FlowLog is faster)
+souffle        / flowlog        syn10 j1 : engine index 0.75x query 0.89x | wall FL/S index 1.17 query 1.10 | RSS FL/S index 5.1 query 3.6
+souffle        / flowlog        syn10 j32: engine index 0.47x query 0.31x | wall FL/S index 1.37 query 1.59 | RSS FL/S index 62.8 query 40.9
+souffle        / flowlog        syn25 j1 : engine index 2.12x query 1.15x | wall FL/S index 0.52 query 1.15 | RSS FL/S index 2.3 query 1.6
+souffle        / flowlog        syn25 j32: engine index 3.87x query 2.17x | wall FL/S index 0.46 query 1.14 | RSS FL/S index 7.5 query 2.9
+souffle-noplan / flowlog-noplan syn10 j1 : engine index 1.43x query 0.90x | wall FL/S index 0.79 query 1.10 | RSS FL/S index 6.6 query 3.6
+souffle-noplan / flowlog-noplan syn10 j32: engine index 0.52x query 0.32x | wall FL/S index 1.31 query 1.61 | RSS FL/S index 62.0 query 41.0
+souffle-noplan / flowlog-noplan syn25 j1 : engine index 2.76x query 1.16x | wall FL/S index 0.38 query 1.14 | RSS FL/S index 5.2 query 1.6
+souffle-noplan / flowlog-noplan syn25 j32: engine index 4.45x query 2.15x | wall FL/S index 0.34 query 1.11 | RSS FL/S index 12.3 query 2.9
+souffle        / flowlog-noplan syn10 j1 : engine index 0.44x query 0.90x | wall FL/S index 1.38 query 0.98 | RSS FL/S index 7.2 query 3.6
+souffle        / flowlog-noplan syn10 j32: engine index 0.45x query 0.32x | wall FL/S index 1.23 query 1.43 | RSS FL/S index 65.9 query 41.0
+souffle        / flowlog-noplan syn25 j1 : engine index 1.00x query 1.16x | wall FL/S index 1.02 query 1.13 | RSS FL/S index 5.0 query 1.6
+souffle        / flowlog-noplan syn25 j32: engine index 2.77x query 2.18x | wall FL/S index 0.51 query 1.10 | RSS FL/S index 12.1 query 2.9
+
+## Hints' effect (no hints / hints, engine)
+souffle-noplan  syn10 j1 : index 3.29x query 1.00x
+souffle-noplan  syn10 j32: index 1.16x query 1.00x
+souffle-noplan  syn25 j1 : index 2.75x query 1.00x
+souffle-noplan  syn25 j32: index 1.61x query 0.99x
+flowlog-noplan  syn10 j1 : index 1.73x query 0.99x
+flowlog-noplan  syn10 j32: index 1.05x query 0.94x
+flowlog-noplan  syn25 j1 : index 2.12x query 0.99x
+flowlog-noplan  syn25 j32: index 1.40x query 0.99x
+
+## j1 -> j32 engine speedup
+souffle         syn10: index 1.82x query 1.26x
+souffle         syn25: index 3.44x query 1.49x
+flowlog         syn10: index 1.14x query 0.43x
+flowlog         syn25: index 6.25x query 2.80x
+souffle-noplan  syn10: index 5.13x query 1.26x
+souffle-noplan  syn25: index 5.86x query 1.50x
+flowlog-noplan  syn10: index 1.87x query 0.45x
+flowlog-noplan  syn25: index 9.48x query 2.79x
+
+## Before (one bench.py run) -> now (medians): engine index; query; RSS index / query (MB)
+syn10 souffle         j1 : index 1.12 -> 1.12; query 0.97 -> 0.97; RSS 34 -> 34 / 40 -> 40
+syn10 souffle         j32: index 0.61 -> 0.61; query 0.82 -> 0.77; RSS 32 -> 32 / 38 -> 38
+syn10 flowlog         j1 : index 1.46 -> 1.48; query 1.10 -> 1.08; RSS 174 -> 174 / 147 -> 144; dataflow 1.39 -> 1.39 / 0.91 -> 0.88
+syn10 flowlog         j32: index 1.58 -> 1.30; query 2.55 -> 2.50; RSS 2008 -> 2010 / 1432 -> 1553; dataflow 1.47 -> 1.18 / 2.32 -> 2.25
+syn25 souffle         j1 : index 44.30 -> 44.39; query 54.05 -> 54.51; RSS 350 -> 350 / 1409 -> 1409
+syn25 souffle         j32: index 12.83 -> 12.92; query 36.73 -> 36.65; RSS 357 -> 358 / 1341 -> 1351
+syn25 flowlog         j1 : index 22.20 -> 20.89; query 48.01 -> 47.42; RSS 795 -> 788 / 2204 -> 2270; dataflow 21.78 -> 20.46 / 37.70 -> 35.29
+syn25 flowlog         j32: index 13.04 -> 3.34; query 28.05 -> 16.93; RSS 2681 -> 2697 / 3554 -> 3853; dataflow 12.57 -> 2.89 / 10.76 -> 5.43
+syn10 souffle-noplan  j1 : index 3.72 -> 3.67; query 0.97 -> 0.97; RSS 37 -> 37 / 40 -> 40
+syn10 souffle-noplan  j32: index 0.71 -> 0.72; query 0.77 -> 0.77; RSS 32 -> 34 / 38 -> 38
+syn10 flowlog-noplan  j1 : index 2.58 -> 2.56; query 1.10 -> 1.07; RSS 240 -> 245 / 146 -> 144; dataflow 2.48 -> 2.47 / 0.90 -> 0.87
+syn10 flowlog-noplan  j32: index 1.58 -> 1.37; query 2.49 -> 2.36; RSS 2128 -> 2108 / 1439 -> 1559; dataflow 1.47 -> 1.27 / 2.27 -> 2.14
+syn25 souffle-noplan  j1 : index 121.76 -> 121.96; query 55.50 -> 54.33; RSS 339 -> 339 / 1408 -> 1409
+syn25 souffle-noplan  j32: index 20.83 -> 20.80; query 36.61 -> 36.15; RSS 350 -> 352 / 1351 -> 1350
+syn25 flowlog-noplan  j1 : index 45.02 -> 44.25; query 49.00 -> 46.92; RSS 1753 -> 1752 / 2223 -> 2313; dataflow 44.55 -> 43.86 / 37.83 -> 35.15
+syn25 flowlog-noplan  j32: index 13.84 -> 4.67; query 20.10 -> 16.80; RSS 4124 -> 4323 / 3655 -> 3908; dataflow 13.33 -> 4.21 / 10.78 -> 5.26

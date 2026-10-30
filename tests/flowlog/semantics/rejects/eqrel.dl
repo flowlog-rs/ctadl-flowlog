@@ -1,0 +1,6 @@
+// eqrel relations are not supported.
+.decl Eq(a: number, b: number) eqrel
+Eq(1, 2). Eq(2, 3).
+.decl O(a: number, b: number)
+.output O
+O(a, b) :- Eq(a, b).

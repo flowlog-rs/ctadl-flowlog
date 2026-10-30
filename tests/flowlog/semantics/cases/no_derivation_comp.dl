@@ -1,0 +1,17 @@
+// As no_derivation.dl, in a program with components: no output, at top
+// level or in an instance, is derived from a fact or an input.  Souffle
+// writes every output empty.
+.comp Outer {
+  .comp Inner<U> {
+    .decl A(x: U, n: number)
+    .output A
+    .decl R(x: U)
+    R(x) :- R(x).
+  }
+  .init i = Inner<symbol>
+  .init j = Inner<unsigned>
+}
+.init o = Outer
+.decl B(x: symbol)
+.output B
+B(x) :- o.i.R(x).

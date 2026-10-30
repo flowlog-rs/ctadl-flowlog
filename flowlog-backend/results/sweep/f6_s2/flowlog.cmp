@@ -1,0 +1,12 @@
+WITNESS  VirtualAssign: 9838 rows, same choice-domain keys, 257 with another witness
+           - ('Main/call/21', 'Main/<globals>', '.g0', 'Main/<globals>', '.g2', 'summary', '')
+           - ('f0/indirect-call/6', 'f0/<globals>', '.g0', 'f0/<globals>', '.g2', 'summary', '')
+           - ('f0/indirect-call/6', 'f0/t3', '.f2', 'f0/<globals>', '.g0', 'summary', '')
+           - ('f0/indirect-call/6', 'f0/t3', '.f2', 'f0/<globals>', '.g1', 'summary', '')
+           - ('f0/indirect-call/8', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'summary', '')
+           + ('Main/call/9', 'Main/<globals>', '.g0', 'Main/<globals>', '.g2', 'summary', '')
+           + ('f0/call/3', 'f0/<globals>', '.g0', 'f0/<globals>', '.g1', 'summary', '')
+           + ('f0/call/3', 'f0/<globals>', '.g0', 'f0/<globals>', '.g2', 'summary', '')
+           + ('f0/indirect-call/8', 'f0/t3', '.f2', 'f0/<globals>', '.g0', 'summary', '')
+           + ('f0/indirect-call/8', 'f0/t3', '.f2', 'f0/<globals>', '.g1', 'summary', '')
+summary: 78 equal (1 up to choice-domain witnesses), 0 different

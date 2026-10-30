@@ -1,0 +1,8 @@
+// Bug B11: as(literal, int64) leaves the literal int32, so `1 bshl 31` is
+// negative.  FlowLog syntax.  Souffle, with number: O={shl}.
+.decl K(x: int64)
+K(0).
+.decl O(name: string)
+.output O
+O("shl") :- K(_), as(1, int64) bshl 31 > 0.
+O("shru") :- K(_), as(-1, int64) bshru 1 = 2147483647.

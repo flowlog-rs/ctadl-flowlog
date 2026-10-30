@@ -1,0 +1,23 @@
+// A `/` or `%` of literals takes its type from its context, as other
+// arithmetic does (souffle2flowlog.py, type_context_partials): with u
+// unsigned, `u > (0 - 1) / 2` divides 2^64 - 1 by 2.
+.decl U(u: unsigned)
+U(3).
+.decl A(s: symbol)
+.output A
+A("u > (0-1)/2") :- U(u), u > (0 - 1) / 2.
+A("u < (0-1)/2") :- U(u), u < (0 - 1) / 2.
+
+.decl B(x: unsigned)
+.output B
+B((0 - 1) / 2) :- U(_).
+B(y) :- y = (0 - 1) % 10.
+B(y) :- U(u), y = u + (0 - 1) / 2.
+B(x) :- U(x), x < 10 / ((0 - 2) bshr 63 + 1).
+// fails on number (INT64_MIN / -1), not on unsigned: unchecked, with a warning
+B((0 - 9223372036854775807 - 1) / (0 - 1)) :- U(_).
+
+.decl N(n: number)
+.output N
+N((0 - 1) / 2) :- U(_).
+N(c) :- c = count : { U(u), u < (0 - 1) / 2 }.

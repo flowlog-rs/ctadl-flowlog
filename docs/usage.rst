@@ -72,6 +72,18 @@ the indexer. CTADL then checks whether it’s compiled an indexer for this
 language before. If not, it calls out to Souffle to compile the indexer,
 then runs it.
 
+With ``--engine flowlog`` (or ``CTADL_ENGINE=flowlog``), ``ctadl index``
+and ``ctadl query`` run their analyses with FlowLog instead (see
+:doc:`install`). CTADL translates the Datalog code to FlowLog and
+compiles it, which takes a few minutes the first time; like the Souffle
+indexers, the compiled analyses are cached. The index has the same layout
+whichever engine wrote it, so a query with either engine can read an index
+from either. The results are the same, except where a ``choice-domain``
+key has several candidates: each engine then keeps one of them, and the
+two may keep different ones. FlowLog needs more memory than Souffle: about
+70 MB per worker (``-j``) on any input, and 2 to 9 times Souffle's peak
+on large ones.
+
 Next, this command creates an index, a sqlite database file
 ``ctadlir.db``. The index contains a data flow graph, a call graph, and
 other analysis artifacts. The filename is unfortunately *not*

@@ -1,0 +1,7 @@
+// As alias_order.dl, in an aggregate body, which Souffle may materialize
+// as a clause of its own.
+.decl U(u: unsigned)
+U(3). U(5).
+.decl A(c: number)
+.output A
+A(c) :- c = count : { U(u), u = 3, u - 10 < 0 }.

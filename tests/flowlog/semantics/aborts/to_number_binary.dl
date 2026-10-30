@@ -1,0 +1,6 @@
+// "0b" selects base 2, so "0b2" has no digits.
+.decl S(s: symbol)
+.decl O(n: number)
+.output O
+O(to_number(s)) :- S(s).
+S("0b2").

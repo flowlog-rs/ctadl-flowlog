@@ -1,0 +1,6 @@
+// Names the translator generates itself.
+.decl FlowlogUnit(x: number)
+FlowlogUnit(1).
+.decl O(x: number)
+.output O
+O(x) :- FlowlogUnit(x).

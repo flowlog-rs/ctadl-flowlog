@@ -1,0 +1,6 @@
+// Variadic cat.
+.decl O(s: symbol)
+.output O
+.decl R(a: symbol)
+R("x").
+O(s) :- R(a), s = cat(a, "-", a).

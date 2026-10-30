@@ -1,0 +1,9 @@
+program    backend          j |     idx  analyze  engine     rss |   query  analyze  engine     rss | load
+syn10      souffle-noplan   1 |    5.36     3.67    3.67     37M |    3.58     1.02    1.02     40M | load=3.54
+syn10      souffle-noplan  32 |    2.50     0.77    0.77     34M |    3.27     0.77    0.77     38M | load=3.22
+syn10      flowlog-noplan   1 |    4.27     2.65    2.54    245M |    3.99     1.39    1.07    144M | load=3.12
+syn10      flowlog-noplan  32 |    3.36     1.57    1.45   2117M |    5.49     2.70    2.36   1553M | load=3.11
+syn25      souffle-noplan   1 |  124.11   121.96  121.96    340M |   91.91    54.30   54.30   1409M | load=7.31
+syn25      souffle-noplan  32 |   22.94    20.73   20.73    351M |   71.42    36.01   36.01   1350M | load=1.23
+syn25      flowlog-noplan   1 |   47.52    45.41   44.25   1753M |  104.52    68.12   49.45   2176M | load=2.33
+syn25      flowlog-noplan  32 |    7.85     5.93    4.70   4334M |   80.65    36.81   17.68   3908M | load=1.24

@@ -1,0 +1,8 @@
+// A negated atom over a computed value.
+.decl R(a: symbol)
+R("x").
+.decl S(a: symbol)
+S("xy").
+.decl O(a: symbol)
+.output O
+O(a) :- R(a), !S(cat(a, "y")).

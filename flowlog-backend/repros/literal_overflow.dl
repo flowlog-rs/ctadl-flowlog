@@ -1,0 +1,8 @@
+// Bug B10: literal arithmetic that overflows (or divides by zero) makes the
+// generated crate fail rustc's arithmetic_overflow (unconditional_panic)
+// lint.  FlowLog syntax.  Souffle, with number: O={-9223372036854775808}.
+.decl K(x: int64)
+K(0).
+.decl O(v: int64)
+.output O
+O(9223372036854775807 + 1) :- K(_).

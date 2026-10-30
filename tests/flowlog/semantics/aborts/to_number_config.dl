@@ -1,0 +1,6 @@
+// An option that is not a number, read as CTADL reads its options.
+.decl Config(key: symbol, value: symbol)
+Config("K", "x").
+.decl O(k: number)
+.output O
+O(k) :- Config("K", s), k = to_number(s), k > 0.

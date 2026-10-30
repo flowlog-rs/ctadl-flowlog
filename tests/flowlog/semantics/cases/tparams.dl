@@ -1,0 +1,68 @@
+// Component type parameters. FlowLog instantiates the components itself,
+// so the translated declarations keep their parameters: a rule outside a
+// component reads the type arguments of the instances it names, and a rule
+// inside lets a parameter agree with any type but a record.
+.decl E(a: symbol, b: symbol)
+E("a", "b").
+E("b", "c").
+E("a", "bx").
+
+.comp Graph<T> {
+  .decl edge(a: T, b: T)
+  .decl node(a: T)
+  node(a) :- edge(a, _).
+  node(b) :- edge(_, b).
+}
+.init g = Graph<symbol>
+g.edge(a, b) :- E(a, b).
+.init ng = Graph<number>
+ng.edge(1, 2).
+ng.edge(2, 4).
+
+// negations over computed values: the helper relations they need are
+// declared with the column types of the instances
+.decl NoX(a: symbol, b: symbol)
+NoX(a, b) :- g.edge(a, b), c = cat(b, "x"), !E(a, c).
+.output NoX
+.decl NoDouble(a: number)
+NoDouble(a) :- ng.node(a), c = a * 2, !ng.node(c).
+.output NoDouble
+
+// a parameter passed on to a nested instance
+.comp Box<U> {
+  .decl item(a: U)
+}
+.comp Shelf<V> {
+  .init box = Box<V>
+  .decl first(a: V)
+  first(a) :- box.item(a), !box.item("p").
+  first("p") :- box.item("p").
+}
+.init s = Shelf<symbol>
+s.box.item("p").
+s.box.item("q").
+.decl ShelfItems(a: symbol)
+ShelfItems(a) :- s.box.item(a), c = cat(a, "!"), !E(a, c).
+ShelfItems(a) :- s.first(a).
+.output ShelfItems
+
+// a parameter agreeing with symbol, in one clause and across disjuncts
+.comp Tagged<T> {
+  .decl tag(a: T)
+  .decl seen(a: T)
+  seen(a) :- (tag(a) ; E(a, _)).
+  .decl both(a: T)
+  both(a) :- tag(a), E(_, a).
+}
+.init t = Tagged<symbol>
+t.tag("z").
+t.tag("c").
+.decl Seen(a: symbol, how: symbol)
+Seen(a, "seen") :- t.seen(a).
+Seen(a, "both") :- t.both(a).
+.output Seen
+
+// an identity cast of a variable of an instance's relation
+.decl Cast(a: symbol)
+Cast(as(a, symbol)) :- g.node(a).
+.output Cast

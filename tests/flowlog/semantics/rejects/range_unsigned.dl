@@ -1,0 +1,4 @@
+// range over unsigned is not translated.
+.decl B(x: unsigned)
+.output B
+B(x) :- x = range(0, 4).

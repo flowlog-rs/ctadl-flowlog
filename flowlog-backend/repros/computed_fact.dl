@@ -1,0 +1,4 @@
+// A fact whose argument is a computed value (Souffle evaluates it).
+.decl C(s: symbol)
+.output C
+C(cat("a", "b")).

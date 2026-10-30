@@ -1,0 +1,7 @@
+// min/max of a target that uses no local variable: FlowLog needs the
+// aggregated value to come from the body.
+.decl R(a: number)
+R(1). R(2).
+.decl O(n: number)
+.output O
+O(n) :- n = min 5 : { R(_) }.

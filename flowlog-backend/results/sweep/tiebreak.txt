@@ -1,0 +1,33 @@
+# FlowLog with the within-clause tie-break reversed (choice_key: len -> LEN_MAX - len,
+# hash -> !hash), compared with Souffle (-j 2 reference) and with the default FlowLog run.
+# Relations listed differ; '-' means equal derived relations.
+f6_s1 | inv-vs-souffle: - | inv-vs-flowlog: CTADLStats
+f6_s2 | inv-vs-souffle: - | inv-vs-flowlog: -
+f6_s3 | inv-vs-souffle: - | inv-vs-flowlog: -
+f6_s4 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f6_s5 | inv-vs-souffle: - | inv-vs-flowlog: -
+f6_s6 | inv-vs-souffle: - | inv-vs-flowlog: -
+f8_s1 | inv-vs-souffle: - | inv-vs-flowlog: -
+f8_s2 | inv-vs-souffle: - | inv-vs-flowlog: -
+f8_s3 | inv-vs-souffle: CTADLStats | inv-vs-flowlog: CTADLStats
+f8_s4 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f8_s5 | inv-vs-souffle: - | inv-vs-flowlog: -
+f8_s6 | inv-vs-souffle: - | inv-vs-flowlog: -
+f10_s1 | inv-vs-souffle: - | inv-vs-flowlog: -
+f10_s2 | inv-vs-souffle: - | inv-vs-flowlog: -
+f10_s3 | inv-vs-souffle: - | inv-vs-flowlog: -
+f10_s4 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f10_s5 | inv-vs-souffle: CTADLStats | inv-vs-flowlog: CTADLStats
+f10_s6 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f12_s1 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f12_s2 | inv-vs-souffle: - | inv-vs-flowlog: -
+f12_s3 | inv-vs-souffle: - | inv-vs-flowlog: -
+f12_s4 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f12_s5 | inv-vs-souffle: - | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f12_s6 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f15_s1 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f15_s2 | inv-vs-souffle: - | inv-vs-flowlog: -
+f15_s3 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f15_s4 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign
+f15_s5 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow Vertex VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow Vertex VirtualAlloc VirtualAssign
+f15_s6 | inv-vs-souffle: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign | inv-vs-flowlog: CTADLStats CallEdge SummaryAlloc SummaryFlow VirtualAlloc VirtualAssign

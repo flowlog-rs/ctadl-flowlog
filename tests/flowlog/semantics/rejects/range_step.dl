@@ -1,0 +1,6 @@
+// Only range(lo, hi) is supported.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+O(i) :- i = range(0, 10, 3).

@@ -1,0 +1,13 @@
+// `.override` needs inheritance, which is refused.
+.comp Base {
+  .decl r(a: number) overridable
+  r(1).
+}
+.comp Sub : Base {
+  .override r
+  r(2).
+}
+.init x = Sub
+.decl O(a: number)
+.output O
+O(a) :- x.r(a).

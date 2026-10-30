@@ -1,0 +1,4 @@
+// Bug B12: no output has a rule, a fact or an input, so FlowLog prunes
+// them all and the generated crate fails on unused items.  Souffle: A={}.
+.decl A(x: number)
+.output A

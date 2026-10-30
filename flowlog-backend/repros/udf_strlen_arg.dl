@@ -1,0 +1,8 @@
+// strlen's result as the argument of a UDF (FlowLog syntax; check.sh passes
+// udf_strlen_arg.rs).
+.extern fn id(a: int32) -> int32
+.decl S(s: string)
+S("ab").
+.decl O(n: int32)
+.output O
+O(id(strlen(s))) :- S(s).

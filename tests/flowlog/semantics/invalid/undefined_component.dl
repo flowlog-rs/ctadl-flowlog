@@ -1,0 +1,13 @@
+// C's clause names the undefined Z (and can never fire).
+// expect: line 7: undefined relation Z
+.decl K(x: number)
+K(0).
+.comp C {
+  .decl R(x: number)
+  R(x) :- K(x), Z(x), x != x.
+}
+.init c = C
+.decl O(n: number)
+.output O
+O(x) :- K(x).
+O(x) :- c.R(x).

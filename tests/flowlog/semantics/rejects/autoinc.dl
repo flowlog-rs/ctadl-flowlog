@@ -1,0 +1,6 @@
+// autoinc() depends on evaluation order.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+O(autoinc()) :- P(_).

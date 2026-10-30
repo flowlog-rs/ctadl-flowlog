@@ -1,0 +1,14 @@
+// A record type argument: FlowLog would instantiate the component with a
+// record type, whose attributes the translation flattens, so it rejects
+// the instance (Soufflé: O = {(1, 2)}).
+.type P = [x: number, y: number]
+.comp Box<T> {
+  .decl item(a: T)
+  .decl copy(a: T)
+  copy(a) :- item(a).
+}
+.init b = Box<P>
+b.item([1, 2]).
+.decl O(x: number, y: number)
+O(x, y) :- b.copy([x, y]).
+.output O

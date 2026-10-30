@@ -1,0 +1,6 @@
+// The logical and bitwise negations are not translated.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+O(lnot x) :- P(x).

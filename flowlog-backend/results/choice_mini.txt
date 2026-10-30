@@ -1,0 +1,5 @@
+Reach: -w1 ok -w4 ok -w32 ok (Souffle: same-round tie broken differently)
+NR: -w1 ok -w4 ok -w32 ok (= Souffle)
+FwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+BwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+choice_mini exit=0

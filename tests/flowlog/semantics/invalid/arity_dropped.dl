@@ -1,0 +1,8 @@
+// Souffle rejects K(1, 2) although the clause can never fire.
+// expect: line 8: mismatching arity of relation K (expected 1, got 2)
+.decl K(x: number)
+K(0).
+.decl O(n: number)
+.output O
+O(1) :- K(_).
+O(2) :- K(_), 1 = 2, K(1, 2).

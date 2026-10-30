@@ -1,0 +1,18 @@
+// One aggregate over a relation that twelve other rules read.
+.decl K(x: number)
+K(100).
+.decl W(n: number)
+.output W
+W(1) :- K(_).
+W(2) :- K(_).
+W(3) :- K(_).
+W(4) :- K(_).
+W(5) :- K(_).
+W(6) :- K(_).
+W(7) :- K(_).
+W(8) :- K(_).
+W(9) :- K(_).
+W(10) :- K(_).
+W(11) :- K(_).
+W(12) :- K(_).
+W(s) :- s = sum x : { K(x) }.

@@ -1,0 +1,7 @@
+// `min<string>` lattice column: accepted by the front end?
+.decl R(k: number, s: symbol)
+R(1, "b").
+R(1, "a").
+.decl M(k: number, s: min<string>)
+.output M
+M(k, s) :- R(k, s).

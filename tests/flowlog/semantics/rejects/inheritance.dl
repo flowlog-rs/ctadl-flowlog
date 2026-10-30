@@ -1,0 +1,14 @@
+// Component inheritance: the translator's name resolution does not follow
+// it, so it is refused.
+.comp Base {
+  .decl r(a: number)
+  r(1).
+}
+.comp Sub : Base {
+  .decl s(a: number)
+  s(a) :- r(a).
+}
+.init x = Sub
+.decl O(a: number)
+.output O
+O(a) :- x.s(a).

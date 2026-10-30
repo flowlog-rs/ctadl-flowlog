@@ -1,0 +1,7 @@
+// nil is not translated.
+.type L = [h: number, t: L]
+.decl R(l: L)
+R(nil).
+.decl O(x: number)
+.output O
+O(1) :- R(nil).

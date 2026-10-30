@@ -1,0 +1,4 @@
+// A rule whose body binds its variables by computation alone.
+.decl C(s: symbol)
+.output C
+C(s) :- s = cat("a", "b").

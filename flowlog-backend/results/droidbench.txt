@@ -1,0 +1,189 @@
+Aliasing__FlowSensitivity1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Aliasing__SimpleAliasing1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Aliasing__StrongUpdate1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+AndroidSpecific__ApplicationModeling1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__Library2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Aliasing__Merge1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__PrivateDataLeak1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+AndroidSpecific__PrivateDataLeak3: souffle: index failed (cannot load _APut); flowlog: index failed (cannot load _APut);
+AndroidSpecific__Obfuscation1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__Parcel1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal up to row order (131 nodes, 21 edges; 2 types and 0 ctxs differ)
+AndroidSpecific__View1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+ArraysAndLists__ArrayAccess2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+ArraysAndLists__ArrayAccess3: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+AndroidSpecific__PublicAPIField1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__ArrayAccess4: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+AndroidSpecific__LogNoLeak: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__ArrayAccess5: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+AndroidSpecific__InactiveActivity: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__DirectLeak1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__HashMapAccess1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__ListAccess1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__PrivateDataLeak2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+AndroidSpecific__PublicAPIField2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__AnonymousClass1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Button1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Button2: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal up to row order (130 nodes, 35 edges; 1 type and 0 ctxs differ)
+ArraysAndLists__ArrayAccess1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Button3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__ArrayToString1: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Button4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__ArrayCopy1: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__LocationLeak1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__LocationLeak2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ArraysAndLists__MultidimensionalArray1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__LocationLeak3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__MultiHandlers1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Ordering1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__RegisterGlobal1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__Battery1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Callbacks__RegisterGlobal2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Unregister1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+DynamicLoading__DynamicBoth1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+DynamicLoading__DynamicSink1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__Bluetooth1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+DynamicLoading__DynamicSource1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__Build1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__Contacts1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__DeviceId1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__File1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__IP1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Callbacks__MethodOverride1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Callbacks__Button5: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__PI1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__ContentProvider1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__IMEI1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__Sensors1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__SubscriberId1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__VoiceMail1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+EmulatorDetection__PlayStore1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+FieldAndObjectSensitivity__FieldSensitivity1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+FieldAndObjectSensitivity__FieldSensitivity2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__Exceptions1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+FieldAndObjectSensitivity__FieldSensitivity3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__Exceptions2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+FieldAndObjectSensitivity__InheritedObjects1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__Exceptions3: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Exceptions4: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Exceptions5: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Exceptions6: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Exceptions7: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Loop1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Loop2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__FactoryMethods1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__Serialization1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__SourceCodeSpecific1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+FieldAndObjectSensitivity__FieldSensitivity4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+FieldAndObjectSensitivity__ObjectSensitivity1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+EmulatorDetection__PlayStore2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+FieldAndObjectSensitivity__ObjectSensitivity2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StringToCharArray1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__Clone1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StartProcessWithSecret1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StaticInitialization1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StaticInitialization2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__VirtualDispatch1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal up to row order (87 nodes, 24 edges; 1 type and 0 ctxs differ)
+GeneralJava__StaticInitialization3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ImplicitFlows__ImplicitFlow1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__UnreachableCode: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__VirtualDispatch2: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StringFormatter1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StringPatternMatching1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__VirtualDispatch3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+GeneralJava__StringToOutputStream1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+ImplicitFlows__ImplicitFlow5: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+ImplicitFlows__ImplicitFlow6: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+GeneralJava__VirtualDispatch4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterAppCommunication__Collector__Collector: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+ImplicitFlows__ImplicitFlow2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterAppCommunication__Device_Id_leakage__DeviceId_Broadcast1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+ImplicitFlows__ImplicitFlow3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal up to row order (97 nodes, 7 edges; 1 type and 0 ctxs differ)
+ImplicitFlows__ImplicitFlow4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterAppCommunication__Device_Id_leakage__DeviceId_OrderedIntent1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Device_Id_leakage__DeviceId_Service1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Device_Id_leakage__DeviceId_contentProvider1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Location_leakage__Location1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Location_leakage__Location_Service1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Location_leakage__Location_Broadcast1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterAppCommunication__Echoer: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterAppCommunication__SendSMS: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterAppCommunication__StartActivityForResult1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication2: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication4: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication5: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication6: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication7: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication8: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__BroadcastTaintAndLeak1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ComponentNotInManifest1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__EventOrdering1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__IntentSink2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ActivityEventSequence1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterComponentCommunication__IntentSource1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ServiceCommunication1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__SharedPreferences1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ActivityEventSequence2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ActivityEventSequence3: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+InterComponentCommunication__Singletons1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__UnresolvableIntent1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__ActivityCommunication1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ActivityLifecycle1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ActivitySavedState1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+InterComponentCommunication__IntentSink1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ApplicationLifecycle3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__BroadcastReceiverLifecycle2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__BroadcastReceiverLifecycle3: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ActivityLifecycle3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ActivityLifecycle2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__FragmentLifecycle1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ActivityLifecycle4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ServiceEventSequence1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ApplicationLifecycle1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__FragmentLifecycle2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__BroadcastReceiverLifecycle1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__ServiceEventSequence2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ServiceEventSequence3: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__AsynchronousEventOrdering1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Native__JavaIDFunction: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ApplicationLifecycle2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Native__NativeIDFunction: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Native__SinkInNativeCode: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Native__SinkInNativeLibCode: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Native__SourceInNativeCode: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__ActivityCommunication2: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ServiceLifecycle2: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Lifecycle__SharedPreferenceChanged1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection_ICC__AllReflection: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyIntent: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyIntentReceive: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__SharedPreferences1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlySMS: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyTelephony: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyTelephony_Dynamic: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyTelephony_Substring: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection_ICC__OnlyTelephony_Reverse: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__EventOrdering1: results 1/1, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection5: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Lifecycle__ServiceLifecycle1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection7: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection__Reflection1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection10-NoFlow: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection10: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection3: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection4: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Reflection__Reflection8: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection__Reflection9: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Threading__TimerTask1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Reflection__Reflection6: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+UnreachableCode__SimpleUnreachable1: souffle: index failed (cannot load _AGet); flowlog: index failed (cannot load _AGet);
+Threading__AsyncTask1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Threading__Executor1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Threading__JavaThread1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Threading__JavaThread2: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+Threading__Looper1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+UnreachableCode__UnreachableSink1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+UnreachableCode__UnreachableSource1: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+UnreachableCode__UnreachableBoth: results 0/0, summary: 114 equal, 0 different, sarif: equal, gml: equal
+apps: 188; identical (DB, SARIF, GML): 111; identical but for the GML's row order: 4; failed alike with both engines: 73

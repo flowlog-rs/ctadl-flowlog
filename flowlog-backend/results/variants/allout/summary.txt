@@ -1,0 +1,33 @@
+alias1                 | souffle: checks ok (ctadlir,strict) [index=2.8s query=3.7s] | flowlog: checks ok (ctadlir,strict) [index=210.5s query=3.5s] | diff: summary: 143 equal, 0 different; sarif: equal
+alias2                 | souffle: checks ok (ctadlir,strict) [index=2.1s query=3.6s] | flowlog: checks ok (ctadlir,strict) [index=2.3s query=3.3s] | diff: summary: 143 equal, 0 different; sarif: equal
+compositional-ctx      | souffle: checks ok (ctadlir,strict) [index=2.1s query=4.0s] | flowlog: checks ok (ctadlir,strict) [index=2.6s query=4.3s] | diff: summary: 143 equal, 0 different; sarif: equal
+compositional-ctx2     | souffle: checks ok (ctadlir,strict) [index=1.8s query=3.8s] | flowlog: checks ok (ctadlir,strict) [index=2.7s query=4.4s] | diff: summary: 143 equal, 0 different; sarif: equal
+compositional-ctx4     | souffle: checks ok (ctadlir,strict) [index=2.3s query=3.8s] | flowlog: checks ok (ctadlir,strict) [index=3.0s query=4.0s] | diff: summary: 143 equal, 0 different; sarif: equal
+ex3                    | souffle: checks ok (codeflows) [index=1.9s query=3.6s] | flowlog: checks ok (codeflows) [index=2.6s query=3.9s] | diff: summary: 143 equal, 0 different; sarif: equal
+ex4                    | souffle: checks ok (codeflows) [index=2.5s query=3.6s] | flowlog: checks ok (codeflows) [index=2.8s query=3.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+global1                | souffle: checks ok (ctadlir,strict) [index=2.1s query=3.5s] | flowlog: checks ok (ctadlir,strict) [index=2.2s query=3.6s] | diff: summary: 143 equal, 0 different; sarif: equal
+global2                | souffle: checks ok (codeflows) [index=2.2s query=3.0s] | flowlog: checks ok (codeflows) [index=2.6s query=3.5s] | diff: summary: 143 equal, 0 different; sarif: equal
+indirect1              | souffle: checks ok (ctadlir,strict) [index=1.8s query=3.5s] | flowlog: checks ok (ctadlir,strict) [index=2.2s query=3.4s] | diff: summary: 143 equal, 0 different; sarif: equal
+indirect4              | souffle: checks ok (codeflows) [index=2.1s query=3.1s] | flowlog: checks ok (codeflows) [index=2.6s query=3.3s] | diff: summary: 143 equal, 0 different; sarif: equal
+sanitizer1             | souffle: checks ok (nocodeflows) [index=2.1s query=3.5s] | flowlog: checks ok (nocodeflows) [index=2.4s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+alias3                 | souffle: ok [index=1.6s query=2.4s] | flowlog: ok [index=2.1s query=2.9s] | diff: summary: 143 equal, 0 different; sarif: equal
+alias4                 | souffle: ok [index=1.7s query=2.8s] | flowlog: ok [index=2.2s query=2.9s] | diff: summary: 143 equal, 0 different; sarif: equal
+alias6                 | souffle: ok [index=1.6s query=2.5s] | flowlog: ok [index=2.0s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+backward               | souffle: ok [index=1.6s query=2.6s] | flowlog: ok [index=2.1s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+bslice1                | souffle: ok [index=1.8s query=2.6s] | flowlog: ok [index=2.1s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+bslice2                | souffle: ok [index=1.6s query=2.6s] | flowlog: ok [index=2.1s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+compositional-ctx3     | souffle: import FAILED [] | flowlog: import FAILED []
+ex-vtable              | souffle: ok [index=1.7s query=2.7s] | flowlog: ok [index=2.3s query=3.1s] | diff: summary: 143 equal, 0 different; sarif: equal
+global3                | souffle: ok [index=1.7s query=2.7s] | flowlog: ok [index=2.2s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+indirect2              | souffle: ok [index=1.6s query=2.6s] | flowlog: ok [index=2.1s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+indirect3              | souffle: ok [index=1.8s query=2.5s] | flowlog: ok [index=2.1s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+ll                     | souffle: ok [index=1.7s query=2.4s] | flowlog: ok [index=2.0s query=2.6s] | diff: summary: 143 equal, 0 different; sarif: equal
+paper-ex               | souffle: ok [index=1.7s query=2.5s] | flowlog: ok [index=2.1s query=2.6s] | diff: summary: 143 equal, 0 different; sarif: equal
+recursion2             | souffle: ok [index=1.6s query=2.5s] | flowlog: ok [index=2.1s query=2.6s] | diff: summary: 143 equal, 0 different; sarif: equal
+slice1                 | souffle: ok [index=1.6s query=2.7s] | flowlog: ok [index=2.1s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+star-query             | souffle: ok [index=1.7s query=2.4s] | flowlog: ok [index=2.1s query=2.8s] | diff: summary: 143 equal, 0 different; sarif: equal
+star1                  | souffle: ok [index=1.7s query=2.5s] | flowlog: ok [index=2.1s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+star2                  | souffle: ok [index=1.8s query=2.5s] | flowlog: ok [index=2.2s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+star3                  | souffle: ok [index=1.7s query=2.5s] | flowlog: ok [index=2.1s query=2.6s] | diff: summary: 143 equal, 0 different; sarif: equal
+star4                  | souffle: ok [index=1.6s query=2.5s] | flowlog: ok [index=2.1s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
+test                   | souffle: ok [index=1.6s query=2.5s] | flowlog: ok [index=2.2s query=2.7s] | diff: summary: 143 equal, 0 different; sarif: equal
