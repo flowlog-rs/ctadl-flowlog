@@ -386,11 +386,13 @@ class HighFunctionExporter {
 
 // TODO: This should only be done once if dumping the entire program
 		SymbolIterator externalSymbols = f.getProgram().getSymbolTable().getSymbols(f.getName());
+		boolean hasLocalEP = false;
 		while (externalSymbols.hasNext()) {
 			Symbol next = externalSymbols.next();
 			if (!next.isExternal()) {
 				Address address = next.getAddress();
 				export(PredicateFile.HFUNC_LOCAL_EP, addressString(f.getEntryPoint()), addressString(address));
+				hasLocalEP = true;
 			} else if (next instanceof FunctionSymbol fsym) {
 				Reference[] references = fsym.getReferences();
 				for (Reference r : references) {
@@ -399,10 +401,18 @@ class HighFunctionExporter {
 						if (address != null) {
 							export(PredicateFile.HFUNC_LOCAL_EP, addressString(f.getEntryPoint()),
 									addressString(address));
+							hasLocalEP = true;
 						}
 					}
 				}
 			}
+		}
+		// No symbol has the name Ghidra gives a thunk of a function with a default name,
+		// such as thunk_FUN_00113347. CTADL makes a function's parameters and return value
+		// at its local entry points, so such a thunk gets its own entry point.
+		if (!hasLocalEP) {
+			export(PredicateFile.HFUNC_LOCAL_EP, addressString(f.getEntryPoint()),
+					addressString(f.getEntryPoint()));
 		}
 		HighFunction high = getHighFunction(res, f, decompiler);
 		debug("Starting function " + high.getFunction().getName());
