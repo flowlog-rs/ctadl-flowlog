@@ -2398,21 +2398,18 @@ class Translator:
         checks: list = []
         checked: dict = {}  # (line, call) -> checked in every clause
         for cl in clauses:
+            head, body = cl.sim if cl.sim is not None else (cl.head, cl.body)
             calls: list = []
-            for lit in (
-                [cl.sim[0]] + cl.sim[1] if cl.sim is not None else [cl.head] + cl.body
-            ):
+            for lit in [head] + body:
                 collect_exprs(lit, is_partial_call, calls)
             in_head = (
-                collect_exprs(cl.sim[0], is_partial_call, [])
-                if cl.sim is not None
-                else []
+                collect_exprs(head, is_partial_call, []) if cl.sim is not None else []
             )
             for c in calls:
                 rule = self.partial_check(cl, c, an) if c in in_head else None
                 key = (cl.line, sx_text(c))
                 whole = rule is not None and not any(
-                    contains_term(lit, c) for lit in cl.sim[1]
+                    contains_term(lit, c) for lit in body
                 )
                 checked[key] = checked.get(key, True) and whole
                 if rule is not None and not any(
