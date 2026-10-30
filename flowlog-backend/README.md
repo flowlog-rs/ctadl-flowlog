@@ -127,7 +127,8 @@ Soufflé's results. What keeps it from replacing Soufflé as the default:
   with CTADL's default of 32 workers on this machine, for an app that Soufflé indexes in 0.05 GB).
   The compiled analyses take 110–250 MB each, 19–28× Soufflé's.
 - **Symbol numbering:** P-code's type propagation depends on the engines' symbol ids, which on
-  curl and nginx coincide but are not guaranteed to ([Limitations](#limitations)).
+  curl and nginx coincide but are not guaranteed to. With ids that differed, FlowLog computed
+  what Soufflé computes with them ([Limitations](#limitations)).
 
 ## Layout
 
@@ -1364,8 +1365,11 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
   `VarnodePointerToAggregate`, and on larger programs the data-flow IR, depend on how the engine
   numbers symbols. FlowLog numbers the symbols of the facts in the order it loads them, which on
   curl and nginx is Soufflé's order; nothing guarantees this. `ord_oracle.sh` checks FlowLog's
-  results against Soufflé's under FlowLog's numbering. Strings that rules compute are numbered in
-  evaluation order, by either engine; the comparisons rename the ids that CTADL derives from them.
+  results against Soufflé's under FlowLog's numbering: on curl, with the ids of the earlier `ord`
+  UDF, which varied between runs and differed from Soufflé's for 197,957 of 197,959 symbols,
+  Soufflé computed FlowLog's database (`results/ord-oracle.txt`). Strings that rules compute are
+  numbered in evaluation order, by either engine; the comparisons rename the ids that CTADL
+  derives from them.
 - **Front ends:** CTADL's P-code and JADX front ends were run on curl, nginx and DroidBench's apps
   ([Front ends](#front-ends)). With CTADL's JADX plugin 0.7.0, apps that index an array with a
   variable cannot be analysed with either engine: the plugin writes such an index of an array read

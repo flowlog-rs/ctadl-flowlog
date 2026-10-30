@@ -1,0 +1,126 @@
+ord_oracle.sh on curl's P-code index, on FlowLog main at b99ed29, with the translation before
+commit 7ffca4c (souffle2flowlog: call FlowLog's ord, widened), when the ids of the facts'
+symbols depended on the timing of FlowLog's workers. CTADL's type propagation orders by ord, so
+its results varied: CVar_Type had 273,727, 286,216 and 277,029 rows in three FlowLog runs, and
+281,935 in each of three Soufflé runs. The oracle ran CTADL's index with Soufflé, each ord(x)
+replaced by the id that a FlowLog run gave x (197,959 symbols; 142 others were numbered past
+them), on the facts that this run read, and compared its database with the run's, whose
+CVar_Type has 286,216 rows: 167 of the 168 relations are equal, and the oracle's CTADLConfig
+lacks only the row that CTADL's driver adds after the analysis. FlowLog computed what Soufflé
+computes with FlowLog's ids.
+
+The second comparison, of a Soufflé run's database with the oracle's, shows how far those ids
+were from Soufflé's: CSourceInfo_Location gives 197,957 of its 197,959 symbols other ids, and
+the CAddress and CSourceInfo relations are keyed by them; CVar_Type and VarnodePointerToAggregate
+differ as the FlowLog run's do. That Soufflé database is from after curl's query, whose rows count
+as different (CTADLConfig, CTADLConfig_Input, CTADLStats, MG_SliceDirection). compare_db.py
+calls its first database souffle and its second flowlog. Paths are shortened.
+
+$ ord_oracle.sh IMPORT FLOWLOG_DB SCHEMA OUT
+oord: 197959 ords from OUT/ords.tsv
+oord: 142 symbols numbered past them
+DIFF     CTADLConfig: souffle 15, flowlog 16, souffle-only 0, flowlog-only 1
+           + ('CTADL_Index_Models', '')
+summary: 167 equal, 1 different
+
+$ compare_db.py SOUFFLE_DB OUT/ctadlir.db -q
+DIFF     CAddress_AbsoluteAddress: souffle 197959, flowlog 197959, souffle-only 197901, flowlog-only 197901
+           - ('1000', '1150324')
+           - ('10000', '1104007')
+           - ('100000', '1114118')
+           - ('100001', '1106872')
+           - ('100002', '1181028')
+           + ('100001', '1172711')
+           + ('100005', '1132541')
+           + ('100007', '1169588')
+           + ('100009', '1168898')
+           + ('10001', '1099915')
+DIFF     CAddress_FullyQualifiedName: souffle 196594, flowlog 196594, souffle-only 196592, flowlog-only 196592
+           - ('1000', 'FUN_00118700@00118700:00118d74:1633')
+           - ('10000', 'FUN_0010c000@0010c000:0010d887:3258')
+           - ('100000', 'FUN_0010fbe0@0010fbe0:DAT_00140148:10579')
+           - ('100001', 'FUN_0010e030@0010e030:10639')
+           - ('100002', 'FUN_00120490@00120490:12728')
+           + ('100001', 'FUN_0011af40@0011af40:0011e4e7:68490')
+           + ('100005', 'FUN_00112750@00112750:001147fd:34041')
+           + ('100007', 'FUN_0011af40@0011af40:0011d8b4:57311')
+           + ('100009', 'FUN_0011af40@0011af40:0011d602:40961')
+           + ('10001', 'FUN_0010c000@0010c000:0010c88b:19035')
+DIFF     CAddress_Kind: souffle 197959, flowlog 197959, souffle-only 150104, flowlog-only 150104
+           - ('1000', 'instruction')
+           - ('10000', 'instruction')
+           - ('100000', 'data')
+           - ('100001', 'data')
+           - ('100002', 'data')
+           + ('100001', 'instruction')
+           + ('100005', 'instruction')
+           + ('100007', 'instruction')
+           + ('100009', 'instruction')
+           + ('100016', 'instruction')
+DIFF     CAddress_Name: souffle 80183, flowlog 80183, souffle-only 80041, flowlog-only 80041
+           - ('100000', 'DAT_00140148')
+           - ('100004', 'unique:00004400')
+           - ('100006', 'local_4d8')
+           - ('100010', 'const:00000001')
+           - ('100011', 'local_4f8')
+           + ('100637', 'FUN_00117980')
+           + ('102321', 'param_4')
+           + ('102337', 'puVar14')
+           + ('102349', 'piVar7')
+           + ('102362', 'ppuVar8')
+DIFF     CSourceInfo_Address: souffle 197959, flowlog 197959, souffle-only 89853, flowlog-only 89853
+           - ('1000',)
+           - ('10000',)
+           - ('100000',)
+           - ('100002',)
+           - ('100003',)
+           + ('12431',)
+           + ('12432',)
+           + ('12433',)
+           + ('12434',)
+           + ('12435',)
+DIFF     CSourceInfo_Location: souffle 197959, flowlog 197959, souffle-only 197957, flowlog-only 197957
+           - ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398', '1', '8625')
+           - ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:00141398:0', '1', '8206')
+           - ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:@ret', '1', '508590')
+           - ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:const:00000001:0', '1', '217618')
+           - ('<EXTERNAL>::_ITM_deregisterTMCloneTable@EXTERNAL:00000081', '1', '13723')
+           + ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398', '1', '82629')
+           + ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:00141398:0', '1', '225430')
+           + ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:@ret', '1', '504033')
+           + ('<EXTERNAL>::_ITM_deregisterTMCloneTable@00141398:const:00000001:0', '1', '303027')
+           + ('<EXTERNAL>::_ITM_deregisterTMCloneTable@EXTERNAL:00000081', '1', '151674')
+DIFF     CTADLConfig: souffle 17, flowlog 15, souffle-only 2, flowlog-only 0
+           - ('CTADL_Index_Models', '')
+           - ('CTADL_Query', 'src/ctadl/souffle-logic/pcode/taintquery.dl')
+MISSING  CTADLConfig_Input: absent from the FlowLog DB, Souffle has 12 rows
+DIFF     CTADLStats: souffle 59, flowlog 53, souffle-only 6, flowlog-only 0
+           - ('import-computed-access-path', '934')
+           - ('import-vertex', '731372')
+           - ('import-virtual-assign', '940039')
+           - ('sink vertices', '0')
+           - ('source vertices', '0')
+DIFF     CVar_Type: souffle 281935, flowlog 286216, souffle-only 23682, flowlog-only 27963
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', '', 'FILE*')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', '', 'byte')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', '', 'char')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', '', 'char*')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', '', 'int')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', '', 'FILE*')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', '', 'byte')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', '', 'char')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', '', 'char*')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', '', 'int')
+MISSING  MG_SliceDirection: absent from the FlowLog DB, Souffle has 1 rows
+DIFF     VarnodePointerToAggregate: souffle 11730, flowlog 12176, souffle-only 1400, flowlog-only 1846
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', 'FILE')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52685', 'pollfd')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52688', 'FILE')
+           - ('FUN_0010c000@0010c000:DAT_00140040:52688', 'pollfd')
+           - ('FUN_0010c000@0010c000:DAT_001400c0:64925', 'FILE')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', 'FILE')
+           + ('FUN_0010c000@0010c000:DAT_00140040:141144', 'pollfd')
+           + ('FUN_0010c000@0010c000:DAT_00140040:51976', 'FILE')
+           + ('FUN_0010c000@0010c000:DAT_00140040:51976', 'pollfd')
+           + ('FUN_0010c000@0010c000:DAT_00140040:53360', 'FILE')
+summary: 198 equal, 12 different
