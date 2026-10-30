@@ -25,7 +25,8 @@ use std::sync::{LazyLock, Mutex};
 //                   2^53 is rounded and one past int64 is INT64_MIN; FlowLog
 //                   computes it exactly, with wrap-around.
 //   ord             FlowLog's `ord` is int32, and FlowLog has no numeric
-//                   conversion (`as` only types) to widen it to `number`.
+//                   conversion (`as` only types) to widen it to `number`;
+//                   the port widens it.
 //   /, %            FlowLog's operators panic on a zero divisor.
 // FlowLog's versions also work on int32, Souffle's `number` is int64.
 //
@@ -190,10 +191,12 @@ pub fn souffle_pow(a: i64, b: i64) -> i64 {
     }
 }
 
-/// Souffle's `ord(s)`, the symbol's id: FlowLog's `ord`, its interned key,
-/// without the cast to int32.
-pub fn souffle_ord(s: String) -> i64 {
-    i64::from(::flowlog_runtime::intern::intern(&s).into_inner().get())
+/// Souffle's `ord(s)`, the symbol's id, from FlowLog's `ord(s)`: the symbol's
+/// interned key, which FlowLog casts to int32. The translation calls
+/// FlowLog's `ord` rather than interning `s` here, as FlowLog then loads the
+/// facts on one worker, so that their symbols' keys do not depend on timing.
+pub fn souffle_ord(o: i32) -> i64 {
+    i64::from(o as u32)
 }
 
 // ---------------------------------------------------------------------------

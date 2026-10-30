@@ -99,7 +99,10 @@ MConst(t) :- Txt(t, ts), match("[a-z]+", ts), contains("b", ts).
 Lt(a, b) :- Txt(a, sa), Txt(b, sb), sa < sb.
 Lt(a + 100, b + 100) :- W(a, sa), W(b, sb), sa <= sb, a != b.
 
-// ord is engine-specific, but identifies symbols.
+// ord is engine-specific, but identifies symbols. The translation keeps
+// FlowLog's `ord`, widened, so that FlowLog loads the facts on one worker
+// (deterministic ids).
+// expect-fl: souffle_ord(ord(
 .decl Ord(n: number)
 .output Ord
 Ord(n) :- n = count : { Txt(_, a), Txt(_, b), ord(a) < ord(b) }.

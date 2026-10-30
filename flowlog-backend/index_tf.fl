@@ -8,7 +8,7 @@
 .extern fn choice_claim2(inst: int32, rel: int32, ck: int64, k1: string, k2: string) -> int64
 .extern fn choice_claim3(inst: int32, rel: int32, ck: int64, k1: string, k2: string, k3: string) -> int64
 .extern fn choice_claim5(inst: int32, rel: int32, ck: int64, k1: string, k2: string, k3: string, k4: string, k5: string) -> int64
-.extern fn souffle_ord(s: string) -> int64
+.extern fn souffle_ord(o: int32) -> int64
 .extern fn souffle_strlen(s: string) -> int64
 .extern fn souffle_substr(s: string, i: int64, n: int64) -> string
 .extern fn souffle_to_number(s: string) -> int64
@@ -1065,12 +1065,12 @@ isComputedAccessPath(ap) :-
 .comp SliceCallee {
   .init input_ = SliceCallee_Input
   .decl ReachableVertex(id: int64, v1: CVar, p1: CAccessPath, label: SliceLabelType)
-  Vertex(v, p), ReachableVertex(souffle_ord(cat(v, cat(":", cat(p, cat(":", label))))), v, p, label) :-
+  Vertex(v, p), ReachableVertex(souffle_ord(ord(cat(v, cat(":", cat(p, cat(":", label)))))), v, p, label) :-
       input_.StartVertex(v, p, label).
   ReachableVertex(vertex_to, v1, p1, tag) :-
-      ReachableVertex(_, v2, p2, tag), VirtualAssign_choice(v1, p1, v2, p2, _, chck279), vertex_to = souffle_ord(cat(v1, cat(":", cat(p1, cat(":", tag))))).
+      ReachableVertex(_, v2, p2, tag), VirtualAssign_choice(v1, p1, v2, p2, _, chck279), vertex_to = souffle_ord(ord(cat(v1, cat(":", cat(p1, cat(":", tag)))))).
   ReachableVertex(vertex_to, v_to, p_to, label) :-
-      ReachableVertex(_, v_from, p_from, label), CallFlowEdge(_, v_to, p_to, v_from, p_from), vertex_to = souffle_ord(cat(v_to, cat(":", cat(p_to, cat(":", label))))).
+      ReachableVertex(_, v_from, p_from, label), CallFlowEdge(_, v_to, p_to, v_from, p_from), vertex_to = souffle_ord(ord(cat(v_to, cat(":", cat(p_to, cat(":", label)))))).
   .decl CallFlowEdge(insn: CInsn, v_callee: CVar, p_callee: CAccessPath, v_caller: CVar, p_caller: CAccessPath)
   .decl IC(call: CInsn, n: int64, p: CAccessPath)
   IC(call, n, p2) :-

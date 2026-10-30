@@ -51,7 +51,9 @@ Rewrites performed (see README.md for the rationale of each one):
   * builtins whose FlowLog counterparts differ from Souffle's call ports with
     Souffle's semantics in souffle2flowlog.rs (SOUFFLE_UDFS).  The partial ones
     (`to_number`, `/`, `%`) are total there, and Souffle's stops on them are
-    reproduced by check rules where that is sound (add_partial_checks);
+    reproduced by check rules where that is sound (add_partial_checks).  The
+    port of `ord` widens FlowLog's `ord`, which keeps the ids of the facts'
+    symbols independent of the workers' timing;
   * integers are kept on Souffle's 64 bits: constant expressions are computed
     as Souffle does, with wrap-around (fold_constants), and the expressions
     FlowLog would type as int32 are pinned with `as(_, int64)` or
@@ -2001,13 +2003,16 @@ RANGE_DIGITS = 32  # RANGE_TABLE == RANGE_DIGITS ** 2
 # chars, to_number parses decimal only, a negative exponent gives 0, `/` and
 # `%` panic on a zero divisor, all but the operators are int32) map to the
 # souffle2flowlog.rs functions with Souffle's semantics: name, parameters, result.
-# `u/` and `u%` are the operators on `unsigned`.
+# `u/` and `u%` are the operators on `unsigned`. `ord(s)` becomes
+# `souffle_ord(ord(s))`, FlowLog's `ord` widened: FlowLog loads the facts of a
+# program that calls its `ord` on one worker, so that the ids of their symbols
+# do not depend on the workers' timing.
 SOUFFLE_UDFS = {
     "strlen": ("souffle_strlen", "s: string", "int64"),
     "substr": ("souffle_substr", "s: string, i: int64, n: int64", "string"),
     "to_number": ("souffle_to_number", "s: string", "int64"),
     "^": ("souffle_pow", "a: int64, b: int64", "int64"),
-    "ord": ("souffle_ord", "s: string", "int64"),
+    "ord": ("souffle_ord", "o: int32", "int64"),
     "/": ("souffle_div", "a: int64, b: int64", "int64"),
     "%": ("souffle_mod", "a: int64, b: int64", "int64"),
     "u/": ("souffle_udiv", "a: uint64, b: uint64", "uint64"),
@@ -4681,7 +4686,8 @@ class Translator:
                     )
                 if e.name in SOUFFLE_UDFS:
                     self.souffle_udfs.add(e.name)
-                    return Call(SOUFFLE_UDFS[e.name][0], e.args)
+                    args = [e] if e.name == "ord" else e.args
+                    return Call(SOUFFLE_UDFS[e.name][0], args)
             if isinstance(e, Num) and isinstance(e.val, float):
                 raise TranslateError(f"float literal {e.val} is not supported")
             if isinstance(e, Agg) and e.kind == "mean":
