@@ -109,8 +109,10 @@ compiler:
 ``FLOWLOG_COMPILER`` defaults to ``flowlog-compiler`` on ``PATH``, and
 ``FLOWLOG_RUNTIME_PATH`` makes the analyses use the runtime of the same
 checkout. ``CARGO_TARGET_DIR`` sets the cargo target directory that all
-compilations share. The FlowLog engine does not need Souffle, but CTADL
-still needs a C preprocessor for its analyses (mcpp, gcc or clang).
+compilations share. CTADL's analyses need FlowLog's ``main`` branch:
+FlowLog's releases, up to 0.8.0, lack a compiler fix that they need. The
+FlowLog engine does not need Souffle, but CTADL still needs a C
+preprocessor for its analyses (mcpp, gcc or clang).
 
 Docker distribution
 -------------------

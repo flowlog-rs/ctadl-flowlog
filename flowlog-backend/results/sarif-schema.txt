@@ -1,0 +1,1132 @@
+check_sarif_schema.py on the SARIF reports of the final runs, on FlowLog main at b99ed29 with the
+final translator and engine: taint-front and the corpora (runs/ord), the 11 option variants
+(runs/variants), the engine checks (runs/engine), the queries of curl and DroidBench's
+ActivityCommunication4 (runs/front-ends) and those of the 115 DroidBench apps that index
+(runs/droidbench). 1,123 reports, 564 of them with FlowLog. 373 are invalid, 187 of them with
+FlowLog: exactly the reports with code flows. Exit status 1, as some reports are invalid.
+
+valid    runs/droidbench/Aliasing__Merge1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Aliasing__Merge1/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__ApplicationModeling1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__ApplicationModeling1/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__DirectLeak1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__DirectLeak1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/AndroidSpecific__InactiveActivity/flowlog/query.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/AndroidSpecific__InactiveActivity/souffle/query.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/AndroidSpecific__Library2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__Library2/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__LogNoLeak/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__LogNoLeak/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__Obfuscation1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__Obfuscation1/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__Parcel1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__Parcel1/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PrivateDataLeak2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PrivateDataLeak2/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PublicAPIField1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PublicAPIField1/souffle/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PublicAPIField2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/AndroidSpecific__PublicAPIField2/souffle/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__ArrayAccess1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__ArrayAccess1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/ArraysAndLists__ArrayCopy1/flowlog/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/ArraysAndLists__ArrayCopy1/souffle/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/ArraysAndLists__ArrayToString1/flowlog/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/ArraysAndLists__ArrayToString1/souffle/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/ArraysAndLists__HashMapAccess1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__HashMapAccess1/souffle/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__ListAccess1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__ListAccess1/souffle/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__MultidimensionalArray1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ArraysAndLists__MultidimensionalArray1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__AnonymousClass1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__AnonymousClass1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/Callbacks__Button2/flowlog/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/Callbacks__Button2/souffle/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/Callbacks__Button3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button3/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button4/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button5/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Button5/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__LocationLeak3/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__MethodOverride1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__MethodOverride1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__MultiHandlers1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__MultiHandlers1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Ordering1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Ordering1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__RegisterGlobal1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__RegisterGlobal1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__RegisterGlobal2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__RegisterGlobal2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Unregister1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Callbacks__Unregister1/souffle/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicBoth1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicBoth1/souffle/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicSink1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicSink1/souffle/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicSource1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/DynamicLoading__DynamicSource1/souffle/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__ContentProvider1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__ContentProvider1/souffle/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__IMEI1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__IMEI1/souffle/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__PlayStore1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/EmulatorDetection__PlayStore1/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity1/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity2/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity3/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__FieldSensitivity4/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__InheritedObjects1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__InheritedObjects1/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__ObjectSensitivity1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__ObjectSensitivity1/souffle/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__ObjectSensitivity2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/FieldAndObjectSensitivity__ObjectSensitivity2/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__Clone1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__Clone1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__FactoryMethods1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__FactoryMethods1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__Serialization1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__Serialization1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__SourceCodeSpecific1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__SourceCodeSpecific1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StartProcessWithSecret1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StartProcessWithSecret1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization2/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StaticInitialization3/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringFormatter1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringFormatter1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringPatternMatching1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringPatternMatching1/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringToOutputStream1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__StringToOutputStream1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/GeneralJava__UnreachableCode/flowlog/query.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/GeneralJava__UnreachableCode/souffle/query.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/GeneralJava__VirtualDispatch1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__VirtualDispatch1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/GeneralJava__VirtualDispatch2/flowlog/query.sarif (1 results): 38 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/GeneralJava__VirtualDispatch2/souffle/query.sarif (1 results): 38 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/GeneralJava__VirtualDispatch3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__VirtualDispatch3/souffle/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__VirtualDispatch4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/GeneralJava__VirtualDispatch4/souffle/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow2/souffle/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow3/souffle/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/ImplicitFlows__ImplicitFlow4/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterAppCommunication__Echoer/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterAppCommunication__Echoer/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/InterAppCommunication__SendSMS/flowlog/query.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/InterAppCommunication__SendSMS/souffle/query.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/InterAppCommunication__StartActivityForResult1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterAppCommunication__StartActivityForResult1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/InterComponentCommunication__ActivityCommunication2/flowlog/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/InterComponentCommunication__ActivityCommunication2/souffle/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication3/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/InterComponentCommunication__ActivityCommunication4/flowlog/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/InterComponentCommunication__ActivityCommunication4/souffle/query.sarif (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication5/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication5/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication6/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication6/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication7/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication7/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication8/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ActivityCommunication8/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__BroadcastTaintAndLeak1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__BroadcastTaintAndLeak1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ComponentNotInManifest1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ComponentNotInManifest1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__EventOrdering1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__EventOrdering1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSink1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSink1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSink2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSink2/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSource1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__IntentSource1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ServiceCommunication1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__ServiceCommunication1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__SharedPreferences1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__SharedPreferences1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__Singletons1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__Singletons1/souffle/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__UnresolvableIntent1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/InterComponentCommunication__UnresolvableIntent1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle3/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivityLifecycle4/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivitySavedState1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ActivitySavedState1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ApplicationLifecycle3/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__AsynchronousEventOrdering1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__AsynchronousEventOrdering1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__BroadcastReceiverLifecycle1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__BroadcastReceiverLifecycle1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__BroadcastReceiverLifecycle2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__BroadcastReceiverLifecycle2/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/Lifecycle__EventOrdering1/flowlog/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/Lifecycle__EventOrdering1/souffle/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/Lifecycle__ServiceLifecycle1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__ServiceLifecycle1/souffle/query.sarif (0 results)
+INVALID  runs/droidbench/Lifecycle__ServiceLifecycle2/flowlog/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/droidbench/Lifecycle__ServiceLifecycle2/souffle/query.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/droidbench/Lifecycle__SharedPreferenceChanged1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Lifecycle__SharedPreferenceChanged1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection10-NoFlow/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection10-NoFlow/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection10/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection10/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection3/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection3/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection4/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection4/souffle/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection6/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Reflection__Reflection6/souffle/query.sarif (0 results)
+valid    runs/droidbench/Threading__AsyncTask1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Threading__AsyncTask1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Threading__Executor1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Threading__Executor1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Threading__JavaThread1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Threading__JavaThread1/souffle/query.sarif (0 results)
+valid    runs/droidbench/Threading__JavaThread2/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Threading__JavaThread2/souffle/query.sarif (0 results)
+valid    runs/droidbench/Threading__Looper1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/Threading__Looper1/souffle/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableBoth/flowlog/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableBoth/souffle/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableSink1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableSink1/souffle/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableSource1/flowlog/query.sarif (0 results)
+valid    runs/droidbench/UnreachableCode__UnreachableSource1/souffle/query.sarif (0 results)
+valid    runs/engine/frag/flowlog1/q.sarif (0 results)
+valid    runs/engine/frag/flowlog2/q.sarif (0 results)
+valid    runs/engine/frag/souffle/q.sarif (0 results)
+valid    runs/engine/mixed/alias1/flowlog-souffle/alias1.sarif (0 results)
+valid    runs/engine/mixed/alias1/souffle-flowlog/alias1.sarif (0 results)
+valid    runs/engine/mixed/alias1/souffle-souffle/alias1.sarif (0 results)
+INVALID  runs/engine/mixed/ex3/flowlog-souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/engine/mixed/ex3/souffle-flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/engine/mixed/ex3/souffle-souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/engine/mixed/global1/flowlog-souffle/global1.sarif (0 results)
+valid    runs/engine/mixed/global1/souffle-flowlog/global1.sarif (0 results)
+valid    runs/engine/mixed/global1/souffle-souffle/global1.sarif (0 results)
+valid    runs/engine/mixed/sanitizer1/flowlog-souffle/sanitizer1.sarif (0 results)
+valid    runs/engine/mixed/sanitizer1/souffle-flowlog/sanitizer1.sarif (0 results)
+valid    runs/engine/mixed/sanitizer1/souffle-souffle/sanitizer1.sarif (0 results)
+INVALID  runs/engine/taintfront2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+valid    runs/engine/taintfront2/flowlog/global2/global2.sarif (0 results)
+INVALID  runs/engine/taintfront2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+valid    runs/engine/taintfront2/souffle/global2/global2.sarif (0 results)
+INVALID  runs/front-ends/ac4/flowlog/query.out (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+INVALID  runs/front-ends/ac4/souffle/query.out (1 results): 32 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Landroid/telephony/TelephonyManager;.getDeviceId:()Ljava/lang/String;/@retparameter', path='')'"}} is not va
+valid    runs/front-ends/curl/flowlog/query.out (0 results)
+valid    runs/front-ends/curl/souffle/query.out (0 results)
+valid    runs/ord/corpus-ctadl-rs/alias_cycle/flowlog/alias_cycle.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/alias_cycle/souffle/alias_cycle.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/basic1/flowlog/basic1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/basic1/souffle/basic1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/basic3/flowlog/basic3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/basic3/souffle/basic3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/branching_taint/flowlog/branching_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/branching_taint/souffle/branching_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_paths/flowlog/callsite_paths.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_paths/souffle/callsite_paths.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_smear_field/flowlog/callsite_smear_field.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_smear_field/souffle/callsite_smear_field.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_smear_retarg/flowlog/callsite_smear_retarg.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/callsite_smear_retarg/souffle/callsite_smear_retarg.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/complex_summary_test/flowlog/complex_summary_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/complex_summary_test/souffle/complex_summary_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/comprehensive_numeric_test/flowlog/comprehensive_numeric_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/comprehensive_numeric_test/souffle/comprehensive_numeric_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/edge_cases_test/flowlog/edge_cases_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/edge_cases_test/souffle/edge_cases_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/ex3/flowlog/ex3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/ex3/souffle/ex3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/ex4/flowlog/ex4.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/ex4/souffle/ex4.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/extra_actuals/flowlog/extra_actuals.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/extra_actuals/souffle/extra_actuals.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/field_sensitivity/flowlog/field_sensitivity.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/field_sensitivity/souffle/field_sensitivity.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr1/flowlog/funcptr1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr1/souffle/funcptr1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_field_forward/flowlog/funcptr_field_forward.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_field_forward/souffle/funcptr_field_forward.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_one_frame_down/flowlog/funcptr_one_frame_down.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_one_frame_down/souffle/funcptr_one_frame_down.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_one_frame_down_same_frame/flowlog/funcptr_one_frame_down_same_frame.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_one_frame_down_same_frame/souffle/funcptr_one_frame_down_same_frame.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_through_indirect/flowlog/funcptr_through_indirect.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_through_indirect/souffle/funcptr_through_indirect.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_frames_down/flowlog/funcptr_two_frames_down.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_frames_down/souffle/funcptr_two_frames_down.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_frames_down_same_frame/flowlog/funcptr_two_frames_down_same_frame.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_frames_down_same_frame/souffle/funcptr_two_frames_down_same_frame.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_targets/flowlog/funcptr_two_targets.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_two_targets/souffle/funcptr_two_targets.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_undefined/flowlog/funcptr_undefined.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/funcptr_undefined/souffle/funcptr_undefined.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/global_call_boundary/flowlog/global_call_boundary.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/global_call_boundary/souffle/global_call_boundary.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/globals1/flowlog/globals1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/globals1/souffle/globals1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/hybrid_context_precision/flowlog/hybrid_context_precision.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/hybrid_context_precision/souffle/hybrid_context_precision.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/hybrid_inlining/flowlog/hybrid_inlining.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/hybrid_inlining/souffle/hybrid_inlining.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/loop_taint/flowlog/loop_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/loop_taint/souffle/loop_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/model_adds_to_summary/flowlog/model_adds_to_summary.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/model_adds_to_summary/souffle/model_adds_to_summary.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/multi_level_alias/flowlog/multi_level_alias.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/multi_level_alias/souffle/multi_level_alias.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/numeric_transfer/flowlog/numeric_transfer.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/numeric_transfer/souffle/numeric_transfer.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/offset_address/flowlog/offset_address.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/offset_address/souffle/offset_address.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/poly/flowlog/poly.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/poly/souffle/poly.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_bare/flowlog/port_bare.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_bare/souffle/port_bare.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_deref/flowlog/port_in_deref.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_deref/souffle/port_in_deref.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_offset/flowlog/port_in_offset.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_offset/souffle/port_in_offset.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_symbol/flowlog/port_in_symbol.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_in_symbol/souffle/port_in_symbol.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_out_symbol/flowlog/port_out_symbol.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_out_symbol/souffle/port_out_symbol.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_two_segment/flowlog/port_two_segment.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/port_two_segment/souffle/port_two_segment.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/reassignment_taint/flowlog/reassignment_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/reassignment_taint/souffle/reassignment_taint.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/recursion/flowlog/recursion.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/recursion/souffle/recursion.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/skip_analysis/flowlog/skip_analysis.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/skip_analysis/souffle/skip_analysis.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/skip_analysis_hybrid/flowlog/skip_analysis_hybrid.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/skip_analysis_hybrid/souffle/skip_analysis_hybrid.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/substitute_prefix_demo/flowlog/substitute_prefix_demo.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/substitute_prefix_demo/souffle/substitute_prefix_demo.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/summary_numeric_test/flowlog/summary_numeric_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/summary_numeric_test/souffle/summary_numeric_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/syntax_test/flowlog/syntax_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/syntax_test/souffle/syntax_test.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint1/flowlog/taint1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint1/souffle/taint1.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint2/flowlog/taint2.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint2/souffle/taint2.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint3/flowlog/taint3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint3/souffle/taint3.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint4/flowlog/taint4.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/taint4/souffle/taint4.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/update/flowlog/update.sarif (0 results)
+valid    runs/ord/corpus-ctadl-rs/update/souffle/update.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias3/souffle/alias3.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias4/souffle/alias4.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/ord/corpus-ctadl/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/ord/corpus-ctadl/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/ord/corpus-ctadl/ll/flowlog/ll.sarif (0 results)
+valid    runs/ord/corpus-ctadl/ll/souffle/ll.sarif (0 results)
+valid    runs/ord/corpus-ctadl/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/ord/corpus-ctadl/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/ord/corpus-ctadl/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/ord/corpus-ctadl/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/ord/corpus-ctadl/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/ord/corpus-ctadl/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star-query/souffle/star-query.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star1/flowlog/star1.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star1/souffle/star1.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star2/flowlog/star2.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star2/souffle/star2.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star3/flowlog/star3.sarif (0 results)
+valid    runs/ord/corpus-ctadl/star3/souffle/star3.sarif (0 results)
+INVALID  runs/ord/corpus-ctadl/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/corpus-ctadl/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/ord/corpus-ctadl/test/flowlog/test.sarif (0 results)
+valid    runs/ord/corpus-ctadl/test/souffle/test.sarif (0 results)
+valid    runs/ord/taint-front/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/ord/taint-front/alias1/souffle/alias1.sarif (0 results)
+valid    runs/ord/taint-front/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/ord/taint-front/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/ord/taint-front/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/ord/taint-front/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/ord/taint-front/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/ord/taint-front/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/ord/taint-front/global1/flowlog/global1.sarif (0 results)
+valid    runs/ord/taint-front/global1/souffle/global1.sarif (0 results)
+INVALID  runs/ord/taint-front/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/ord/taint-front/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/ord/taint-front/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/ord/taint-front/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/allout/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/allout/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/allout/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/allout/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/allout/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/allout/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/allout/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/allout/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/allout/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/allout/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/allout/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/allout/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/allout/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/allout/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/allout/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/allout/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/allout/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/allout/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/allout/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/allout/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/allout/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/allout/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/allout/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/allout/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/allout/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/allout/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/allout/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/allout/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/allout/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/allout/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/allout/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/allout/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/allout/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/allout/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/cha/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/cha/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/cha/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/cha/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/cha/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/cha/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/cha/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/cha/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/cha/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/cha/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/cha/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/cha/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/cha/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/cha/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/cha/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/cha/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/cha/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/cha/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/cha/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/cha/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/cha/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/cha/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/cha/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/cha/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/cha/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/cha/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/cha/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/cha/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/cha/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/cha/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/cha/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/cha/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/cha/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/cha/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/dynap3/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/dynap3/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/dynap3/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/dynap3/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/dynap3/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/dynap3/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/dynap3/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/dynap3/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/dynap3/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/dynap3/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/dynap3/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/dynap3/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/dynap3/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/dynap3/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/dynap3/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/dynap3/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/dynap3/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/dynap3/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/dynap3/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/dynap3/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/dynap3/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/dynap3/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/dynap3/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/kctx2/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/kctx2/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/kctx2/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/kctx2/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/kctx2/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/kctx2/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/kctx2/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/kctx2/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/kctx2/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/kctx2/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/kctx2/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/kctx2/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/kctx2/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/kctx2/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/kctx2/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/kctx2/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/kctx2/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/kctx2/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/kctx2/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/kctx2/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/kctx2/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/kctx2/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/kctx2/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/nohi/corpus/alias6/souffle/alias6.sarif (0 results)
+valid    runs/variants/nohi/corpus/backward/flowlog/backward.sarif (0 results)
+valid    runs/variants/nohi/corpus/backward/souffle/backward.sarif (0 results)
+INVALID  runs/variants/nohi/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/corpus/ex-vtable/flowlog/ex-vtable.sarif (0 results)
+valid    runs/variants/nohi/corpus/ex-vtable/souffle/ex-vtable.sarif (0 results)
+INVALID  runs/variants/nohi/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/corpus/indirect2/flowlog/indirect2.sarif (0 results)
+valid    runs/variants/nohi/corpus/indirect2/souffle/indirect2.sarif (0 results)
+valid    runs/variants/nohi/corpus/indirect3/flowlog/indirect3.sarif (0 results)
+valid    runs/variants/nohi/corpus/indirect3/souffle/indirect3.sarif (0 results)
+valid    runs/variants/nohi/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/nohi/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/nohi/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/nohi/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/nohi/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/nohi/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/nohi/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/nohi/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/nohi/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/nohi/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/nohi/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/nohi/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/nohi/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/nohi/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/nohi/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/nohi/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/nohi/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/nohi/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/nohi/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/nohi/tests/alias2/souffle/alias2.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx/flowlog/compositional-ctx.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx/souffle/compositional-ctx.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/nohi/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/nohi/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/nohi/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/nohi/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nohi/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nohi/tests/indirect1/flowlog/indirect1.sarif (0 results)
+valid    runs/variants/nohi/tests/indirect1/souffle/indirect1.sarif (0 results)
+valid    runs/variants/nohi/tests/indirect4/flowlog/indirect4.sarif (0 results)
+valid    runs/variants/nohi/tests/indirect4/souffle/indirect4.sarif (0 results)
+valid    runs/variants/nohi/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/nohi/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/nointer/corpus/alias6/souffle/alias6.sarif (0 results)
+valid    runs/variants/nointer/corpus/backward/flowlog/backward.sarif (0 results)
+valid    runs/variants/nointer/corpus/backward/souffle/backward.sarif (0 results)
+INVALID  runs/variants/nointer/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nointer/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nointer/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nointer/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nointer/corpus/ex-vtable/flowlog/ex-vtable.sarif (0 results)
+valid    runs/variants/nointer/corpus/ex-vtable/souffle/ex-vtable.sarif (0 results)
+valid    runs/variants/nointer/corpus/global3/flowlog/global3.sarif (0 results)
+valid    runs/variants/nointer/corpus/global3/souffle/global3.sarif (0 results)
+valid    runs/variants/nointer/corpus/indirect2/flowlog/indirect2.sarif (0 results)
+valid    runs/variants/nointer/corpus/indirect2/souffle/indirect2.sarif (0 results)
+valid    runs/variants/nointer/corpus/indirect3/flowlog/indirect3.sarif (0 results)
+valid    runs/variants/nointer/corpus/indirect3/souffle/indirect3.sarif (0 results)
+valid    runs/variants/nointer/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/nointer/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/nointer/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/nointer/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/nointer/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/nointer/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/nointer/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nointer/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nointer/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/nointer/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/nointer/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/nointer/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/nointer/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/nointer/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/nointer/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/nointer/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/nointer/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/nointer/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/nointer/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/nointer/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/nointer/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/nointer/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/nointer/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/nointer/tests/alias2/souffle/alias2.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx/flowlog/compositional-ctx.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx/souffle/compositional-ctx.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/nointer/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+valid    runs/variants/nointer/tests/ex3/flowlog/ex3.sarif (0 results)
+valid    runs/variants/nointer/tests/ex3/souffle/ex3.sarif (0 results)
+valid    runs/variants/nointer/tests/ex4/flowlog/ex4.sarif (0 results)
+valid    runs/variants/nointer/tests/ex4/souffle/ex4.sarif (0 results)
+valid    runs/variants/nointer/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/nointer/tests/global1/souffle/global1.sarif (0 results)
+valid    runs/variants/nointer/tests/global2/flowlog/global2.sarif (0 results)
+valid    runs/variants/nointer/tests/global2/souffle/global2.sarif (0 results)
+valid    runs/variants/nointer/tests/indirect1/flowlog/indirect1.sarif (0 results)
+valid    runs/variants/nointer/tests/indirect1/souffle/indirect1.sarif (0 results)
+valid    runs/variants/nointer/tests/indirect4/flowlog/indirect4.sarif (0 results)
+valid    runs/variants/nointer/tests/indirect4/souffle/indirect4.sarif (0 results)
+valid    runs/variants/nointer/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/nointer/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/objtrack/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/objtrack/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/objtrack/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/objtrack/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/objtrack/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/objtrack/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/objtrack/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/objtrack/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/objtrack/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/objtrack/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/objtrack/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/objtrack/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/objtrack/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/objtrack/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/objtrack/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/objtrack/tests/compositional-ctx/flowlog/compositional-ctx.sarif (6 results): 216 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/compositional-ctx/souffle/compositional-ctx.sarif (6 results): 216 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/objtrack/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/objtrack/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/objtrack/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/objtrack/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/indirect1/flowlog/indirect1.sarif (2 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/indirect1/souffle/indirect1.sarif (2 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/objtrack/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/objtrack/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/objtrack/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/parthians/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/parthians/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/parthians/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/parthians/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/parthians/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/parthians/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/parthians/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/parthians/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/parthians/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/parthians/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/parthians/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/parthians/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/parthians/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/parthians/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/parthians/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/parthians/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/parthians/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/parthians/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/parthians/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/parthians/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/parthians/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/parthians/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/parthians/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/parthians/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/parthians/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/parthians/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/parthians/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/parthians/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/parthians/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/qall/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/qall/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/qall/corpus/alias4/flowlog/alias4.sarif (6 results)
+valid    runs/variants/qall/corpus/alias4/souffle/alias4.sarif (6 results)
+valid    runs/variants/qall/corpus/alias6/flowlog/alias6.sarif (11 results)
+valid    runs/variants/qall/corpus/alias6/souffle/alias6.sarif (11 results)
+INVALID  runs/variants/qall/corpus/backward/flowlog/backward.sarif (20 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/backward/souffle/backward.sarif (20 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/bslice1/flowlog/bslice1.sarif (19 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/bslice1/souffle/bslice1.sarif (19 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/bslice2/flowlog/bslice2.sarif (21 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/bslice2/souffle/bslice2.sarif (21 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/ex-vtable/flowlog/ex-vtable.sarif (28 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/ex-vtable/souffle/ex-vtable.sarif (28 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/global3/flowlog/global3.sarif (49 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/global3/souffle/global3.sarif (49 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/indirect2/flowlog/indirect2.sarif (26 results): 120 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/indirect2/souffle/indirect2.sarif (26 results): 120 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/indirect3/flowlog/indirect3.sarif (14 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/indirect3/souffle/indirect3.sarif (14 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/qall/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/qall/corpus/paper-ex/flowlog/paper-ex.sarif (4 results)
+valid    runs/variants/qall/corpus/paper-ex/souffle/paper-ex.sarif (4 results)
+valid    runs/variants/qall/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/qall/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/qall/corpus/slice1/flowlog/slice1.sarif (19 results): 40 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/slice1/souffle/slice1.sarif (19 results): 40 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/qall/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/qall/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/qall/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/qall/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/qall/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/qall/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/qall/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/qall/corpus/star4/flowlog/star4.sarif (7 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/corpus/star4/souffle/star4.sarif (7 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/corpus/test/flowlog/test.sarif (12 results)
+valid    runs/variants/qall/corpus/test/souffle/test.sarif (12 results)
+valid    runs/variants/qall/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/qall/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/qall/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/qall/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/qall/tests/compositional-ctx/flowlog/compositional-ctx.sarif (123 results): 216 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/compositional-ctx/souffle/compositional-ctx.sarif (123 results): 216 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='service/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (59 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (59 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/qall/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/qall/tests/ex3/flowlog/ex3.sarif (19 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/ex3/souffle/ex3.sarif (19 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/ex4/flowlog/ex4.sarif (26 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/ex4/souffle/ex4.sarif (26 results): 16 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/tests/global1/flowlog/global1.sarif (55 results)
+valid    runs/variants/qall/tests/global1/souffle/global1.sarif (55 results)
+INVALID  runs/variants/qall/tests/global2/flowlog/global2.sarif (43 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/global2/souffle/global2.sarif (43 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/indirect1/flowlog/indirect1.sarif (22 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/indirect1/souffle/indirect1.sarif (22 results): 52 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/indirect4/flowlog/indirect4.sarif (14 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/qall/tests/indirect4/souffle/indirect4.sarif (14 results): 28 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/qall/tests/sanitizer1/flowlog/sanitizer1.sarif (6 results)
+valid    runs/variants/qall/tests/sanitizer1/souffle/sanitizer1.sarif (6 results)
+valid    runs/variants/star/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/star/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/star/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/star/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/star/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/star/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/star/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/star/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/star/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/star/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/star/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/star/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/star/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/star/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/star/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/star/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/star/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/star/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/star/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/star/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/star/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/star/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/star/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/star/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/star/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/star/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/star/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/star/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/star/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/star/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/star/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/star/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/star/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/star/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias3/flowlog/alias3.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias3/souffle/alias3.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias4/flowlog/alias4.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias4/souffle/alias4.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias6/flowlog/alias6.sarif (0 results)
+valid    runs/variants/unbounded/corpus/alias6/souffle/alias6.sarif (0 results)
+INVALID  runs/variants/unbounded/corpus/backward/flowlog/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/backward/souffle/backward.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/bslice1/flowlog/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/bslice1/souffle/bslice1.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/bslice2/flowlog/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/bslice2/souffle/bslice2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='main/fname', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/ex-vtable/flowlog/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/ex-vtable/souffle/ex-vtable.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/a0', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/global3/flowlog/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/global3/souffle/global3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/indirect2/flowlog/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/indirect2/souffle/indirect2.sarif (3 results): 60 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/indirect3/flowlog/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/indirect3/souffle/indirect3.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/corpus/ll/flowlog/ll.sarif (0 results)
+valid    runs/variants/unbounded/corpus/ll/souffle/ll.sarif (0 results)
+valid    runs/variants/unbounded/corpus/paper-ex/flowlog/paper-ex.sarif (0 results)
+valid    runs/variants/unbounded/corpus/paper-ex/souffle/paper-ex.sarif (0 results)
+valid    runs/variants/unbounded/corpus/recursion2/flowlog/recursion2.sarif (0 results)
+valid    runs/variants/unbounded/corpus/recursion2/souffle/recursion2.sarif (0 results)
+INVALID  runs/variants/unbounded/corpus/slice1/flowlog/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/slice1/souffle/slice1.sarif (1 results): 20 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='call_source/x', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/corpus/star-query/flowlog/star-query.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star-query/souffle/star-query.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star1/flowlog/star1.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star1/souffle/star1.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star2/flowlog/star2.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star2/souffle/star2.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star3/flowlog/star3.sarif (0 results)
+valid    runs/variants/unbounded/corpus/star3/souffle/star3.sarif (0 results)
+INVALID  runs/variants/unbounded/corpus/star4/flowlog/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/corpus/star4/souffle/star4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='A/p', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/corpus/test/flowlog/test.sarif (0 results)
+valid    runs/variants/unbounded/corpus/test/souffle/test.sarif (0 results)
+valid    runs/variants/unbounded/tests/alias1/flowlog/alias1.sarif (0 results)
+valid    runs/variants/unbounded/tests/alias1/souffle/alias1.sarif (0 results)
+valid    runs/variants/unbounded/tests/alias2/flowlog/alias2.sarif (0 results)
+valid    runs/variants/unbounded/tests/alias2/souffle/alias2.sarif (0 results)
+INVALID  runs/variants/unbounded/tests/compositional-ctx/flowlog/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/compositional-ctx/souffle/compositional-ctx.sarif (3 results): 108 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='polyZ/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/compositional-ctx2/flowlog/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/compositional-ctx2/souffle/compositional-ctx2.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/first', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/tests/compositional-ctx4/flowlog/compositional-ctx4.sarif (0 results)
+valid    runs/variants/unbounded/tests/compositional-ctx4/souffle/compositional-ctx4.sarif (0 results)
+INVALID  runs/variants/unbounded/tests/ex3/flowlog/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/ex3/souffle/ex3.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/ex4/flowlog/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/ex4/souffle/ex4.sarif (1 results): 8 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/x', path='.bar')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/tests/global1/flowlog/global1.sarif (0 results)
+valid    runs/variants/unbounded/tests/global1/souffle/global1.sarif (0 results)
+INVALID  runs/variants/unbounded/tests/global2/flowlog/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/global2/souffle/global2.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='Main/s', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/indirect1/flowlog/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/indirect1/souffle/indirect1.sarif (1 results): 26 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/tmp', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/indirect4/flowlog/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+INVALID  runs/variants/unbounded/tests/indirect4/souffle/indirect4.sarif (1 results): 14 violations, the first at /runs/0/results/0/codeFlows/0/threadFlows/0/locations/0/location/annotations/0: {'message': {'text': "Source vertex: 'VertexTy(var='f/fret', path='')'"}} is not valid under any of the given schemas
+valid    runs/variants/unbounded/tests/sanitizer1/flowlog/sanitizer1.sarif (0 results)
+valid    runs/variants/unbounded/tests/sanitizer1/souffle/sanitizer1.sarif (0 results)
+750 valid, 373 invalid
+pairs of reports, with FlowLog and with Soufflé alone: 564, 564 the same, 0 different; FlowLog's without Soufflé's: 0

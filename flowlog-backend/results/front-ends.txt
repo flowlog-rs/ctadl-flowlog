@@ -1,0 +1,59 @@
+curl   curl           import exit=0    24.6 s   1.81 GB  imported
+nginx  nginx          import exit=0   222.3 s   3.91 GB  imported
+ac4    ac4            import exit=0     1.0 s   0.26 GB  imported
+curl   souffle        index  exit=0    38.7 s   0.57 GB
+curl   souffle        query  exit=0    17.4 s   0.38 GB  results: 0
+curl   souffle-opt1   index  exit=0    39.8 s   0.57 GB  --match-star
+curl   souffle-opt2   index  exit=0    38.7 s   0.57 GB  --cha --no-hybrid-inlining
+curl   souffle-opt3   index  exit=0    65.5 s   1.76 GB  --star
+nginx  souffle        index  exit=0   452.9 s   9.40 GB
+nginx  souffle        query  exit=0    66.8 s   1.38 GB  forward source-slice: 17 instructions (check: > 10)
+ac4    souffle        index  exit=0     1.7 s   0.04 GB
+ac4    souffle        query  exit=0     2.6 s   0.06 GB  C0001 results: 1
+ac4    souffle        ctadlir exit=0     0.0 s   0.01 GB  testing 'ctadlir.db'
+ac4    souffle        export exit=0     0.2 s   0.04 GB  17222 bytes
+curl   flowlog        index  exit=0    36.0 s   4.89 GB
+curl   flowlog        query  exit=0    14.9 s   2.17 GB  results: 0
+curl   flowlog-opt1   index  exit=0    36.6 s   4.92 GB  --match-star
+curl   flowlog-opt2   index  exit=0    40.1 s   4.83 GB  --cha --no-hybrid-inlining
+curl   flowlog-opt3   index  exit=0    45.7 s   5.47 GB  --star
+nginx  flowlog        index  exit=0   182.9 s  19.17 GB
+nginx  flowlog        query  exit=0    26.9 s   3.50 GB  forward source-slice: 17 instructions (check: > 10)
+ac4    flowlog        index  exit=0     2.8 s   2.29 GB
+ac4    flowlog        query  exit=0     2.9 s   1.43 GB  C0001 results: 1
+ac4    flowlog        ctadlir exit=0     0.0 s   0.01 GB  testing 'ctadlir.db'
+ac4    flowlog        export exit=0     0.2 s   0.04 GB  17221 bytes
+curl, souffle vs flowlog:
+  summary: 210 equal, 0 different
+curl SARIF, souffle vs flowlog: sarif: equal
+curl --match-star, souffle vs flowlog:
+  summary: 168 equal, 0 different
+curl --cha --no-hybrid-inlining, souffle vs flowlog:
+  summary: 168 equal, 0 different
+curl --star, souffle vs flowlog:
+  DIFF     CTADLStats: souffle 53, flowlog 53, souffle-only 1, flowlog-only 1
+             - ('virtual-assign-summary', '22177')
+             + ('virtual-assign-summary', '22480')
+  summary: 167 equal, 1 different
+nginx, souffle vs flowlog:
+  DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 3, flowlog-only 3
+             - ('ctx', '134')
+             - ('virtual-assign-fp', '2968652')
+             - ('virtual-assign-summary', '79895')
+             + ('ctx', '135')
+             + ('virtual-assign-fp', '2968571')
+             + ('virtual-assign-summary', '79976')
+  summary: 209 equal, 1 different
+nginx summary, souffle vs flowlog: equal
+ac4, souffle vs flowlog:
+  summary: 114 equal, 0 different
+ac4 SARIF, souffle vs flowlog: sarif: equal
+ac4 GML, souffle vs flowlog: gml: equal (90 nodes, 9 edges)
+exit=0
+
+Soufflé's curl --star index, run twice more (r1, r2), compared with its first run, then r1 with r2:
+souffle --star r1 exit=0
+summary: 168 equal, 0 different
+souffle --star r2 exit=0
+summary: 168 equal, 0 different
+summary: 168 equal, 0 different

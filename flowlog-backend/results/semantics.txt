@@ -67,9 +67,9 @@ case scoping
   -w 4: same as Soufflé (6 relations, 94 rows)
   -w 32: same as Soufflé (6 relations, 94 rows)
 case strings
-  -w 1: same as Soufflé (14 relations, 337 rows)
-  -w 4: same as Soufflé (14 relations, 337 rows)
-  -w 32: same as Soufflé (14 relations, 337 rows)
+  -w 1: same as Soufflé (15 relations, 340 rows)
+  -w 4: same as Soufflé (15 relations, 340 rows)
+  -w 32: same as Soufflé (15 relations, 340 rows)
 case tparams
   -w 1: same as Soufflé (5 relations, 14 rows)
   -w 4: same as Soufflé (5 relations, 14 rows)

@@ -80,7 +80,9 @@ indexers, the compiled analyses are cached. The index has the same layout
 whichever engine wrote it, so a query with either engine can read an index
 from either. The results are the same, except where a ``choice-domain``
 key has several candidates: each engine then keeps one of them, and the
-two may keep different ones.
+two may keep different ones. FlowLog needs more memory than Souffle: about
+70 MB per worker (``-j``) on any input, and 2 to 9 times Souffle's peak
+on large ones.
 
 Next, this command creates an index, a sqlite database file
 ``ctadlir.db``. The index contains a data flow graph, a call graph, and

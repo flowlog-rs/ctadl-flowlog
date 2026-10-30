@@ -21,8 +21,21 @@ analyses run on FlowLog and produce the same results as Soufflé:
 - **Differential runs:** 435 runs, each comparing every database relation (120 per run, 143
   with `--all-outputs`) and the SARIF report. Every run is identical except one. In that run,
   FlowLog picked a different but valid `choice-domain` witness ([Limitations](#limitations)).
-- **CTADL's own tests:** `tests/bin/check-taintfront` passes with `CTADL_ENGINE=flowlog`, as with
-  Soufflé.
+- **CTADL's own tests:** with `CTADL_ENGINE=flowlog`, `tests/bin/check-taintfront` passes, as with
+  Soufflé (`results/check-taintfront.txt`). `check-taintfront2` passes too, except its two steps
+  that run Soufflé's interpreter (`--no-compile-analysis`), which the engine refuses. The steps of
+  `check-pcode`, `check-analysis-options` and `check-ActivityCommunication4`, which use the Ghidra
+  (P-code) and JADX front ends, pass on inputs like theirs ([Front ends](#front-ends)), and
+  `check-static` (black, pyright) passes. Instead of `checksarif`, the SARIF reports were
+  validated against SARIF's JSON schema: each FlowLog report has the same violations as Soufflé's
+  report of the same run, if any ([Front ends](#front-ends)).
+- **Front ends:** on curl and nginx (P-code) and on DroidBench's Android apps (JADX), the
+  databases, SARIF reports, GML exports and slices are Soufflé's. Two kinds of difference remain,
+  both valid. CTADL's statistics count rows by a `choice-domain` witness, which the engines pick
+  differently. The GML exporter takes a node's type from the last of its database rows, and the
+  engines order rows differently. Of DroidBench's 188 apps, 111 are identical, and 4 differ only
+  in such a GML type. The other 73 fail to load with either engine: CTADL's JADX plugin writes
+  facts that CTADL's analysis does not accept ([Front ends](#front-ends)).
 - **Semantics suite:** small programs check each translated construct against Soufflé. 20 programs
   give Soufflé's rows with 1, 4 and 32 workers; on 11 more, Soufflé stops with an error and so does
   FlowLog. The translator refuses 41 programs it cannot translate faithfully, rejects 7 erroneous
@@ -49,8 +62,9 @@ FlowLog does not accept CTADL's program as is. It took four things:
    - Ports of CTADL's 13 C++ functors (call strings, access paths, substring checks), in
      `functors.rs` next to CTADL's `functors.cpp`. Soufflé loads these from a C++ shared library.
    - Soufflé's semantics for builtins that FlowLog computes differently (`strlen`, `substr`,
-     `to_number`, `^`, `ord`), and for `/` and `%`, which panic in FlowLog on a zero divisor, also
-     where Soufflé may never divide ([Runtime errors](#runtime-errors)).
+     `to_number`, `^`), and for `/` and `%`, which panic in FlowLog on a zero divisor, also
+     where Soufflé may never divide ([Runtime errors](#runtime-errors)). FlowLog's `ord`, an
+     `int32`, is widened to Soufflé's 64-bit `number`.
    - Stateful helpers that emulate `choice-domain`:
      - `choice_keyN` and `choice_field` intern a candidate's dependent columns into an `int64`
        key, so that a FlowLog `min` lattice keeps one deterministic witness per key.
@@ -98,6 +112,22 @@ to work around B2, B4, B5 and B10–B13; it now relies on FlowLog's fixes instea
 compilation the binary of another program compiled at the same time; the engine and the tests
 avoid it. B15 is an internal compiler error on a rule whose body has only negated atoms, which the
 translator anchors on a one-row relation.
+
+**Status: an end-to-end alternative, opt-in, not yet the default.** With `--engine flowlog`, CTADL
+indexes and queries programs from its three front ends (taint-front, Ghidra's P-code, JADX), with
+every option but the two that run Soufflé's interpreter, and its exports, reports and checks give
+Soufflé's results. What keeps it from replacing Soufflé as the default:
+
+- **No FlowLog release has the B1 fix:** the latest, `flowlog-compiler-v0.8.0`, predates #477, so
+  the engine needs FlowLog built from `main` ([Setup](#setup)).
+- **CI:** CTADL's CI (`nix run .#test`) builds Soufflé only, so nothing tests the engine on each
+  change.
+- **Cost:** FlowLog is faster on large inputs (on nginx, 2.5× in both phases), but needs 2–9×
+  Soufflé's peak memory (19 GB for nginx's index), and about 70 MB per worker on any input (2.3 GB
+  with CTADL's default of 32 workers on this machine, for an app that Soufflé indexes in 0.05 GB).
+  The compiled analyses take 110–250 MB each, 19–28× Soufflé's.
+- **Symbol numbering:** P-code's type propagation depends on the engines' symbol ids, which on
+  curl and nginx coincide but are not guaranteed to ([Limitations](#limitations)).
 
 ## Layout
 
@@ -149,10 +179,21 @@ run_taintfront.py     differential runner (CTADL tests or any .tnt corpus)
 run_variants.sh       differential runs under non-default CTADL options
 run_sweep.sh          differential runs on generated programs: Soufflé -j 1 against Soufflé
                       and FlowLog on JOBS workers, and the choice-model check
-run_engine_checks.sh  the engine option: queries on the other engine's index, a --dl
-                      fragment's file I/O, two FlowLog runs compiling it at once
+run_engine_checks.sh  the engine option: queries on the other engine's index, CTADL's
+                      check-taintfront2, a --dl fragment's file I/O, two FlowLog runs
+                      compiling it at once
+run_front_ends.sh     CTADL's Ghidra (P-code) and JADX checks with both engines, compared
+run_droidbench.sh     Android apps (DroidBench) with both engines, compared
 compare_db.py         relation-by-relation DB comparison
 compare_sarif.py      SARIF comparison
+check_sarif_schema.py SARIF reports against SARIF 2.1.0's JSON schema, which CTADL's tests
+                      check with checksarif; FlowLog's violations against Soufflé's
+compare_gml.py        GML comparison: nodes and edges as multisets; the `type` and `ctx` that
+                      the exporter takes from the last of several rows are compared apart
+compare_pcode.py,     compare_db.py for P-code and JADX DBs, with the ids that CTADL computes
+  compare_jadx.py       with `ord` renamed; compare_jadx.py also renames them in SARIF and GML
+ord_oracle.sh, .cpp   P-code's type propagation, which orders by `ord`: Soufflé with
+                      FlowLog's numbering, compared with FlowLog
 check_choice_model.py checks that a FlowLog DB is a valid choice model (Soufflé on the
                       program restricted to FlowLog's choice-domain witnesses)
 bench.py, gen_tnt.py  benchmark harness, synthetic program generator
@@ -185,11 +226,15 @@ export PATH=$PWD/bin:$PATH CARGO_TARGET_DIR=$PWD/fltarget \
 [#477](https://github.com/flowlog-rs/flowlog/pull/477). The translator relies on the fixes for B2,
 B4, B5 and B10–B13 as well ([FlowLog findings](#flowlog-findings)), so the semantics suite and
 `repros/check.sh -t` need `main` at `c605e65` (#484) or later. On `b99ed29`, CTADL's taint-front
-tests, both corpora, the option variants, the semantics suite and the `choice-domain` test give
-the results reported here ([Validation](#validation)). The benchmarks used `main` at `84b3a1c`
-plus #477 as it was before it was merged (`fed6293`), except those [with the interner
-fix](#with-the-interner-fix). The translator's later simplifications leave CTADL's FlowLog
-programs (`index_tf.fl`, `query_tf.fl`) unchanged, byte for byte.
+tests, both corpora, the option variants, the semantics suite, the `choice-domain` test and the
+front ends give the results reported here ([Validation](#validation)). The benchmarks used `main`
+at `84b3a1c` plus #477 as it was before it was merged (`fed6293`), except those [with the
+interner fix](#with-the-interner-fix). The translator's later simplifications leave CTADL's
+FlowLog programs (`index_tf.fl`, `query_tf.fl`) unchanged, byte for byte, but for the `ord` fix:
+`souffle_ord`'s declaration and its 3 calls in each program. The fixed programs are as fast: on
+syn25 with 32 workers, medians of 3 runs on `b99ed29`, FlowLog's engine took 3.47 s for the index
+(3.43 s before the fix) and 17.0 s for the query (17.9 s). On syn10, the query's fell from 2.37 s
+to 0.77 s (`results/bench/ord-ab.txt`).
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
 analyses and the cargo target dir take a few GB ([Disk usage](#disk-usage)). Put the workspace,
@@ -217,7 +262,8 @@ ctadl --directory work query --engine flowlog --format sarif -o prog.sarif
 - **Mixing engines:** the index database has Soufflé's layout whichever engine wrote it, and a
   query with either engine reads an index from either.
 - **Options:** CTADL's options work with both engines, except `--souffle-arg` and
-  `--no-compile-analysis` (Soufflé's interpreter), which need `--engine souffle`.
+  `--no-compile-analysis` (Soufflé's interpreter), which need `--engine souffle`. `ctadl` refuses
+  them with FlowLog before it touches any output, so `index -f` keeps the existing index.
 - **Environment variables:** `CTADL_ENGINE`; `FLOWLOG_COMPILER` (default: `flowlog-compiler` on
   `PATH`); `FLOWLOG_RUNTIME_PATH`, the `flowlog-runtime` source that the compiler builds against
   (default: the crates.io release it was built with); `CARGO_TARGET_DIR`, the cargo target dir
@@ -309,7 +355,8 @@ they need FlowLog's `int64` type or its UDFs; the semantics suite tests those re
 | `.pragma`, representation qualifiers | Dropped. `.limitsize`, which truncates a relation, is rejected. | `pragma` |
 | Output relations that no fact, input or rule derives | Kept. FlowLog prunes them and writes nothing for them; the engine creates their tables and files empty, as Soufflé does ([Pipeline](#pipeline)). | `empty_dataflow`, `empty_output` |
 | `number`, `unsigned` | `int64`, `uint64`: CTADL needs Soufflé's 64-bit domain. Constant expressions are computed with Soufflé's wrap-around, and expressions FlowLog would compute on `int32` are pinned to 64 bits with `as` ([below](#integers)). `float` is rejected (CTADL has none). | `cast_literal`, `tests/flowlog/semantics/cases/widths.dl` |
-| `strlen`, `substr`, `^`, `ord` | Calls to UDFs with Soufflé's semantics (`souffle_strlen`, …). FlowLog's `strlen` and `substr` count characters, not bytes (bug B7), and its `^` is exact where Soufflé truncates a `double`. Its `ord` is an `int32`, which FlowLog cannot widen. | `souffle_builtins`, `tests/flowlog/semantics/cases/pow.dl` |
+| `strlen`, `substr`, `^` | Calls to UDFs with Soufflé's semantics (`souffle_strlen`, …). FlowLog's `strlen` and `substr` count characters, not bytes (bug B7), and its `^` is exact where Soufflé truncates a `double`. | `souffle_builtins`, `tests/flowlog/semantics/cases/pow.dl` |
+| `ord(s)` | `souffle_ord(ord(s))`. In both engines, `ord` is the symbol's id in the engine's symbol table. FlowLog's is an `int32`, which `as` cannot convert (it only types), so a UDF widens it. FlowLog loads the inputs of a program that calls its `ord` on one worker, in order, so the ids of the inputs' symbols do not depend on the workers' timing; a UDF that interned `s` itself gave CTADL's P-code ids that varied between runs. The ids of strings that rules compute (`ord(cat(..))`) depend on timing, as in Soufflé with several threads. | `tests/flowlog/semantics/cases/strings.dl` |
 | `to_number`, `/`, `%` | Total UDFs with Soufflé's semantics, plus check rules for Soufflé's runtime errors ([below](#runtime-errors)). FlowLog's `to_number` parses decimal only. Its `/` and `%` panic on a zero divisor, also on rows Soufflé may never evaluate (as in bugs B8 and B9, now fixed). | `filter_order`, `antijoin_projection` |
 | `.input`/`.output` | `IO`, `filename` and `delimiter` kept; other parameters dropped with a warning. Sqlite and file directives are recorded in the schema manifest, one entry per component instance (`inst.R`). | `tests/flowlog/adapter` |
 | Several `.output`s of a top-level relation, `.output R`, `.output R(filename="R2.csv")` | FlowLog writes one per relation. The one not to a file (at most one), else the first, stays on `R`, and each other one writes a copy, `FlowlogOutputN(x) :- R(x).`, to the file Soufflé writes. Two outputs to one file are rejected. | `dup_output`, `tests/flowlog/semantics/cases/outputs.dl` |
@@ -539,14 +586,15 @@ name resolves to there. Both engines name the relation and its default file afte
 | `AndroidManifestClassId` | Android manifest class ids (unused by taint-front) |
 | `choice_key1..4`, `choice_field`, `choice_number` | `minchoice` keys: intern the dependent columns, decode them (`choice_number` for a `number` column) |
 | `choice_claim1..6` | In-loop witness claims |
-| `souffle_strlen`, `souffle_substr`, `souffle_pow`, `souffle_ord` | Soufflé's `strlen` and `substr` (on bytes), `^` (truncated `std::pow`) and `ord` (as a `number`) |
+| `souffle_strlen`, `souffle_substr`, `souffle_pow`, `souffle_ord` | Soufflé's `strlen` and `substr` (on bytes), `^` (truncated `std::pow`); FlowLog's `ord` as a `number` |
 | `souffle_to_number`, `souffle_div`, `souffle_mod`, `souffle_udiv`, `souffle_umod` | Soufflé's partial functions, made total: 0 where Soufflé stops |
 | `souffle_*_error`, `souffle_raise` | The [runtime-error](#runtime-errors) checks: Soufflé's complaint, or `""`; stop the run |
 
 The first four rows are CTADL's functors, in `src/ctadl/souffle-logic/functors.rs`, which ports
 `functors.cpp` next to it. The others are the translator's, in `src/ctadl/flowlog/souffle2flowlog.rs`.
 FlowLog passes `string` arguments as owned `String`, and `number` (FlowLog's `int64`, as CTADL
-builds Soufflé with 64-bit numbers) as `i64`. The choice helpers' priorities, instance and relation ids are `int32`.
+builds Soufflé with 64-bit numbers) as `i64`. The choice helpers' priorities, instance and relation
+ids, and `souffle_ord`'s argument, are `int32`.
 
 ## Validation
 
@@ -570,21 +618,25 @@ The differential results:
 
 Both backends ran with 32 workers (`-j 32`). That is CTADL's default on the test machine, which
 has 64 hardware threads; CTADL uses half the CPUs. The runs used `ctadl --engine flowlog` on FlowLog
-`main` at `b99ed29`, with FlowLog's analyses compiled from scratch. Earlier rounds, on `main` at
-`84b3a1c` plus #477 with 4 and 32 workers, gave the same results. The engine's final file I/O
-(component instances, records in Soufflé's text) came after the corpus and variant runs. It leaves
-CTADL's FlowLog programs the same, byte for byte, and gives the same FlowLog input files for the
-fact directories of all 447 FlowLog runs of the round. With it, the taint-front tests are again
-identical, and CTADL's `tests/bin/check-taintfront` passes with `CTADL_ENGINE=flowlog`. Each run's
-line is in `results/taint-front/summary.txt` (with the final code),
-`results/corpus-ctadl/summary.txt`, `results/corpus-ctadl-rs/summary.txt` and
-`results/variants/*/summary.txt`; their times include the compilation of FlowLog's analyses in the
-first runs. Three more checks of the engine option, made by `run_engine_checks.sh` with the final
-code, gave Soufflé's results (`results/engine.txt`): four taint-front tests whose query ran on the
-other engine's index, both ways round; a `--dl` query fragment with file inputs and outputs
-(records, nullary relations, a component instance, a subdirectory, several outputs of a relation,
-among them one the query writes to its database), whose files are the same with either engine;
-and two FlowLog runs of that fragment at the same time, which compiled its analysis once.
+`main` at `b99ed29`, with the final translator and engine, and FlowLog's analyses compiled from
+scratch. Earlier rounds gave the same results: on `main` at `84b3a1c` plus #477, with 4 and 32
+workers, and on `b99ed29` before the `ord` fix ([Setup](#setup)). Each run's line is in
+`results/taint-front/summary.txt`, `results/corpus-ctadl/summary.txt`,
+`results/corpus-ctadl-rs/summary.txt` and `results/variants/*/summary.txt`; their times include
+the compilation of FlowLog's analyses in the first runs. Four more checks of the engine option,
+made by `run_engine_checks.sh`, gave Soufflé's results (`results/engine.txt`):
+
+- four taint-front tests whose query ran on the other engine's index, both ways round;
+- CTADL's `tests/bin/check-taintfront2`, in a copy for each engine. It indexes and queries with
+  Soufflé's interpreter (`--no-compile-analysis`), runs three commands that must fail (an index
+  that exists, a missing facts directory, a missing index), then indexes without interprocedural
+  data flow, exports the GML and queries for a SARIF report without code flows. Every step exits
+  as with Soufflé, except the two interpreter runs, which FlowLog refuses; the databases, SARIF
+  reports and GML exports are equal;
+- a `--dl` query fragment with file inputs and outputs (records, nullary relations, a component
+  instance, a subdirectory, several outputs of a relation, among them one the query writes to its
+  database), whose files are the same with either engine;
+- two FlowLog runs of that fragment at the same time, which compiled its analysis once.
 
 The option variants are: `--object-tracking`, `--hybrid-inlining-context-bound=2`,
 `--no-hybrid-inlining`, `--dynamic-access-paths-max-length=3`, `--no-interprocedural-data-flow`,
@@ -605,11 +657,61 @@ Per-variant tallies are in `results/variants/tally.txt`.
   canonical renaming. Rule C0006 is filled by CTADL's own SQL, which uses `GROUP BY` with bare
   columns. SQLite then picks an arbitrary row, so only the candidate set is compared.
 
+<a id="front-ends"></a>
+**Front ends.** The suites above use taint-front, CTADL's language for hand-written examples. Its
+other tests run the analyses on facts from Ghidra (P-code) and JADX: `check-pcode` and
+`check-analysis-options` on curl and nginx, which they build with nix, and
+`check-ActivityCommunication4` on a DroidBench app. `run_front_ends.sh` runs their steps with both
+engines, on Ubuntu's curl, an nginx built with the flags of CTADL's `nginx-debug`, and the app
+([Versions](#versions)), and compares the results (`results/front-ends.txt`). Each engine runs in a
+copy of the import, with 32 workers and its analyses compiled beforehand. Times are the wall times
+of `ctadl`'s commands, and memory the largest peak RSS among their processes:
+
+| Program | Step | Soufflé | FlowLog | Compared |
+|---|---|---|---|---|
+| curl (P-code) | index | 38.7 s, 0.57 GB | 36.0 s, 4.89 GB | |
+| | query, SARIF | 17.4 s, 0.38 GB | 14.9 s, 2.17 GB | database (210 relations) and SARIF equal; no results |
+| | index `--match-star` | 39.8 s, 0.57 GB | 36.6 s, 4.92 GB | database (168) equal |
+| | index `--cha --no-hybrid-inlining` | 38.7 s, 0.57 GB | 40.1 s, 4.83 GB | database (168) equal |
+| | index `--star` | 65.5 s, 1.76 GB | 45.7 s, 5.47 GB | 167 relations equal; CTADLStats: 1 count differs |
+| nginx (P-code) | index | 452.9 s, 9.40 GB | 182.9 s, 19.17 GB | |
+| | query, forward slice | 66.8 s, 1.38 GB | 26.9 s, 3.50 GB | 209 relations equal; CTADLStats: 3 counts differ. Slice summaries equal (17 instructions; the check wants more than 10) |
+| ActivityCommunication4 (JADX) | index | 1.7 s, 0.04 GB | 2.8 s, 2.29 GB | |
+| | query, SARIF | 2.6 s, 0.06 GB | 2.9 s, 1.43 GB | database (114) and SARIF equal; the check's C0001 result and intent assignments |
+| | export, GML | 0.2 s | 0.2 s | GML equal (90 nodes, 9 edges) |
+
+- **CTADLStats** counts the rows of some intermediate relations. Those that differ depend on the
+  context that `ContextObj`'s `choice-domain` keeps for a key, which the engines pick differently:
+  the number of contexts (134 and 135 on nginx) and of the virtual assignments made in them. Each
+  engine picks the same contexts on every run: Soufflé's `--star` index of curl, run three times,
+  gave the same database each time, and FlowLog's gave the same counts as in an earlier run.
+- **Time and memory:** on nginx, FlowLog's index and query phases are each 2.5× as fast as
+  Soufflé's, with 2.0× and 2.5× its memory. FlowLog needs about 70 MB per worker whatever the
+  program: ActivityCommunication4's index takes 0.15 GB with 1 worker, 0.33 GB with 4 and 2.3 GB
+  with 32, against Soufflé's 0.05 GB.
+- **DroidBench:** `run_droidbench.sh` runs `check-ActivityCommunication4`'s steps on DroidBench's
+  188 apps, with 4 workers per engine (`results/droidbench.txt`). 111 apps give identical
+  databases, SARIF reports and GML exports; 11 of them report a leak, with either engine. 4 more
+  differ only in the GML, where 1 or 2 nodes get another type: the exporter takes a node's type
+  from the last of its database rows, and the engines order the rows differently. The other 73
+  fail to index with either engine, on facts that CTADL's JADX plugin writes
+  ([Limitations](#limitations)).
+- **SARIF validation:** `check-pcode` validates curl's report with `checksarif`, Microsoft's SARIF
+  multitool, and fails on its schema violations. `check_sarif_schema.py` validates reports against
+  the same schema (SARIF 2.1.0, at the revision that CTADL pins) with Python's `jsonschema`, and
+  compares the violations of each FlowLog report with those of Soufflé's report of the same run.
+  curl's report is valid with either engine. Of the 1,123 reports of all the runs above, the 373
+  with code flows are invalid, and each of the 564 FlowLog reports has the same number of results
+  and the same violations in each result as Soufflé's (`results/sarif-schema.txt`). CTADL writes a
+  code-flow location's annotations as a message without a position (`startLine`, `charOffset` or
+  `byteOffset`), which a SARIF region requires. CTADL's tests validate only curl's report, which
+  has no results.
+
 Other checks:
 
 - `tests/flowlog/semantics/run.sh` tests the translation rule by rule against Soufflé, on small programs
   written for the purpose (last run in `results/semantics.txt`):
-  - `cases/` (20 programs, 1,198 rows): every output relation is equal with FlowLog at 1, 4 and
+  - `cases/` (20 programs, 1,201 rows): every output relation is equal with FlowLog at 1, 4 and
     32 workers. They cover rule forms, components and their name scoping, arithmetic and integer
     widths, strings, aggregates and their scoping, records, ranges, `choice-domain`, programs
     without a derived output, several outputs of a relation, `.plan` hints, and Soufflé's
@@ -1194,7 +1296,8 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
    row, and pass strings to UDFs as `&str`.
 4. **64-bit literals:** a literal that no column or parameter types is an `int32`. The translator
    pins such terms to 64 bits with `as`, which types them since #487 and #492. An option to
-   default to `int64` would make these anchors unnecessary ([Integers](#integers)).
+   default to `int64` would make these anchors unnecessary ([Integers](#integers)), and an `int64`
+   `ord`, `souffle_ord`.
 5. **Soufflé-compatible syntax**: nested components; `inline`; records (flattening would be enough);
    `range`; variadic `cat`; expression arguments of atoms; negation and aggregation over computed
    values; computed facts and bodies; `true`/`false`; ignoring unknown `.pragma`s;
@@ -1211,6 +1314,10 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
    compile, against Soufflé's 2 min 43 s and 1 min 10 s. The binaries are 19–28× larger (168 and
    116 MB). Both engines cache the binary, so this cost is paid once per version of the analysis,
    but it slows down work on the analysis itself.
+8. **Memory.** FlowLog needs about 70 MB per worker whatever the program: CTADL's index of a small
+   Android app takes 0.15 GB with 1 worker, 0.33 GB with 4 and 2.3 GB with 32, where Soufflé takes
+   0.05 GB. On large inputs it needs 2–9× Soufflé's peak memory, for example 19 GB against 9.4 GB
+   for nginx's index ([Front ends](#front-ends)).
 
 ## Limitations
 
@@ -1252,13 +1359,23 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
   outer relation, instantiated twice, or `.output inst.R` next to the component's own). Fact files
   are read as FlowLog reads them, for blank lines and extra columns ([Behaviour
   differences](#behaviour-differences)).
-- **Front ends:** only the taint-front front end was exercised. Ghidra (P-code) and JADX (Android)
-  imports use the same analysis programs but were not run.
+- **Symbol numbering:** CTADL's P-code type propagation (`typeprop.dl`) orders its constraint
+  edges by `ord` and represents each class by its varnode of least `ord`, so `CVar_Type` and
+  `VarnodePointerToAggregate`, and on larger programs the data-flow IR, depend on how the engine
+  numbers symbols. FlowLog numbers the symbols of the facts in the order it loads them, which on
+  curl and nginx is Soufflé's order; nothing guarantees this. `ord_oracle.sh` checks FlowLog's
+  results against Soufflé's under FlowLog's numbering. Strings that rules compute are numbered in
+  evaluation order, by either engine; the comparisons rename the ids that CTADL derives from them.
+- **Front ends:** CTADL's P-code and JADX front ends were run on curl, nginx and DroidBench's apps
+  ([Front ends](#front-ends)). With CTADL's JADX plugin 0.7.0, apps that index an array with a
+  variable cannot be analysed with either engine: the plugin writes such an index of an array read
+  or write (`AGet`, `APut`) as the variable, where CTADL 0.14.1 declares a `number`; CTADL's own
+  check uses an app that does not.
 
 <a id="disk-usage"></a>
 ## Disk usage
 
-- **Compiled analyses:** each takes about 100–190 MB in CTADL's state directory
+- **Compiled analyses:** each takes about 110–250 MB in CTADL's state directory
   (`~/.local/state/ctadl/analysis/<version>/flowlog/`). Delete the entries you no longer need; any
   change to the translator, policy, UDFs or compiler produces new keys.
 - **Shared target dir:** the cargo target dir (`CARGO_TARGET_DIR`, by default `target/` in the
@@ -1280,6 +1397,8 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
 | CTADL | 0.14.1, `4f6f8cb` |
 | ctadl-rs | `7c98b73e` |
 | Soufflé | 2.5 |
+| Front ends | Ghidra 11.2 with CTADL's Ghidra plugin 0.1.0, CTADL's JADX plugin 0.7.0, on Temurin JDK 21.0.13+9 |
+| Front-end inputs | curl 7.81.0 (Ubuntu 22.04's `/usr/bin/curl`); nginx 1.24.0, built with `--with-debug --with-cc-opt=-gdwarf-4 --without-http_gzip_module --without-http_rewrite_module`; DroidBench's 188 apps (`master` at `a57fa6f`) |
 | g++ | 11.4.0 (compiles Soufflé's analyses) |
 | Rust | 1.95.0 |
 | Python | 3.10.12 |

@@ -1,0 +1,7 @@
+CTADL's tests/bin/check-taintfront with each engine (CTADL_ENGINE=souffle, then flowlog), on
+FlowLog main at b99ed29 with the final translator and engine; CTADL's default of 32 workers,
+the analyses compiled beforehand. It imports, indexes and queries the 12 tests of
+tests/taint-front, and checks the IR (7 tests), code flows (4) and their absence (1).
+
+souffle: 12 tests, no failure, exit 0
+flowlog: 12 tests, no failure, exit 0
