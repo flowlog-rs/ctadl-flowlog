@@ -238,7 +238,7 @@ syn25 with 32 workers, medians of 3 runs on `b99ed29`, FlowLog's engine took 3.4
 to 0.77 s (`results/bench/ord-ab.txt`).
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
-analyses and the cargo target dir take a few GB ([Disk usage](#disk-usage)). Put the workspace,
+analyses and the cargo target dir take about 1 GB ([Disk usage](#disk-usage)). Put the workspace,
 CTADL's state directory (`XDG_STATE_HOME`, where the compiled analyses are cached) and `TMPDIR` on
 a disk with room.
 
@@ -1172,7 +1172,7 @@ every repro of those bugs gives Soufflé's result there, except `count_all_wild`
 | **B11** `cast_literal` (FlowLog syntax): `as(1, int64) bshl 31 > 0` and `as(-1, int64) bshru 1 = 2147483647` | With `number`: `O={shl}` | `O={shru}`: `as` leaves the literal `int32`. | The translator pins widths with `as` and relies on the fix ([Integers](#integers)). |
 | **B12** `empty_dataflow`: no rule, fact or input derives an output | `A={}` | rustc fails: ``unused import: `super::*` ``. FlowLog prunes every relation. | The translator relies on the fix. FlowLog then writes no file for the output, and the engine creates it empty ([Pipeline](#pipeline)). |
 | **B13** `type_limit_cmp`: `A(u) :- U(u), u >= 0.` on `unsigned` | `A={3}` | rustc fails: `comparison is useless due to type limits`. | The translator relies on the fix. |
-| **B14** `same_name.sh`: two programs compiled at the same time to executables of the same name, `-o a/bin` and `-o b/bin`, with the same target dir (`-T`) | (no shared build) | `b` runs `a`'s program: `a: O={1}`, `b: O={1}`, every time. FlowLog names the crate after the executable, and each crate is a cargo workspace of its own, so the two share cargo's build of the crate, whose freshness cargo judges by mtimes. `b`'s sources are written while `a` builds, cargo finds `b` up to date, and flowlog-compiler copies `a`'s binary. | The engine names each analysis' crate after its cache key, and the tests name theirs after the run. |
+| **B14** `same_name.sh`: two programs compiled at the same time to executables of the same name, `-o a/bin` and `-o b/bin`, with the same target dir (`-T`) | (no shared build) | `b` runs `a`'s program: `a: O={1}`, `b: O={1}`, every time. FlowLog names the crate after the executable, and each crate is a cargo workspace of its own, so the two share cargo's build of the crate, whose freshness cargo judges by mtimes. `b`'s sources are written while `a` builds, cargo finds `b` up to date, and flowlog-compiler copies `a`'s binary. | The engine names each analysis' crate after its cache entry, and the tests name theirs after the run. |
 | **B15** `neg_only_body`: a body whose only atoms are negated, `A(1) :- !B(1).` (also `A(x) :- x = 1, !B(x).`) | `A={1}` | Internal compiler error in the planner: `optimizer needs at least two core atoms, found 0 in a(1) :- !π[](b)().` Bodies with only an aggregate or only comparisons compile. | The translator anchors a body with no positive atom or aggregate on `FlowlogUnit`. |
 
 B8's report also mentions a variable repeated in an atom, `O(x) :- R(x, x, b), x / b > 1.`.
@@ -1386,11 +1386,12 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
   (`~/.local/state/ctadl/analysis/<version>/flowlog/`). Delete the entries you no longer need; any
   change to the translator, policy, UDFs or compiler produces new keys.
 - **Shared target dir:** the cargo target dir (`CARGO_TARGET_DIR`, by default `target/` in the
-  cache) keeps the compiled FlowLog runtime and dependencies, about 0.8 GB. Since each analysis'
-  crate is named after its key (B14), it also keeps cargo's copy of each compiled analysis
-  (`release/deps/ctadl_<key>-*`). Deleting the target dir is safe: the next compilation first
-  rebuilds the runtime. The tests use it too when it is set, or `ctadl-test-output/flowlog-target`,
-  and remove their programs' builds from it when they exit.
+  cache) keeps the compiled FlowLog runtime and dependencies, about 0.3 GB for each runtime it
+  builds against. The rest of each build (cargo's copy of the binary,
+  `release/deps/ctadl_<hash>-*`, and its fingerprint) is removed from it: by the engine once the
+  binary is cached, by the tests when they exit. Deleting the target dir is safe: the next
+  compilation first rebuilds the runtime. The tests use it too when it is set, or
+  `ctadl-test-output/flowlog-target`.
 - **Build dirs:** FlowLog enables rustc incremental compilation when given a build dir (`-B`). The
   engine would never reuse one, and each would keep about 1 GB, so it passes none: the compiler
   then builds in a scratch directory next to its output and deletes it after a successful build.

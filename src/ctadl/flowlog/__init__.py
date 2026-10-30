@@ -36,6 +36,7 @@ import shutil
 import subprocess
 import sys
 from collections import defaultdict
+from contextlib import suppress
 from importlib import resources
 from pathlib import Path
 
@@ -129,8 +130,11 @@ class FlowLogAnalysis:
         target = os.environ.get("CARGO_TARGET_DIR") or str(CACHE / "target")
         # flowlog-compiler names the crate after the executable. In a shared
         # target dir, cargo can take a build of another crate of the same name
-        # for this one's, so each analysis gets its own name.
-        tmp, log = self.dir / f"ctadl_{self.dir.name}", self.dir / "compile.log"
+        # for this one's, and the cleanup below would remove a build still in
+        # progress: so each cache entry (built by one process at a time) gets
+        # a name of its own, even for the same analysis in another cache.
+        name = hashlib.sha256(str(self.dir.resolve()).encode()).hexdigest()[:32]
+        tmp, log = self.dir / f"ctadl_{name}", self.dir / "compile.log"
         cmd = [
             str(flc),
             str(program),
@@ -150,6 +154,19 @@ class FlowLogAnalysis:
             error(f"FlowLog compilation failed (log: '{log}'):\n" + "\n".join(tail))
             sys.exit(1)
         os.replace(tmp, self.bin)
+        # The binary is cached here: of its build, the target dir need only
+        # keep what the analyses share (the runtime and dependencies).
+        release = Path(target) / "release"
+        for p in [release / tmp.name, release / f"{tmp.name}.d"] + [
+            p
+            for d in ("deps", ".fingerprint")
+            for p in release.glob(f"{d}/{tmp.name}-*")
+        ]:
+            with suppress(OSError):
+                if p.is_dir():
+                    shutil.rmtree(p)
+                else:
+                    p.unlink()
 
     def read_inputs(self, fact_dir, tmp: Path) -> tuple[Path, Path]:
         """Writes the analysis' inputs, from the Souffle fact directory

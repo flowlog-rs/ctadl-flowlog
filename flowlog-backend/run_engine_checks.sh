@@ -186,14 +186,11 @@ END
     echo "--dl fragment, $e: $same; $(compare_db "$F/souffle/ctadlir.db" "$F/$e/ctadlir.db"); $(compare_sarif \
       "$F/souffle/q.sarif" "$F/$e/q.sarif")"
   done
-  # FlowLog's status line names the analysis in the cache
+  # FlowLog's status line names the analysis in the cache (the engine removes
+  # its build from the target dir)
   keys=$(sed -n "s/^.*compiling FlowLog analysis to '\(.*\)\/analysis'.*$/\1/p" "$F"/flowlog[12]/run.log)
   echo "--dl fragment, FlowLog compilations: $(printf '%s' "$keys" | grep -c .)"
-  for k in $keys; do
-    target=${CARGO_TARGET_DIR:-$(dirname "$k")/target}
-    rm -rf "$k" "$target/release/ctadl_$(basename "$k")"{,.d} \
-      "$target"/release/{deps,.fingerprint}/"ctadl_$(basename "$k")"-*
-  done
+  for k in $keys; do rm -rf "$k"; done
   cat "$F/souffle.txt"
 }
 
