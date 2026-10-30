@@ -3651,7 +3651,7 @@ class Translator:
                 out.extend(self.transform_decl(it, scope))
             elif isinstance(it, IODecl):
                 self.record_io(it, scope)
-                r = self.transform_io(it)
+                r = self.transform_io(it, scope)
                 if r is not None:
                     out.append(r)
             elif isinstance(it, Comp):
@@ -3857,7 +3857,7 @@ class Translator:
                     entry["read"] = False
                 lst.append(entry)
 
-    def transform_io(self, io: IODecl) -> Raw | None:
+    def transform_io(self, io: IODecl, scope: tuple) -> Raw | None:
         if io.kind == ".limitsize":
             raise TranslateError(
                 f".limitsize {io.name} is not supported (it truncates the relation)"
@@ -3872,8 +3872,22 @@ class Translator:
                 params.append(f"{k}={fl_string(v)}")
             else:
                 self.warn(f"{io.kind} {io.name}: dropped IO parameter {k}={v}")
+        if io.kind == ".output":
+            params += self.output_order(io, scope)
         p = f"({', '.join(params)})" if params else ""
         return Raw(f"{io.kind} {io.name}{p}")
+
+    def output_order(self, io: IODecl, scope: tuple) -> list:
+        """Souffle writes a relation's rows sorted, in the order of its
+        index; FlowLog writes them in the order its workers publish them,
+        which differs between runs with several workers. CTADL reads some
+        choices from the first or last of a relation's database rows (a
+        statistic, a variable's name, a witness path), so FlowLog sorts the
+        rows by every column, a string by its text: each run then writes
+        the same tables."""
+        d = self.resolve_decl(io.name, scope)
+        cols = [fl_name(a) for a, _ in self.flat_attrs(d.attrs)] if d else []
+        return [f"order_by={fl_string(', '.join(cols))}"] if cols else []
 
     def transform_decl(self, d: RelDecl, scope: tuple) -> list:
         attrs = self.flat_attrs(d.attrs)

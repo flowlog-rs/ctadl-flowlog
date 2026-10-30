@@ -1,8 +1,9 @@
 // Several .output directives of a relation: FlowLog writes one per
 // relation, so each further one writes a copy of it (split_outputs).
-// expect-fl: .output FlowlogOutput2(delimiter=",", filename="R3.csv")
-// expect-fl: .output FlowlogOutput3(filename="E.csv")
-// expect-fl: .output FlowlogOutput4(filename="S.csv")
+// Each output sorts the relation's rows (output_order).
+// expect-fl: .output FlowlogOutput2(delimiter=",", filename="R3.csv", order_by="x, s")
+// expect-fl: .output FlowlogOutput3(filename="E.csv", order_by="x")
+// expect-fl: .output FlowlogOutput4(filename="S.csv", order_by="x")
 .decl R(x: number, s: symbol)
 R(1, "a").
 R(2, "b c").

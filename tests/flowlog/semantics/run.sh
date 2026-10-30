@@ -2,7 +2,9 @@
 # Differential semantics suite for ctadl.flowlog's Soufflé-to-FlowLog
 # translator, souffle2flowlog.py and souffle2flowlog.rs.
 #   cases/*.dl    Soufflé and the port (FlowLog with 1 and 4 workers) must
-#                 write the same rows to every output relation.
+#                 write the same rows to every output relation, and the
+#                 port must write each file's rows in the same order with
+#                 every worker count.
 #   rejects/*.dl  the translator must refuse them with an error message.
 #   invalid/*.dl  Soufflé must reject them as erroneous, and so must the
 #                 translator (with an error message).
@@ -83,6 +85,7 @@ for f in "$HERE"/cases/*.dl; do
   while IFS= read -r want; do
     grep -qF -- "$want" "$d/p.fl" || { echo "  translation lacks: $want"; status=1; }
   done < <(sed -n 's|^// expect-fl: ||p' "$f")
+  first=
   for w in $WORKERS; do
     mkdir -p "$d/out$w"
     timeout 300 "$d/bin" -D "$d/out$w" -w $w > "$d/run$w.log" 2>&1 \
@@ -105,6 +108,14 @@ for f in "$HERE"/cases/*.dl; do
       echo "  -w $w: DIFFERENT in ${bad[*]} (< Soufflé, > FlowLog)"
       cat "$d"/diff$w.* 
       status=1
+    fi
+    if [ -z "$first" ]; then
+      first=$w
+    else
+      for o in "$d/out$first"/*.csv; do
+        cmp -s "$o" "$d/out$w/$(basename "$o")" \
+          || { echo "  -w $w: $(basename "$o") not in the order of -w $first"; status=1; }
+      done
     fi
   done
 done
