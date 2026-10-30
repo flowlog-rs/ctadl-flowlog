@@ -9,6 +9,10 @@
   ok   an empty record relation is converted (with no record table)
   ok   and read back empty
   ok   an input missing from the DB is not created (the unread Name still is)
+  ok   an append replaces the rows of the relations it writes, keeping their tables, views and indexes (and the indexes' statistics), as Soufflé's writer does
+  ok   an append to a relation with another number of columns fails, leaving the DB as it was: Name: 2 columns in $TMPDIR/tmp.XXXXXXXXXX/wide.sqlite, expected 1
+  ok   an append interrupted by Ctrl-C leaves the DB as it was
+  ok   as does one killed, from the journal it leaves
   ok   the manifest lists the file inputs of each component instance
   ok   inputs are linked, or converted where they have record columns
   ok   records are read as Soufflé reads them, also nested ones

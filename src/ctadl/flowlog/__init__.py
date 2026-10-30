@@ -200,11 +200,11 @@ class FlowLogAnalysis:
         (CTADL runs it in the output directory), in Souffle's layout: the
         sqlite outputs are added to their databases, the output files placed
         (facts.place_outputs)."""
-        for fname, rels in by_file(self.schema.get("outputs", [])).items():
-            sqlite_layout.to_souffle(
-                str(outdir / fname), fname, {"outputs": rels}, append=True
-            )
         try:
+            for fname, rels in by_file(self.schema.get("outputs", [])).items():
+                sqlite_layout.to_souffle(
+                    str(outdir / fname), fname, {"outputs": rels}, append=True
+                )
             facts.place_outputs(self.files.get("outputs", []), outdir)
         except ValueError as e:
             error(f"cannot write the analysis outputs: {e}")

@@ -21,8 +21,11 @@ one transaction: an error, Ctrl-C or kill leaves the DB it writes (with
       Copy the manifest's outputs from the FlowLog DB into OUTDB in Souffle's
       layout. Outputs FlowLog did not write (it prunes relations without
       rules) are created empty, as Souffle would. Without --append OUTDB is
-      recreated; with it, OUTDB's symbol table is extended and only the
-      listed relations are replaced.
+      recreated; with it, OUTDB's symbol table is extended and the rows of
+      the listed relations are replaced, as Souffle's sqlite writer does: a
+      relation OUTDB has keeps its table, view and indexes (CTADL indexes
+      tables of its index DB that a query writes again), and must have as
+      many columns.
   to-flowlog INDB FLDB --schema S.json
       Copy the manifest's sqlite inputs from a Souffle-layout DB (read by
       position through the views, as Souffle does) into a fresh FlowLog DB.
@@ -124,14 +127,15 @@ def souffle_view_sql(name: str, cols: list) -> str:
             where.append(f"{q(shadow)}.{q(str(i))} = {q(st)}.id")
         else:
             sel.append(f"{q(shadow)}.{q(str(i))} AS {q(c['attr'])}")
-    sql = f"CREATE VIEW {q(name)} AS SELECT {','.join(sel)} FROM {','.join(frm)}"
+    sql = f"CREATE VIEW IF NOT EXISTS {q(name)} AS SELECT {','.join(sel)} FROM {','.join(frm)}"
     if where:
         sql += " WHERE " + " AND ".join(where)
     return sql
 
 
 def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) -> dict:
-    """Returns {relation: row count}."""
+    """Returns {relation: row count}. Raises ValueError if a relation in
+    OUTDB has another number of columns (Souffle fails too)."""
     if not append and os.path.exists(out_path):
         os.unlink(out_path)
     counts: dict = {}
@@ -144,14 +148,18 @@ def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) 
         )
         for rel in schema["outputs"]:
             name, cols = rel["name"], rel["columns"]
-            shadow = "_" + name
-            out.execute(f"DROP VIEW IF EXISTS main.{dq(name)}")
-            out.execute(f"DROP TABLE IF EXISTS main.{dq(shadow)}")
+            shadow = q("_" + name)
             out.execute(
-                f"CREATE TABLE main.{q(shadow)} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})"
+                f"CREATE TABLE IF NOT EXISTS main.{shadow} ({','.join(q(str(i)) + ' INTEGER' for i in range(len(cols)))})"
             )
-            counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
+            width = len(out.execute(f"PRAGMA main.table_info({shadow})").fetchall())
+            if width != len(cols):
+                raise ValueError(
+                    f"{name}: {width} columns in {out_path}, expected {len(cols)}"
+                )
+            out.execute(f"DELETE FROM main.{shadow}")
             out.execute(souffle_view_sql(name, cols))
+            counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
     return counts
 
 
@@ -291,14 +299,15 @@ def main(argv: list | None = None) -> int:
     b.add_argument("--schema", action="append", required=True)
     args = ap.parse_args(argv)
     schema = load_schema(args.schema)
-    if args.cmd == "to-souffle":
-        counts = to_souffle(args.fldb, args.outdb, schema, args.append)
-    else:
-        try:
+    try:
+        if args.cmd == "to-souffle":
+            counts = to_souffle(args.fldb, args.outdb, schema, args.append)
+        else:
             counts = to_flowlog(args.indb, args.fldb, schema)
-        except ValueError as e:
-            print(f"error: {e}", file=sys.stderr)
-            return 1
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    if args.cmd == "to-flowlog":
         missing = sorted(n for n, c in counts.items() if c < 0)
         if missing:
             print(

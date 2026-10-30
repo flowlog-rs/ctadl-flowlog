@@ -12,6 +12,9 @@
 #   - without FlowLog's DB, to-souffle creates every output empty;
 #   - an input missing from the DB is not created (FlowLog, like Soufflé,
 #     fails if it reads it);
+#   - an append replaces the rows of the relations it writes, keeping their
+#     tables, views and indexes, as Soufflé does, and fails, leaving the DB
+#     as it was, where one has another number of columns;
 #   - an append (to-souffle --append, as to CTADL's index) interrupted by
 #     Ctrl-C, or killed, leaves the DB as it was.
 # And facts.py, on a program with component instances (Soufflé names their
@@ -186,6 +189,43 @@ counts = A.to_flowlog(f"{W}/none.sqlite", f"{W}/fl6.db", read)
 tables = {r[0] for r in sqlite3.connect(f"{W}/fl6.db").execute("SELECT name FROM sqlite_master")}
 check("an input missing from the DB is not created (the unread Name still is)",
       counts == {"Call": -1, "Name": 0} and tables == {"Name"})
+
+# Soufflé writes db.sqlite again, the port appends to kept.sqlite, each with
+# an index
+import shutil, subprocess
+
+def objects(db):
+    c = sqlite3.connect(db)
+    return set(c.execute("SELECT type, name FROM sqlite_master")), set(c.execute("SELECT idx FROM sqlite_stat1"))
+
+A.to_souffle(f"{W}/fl_out.db", f"{W}/kept.sqlite", out, False)
+had = {}
+for db in (f"{W}/db.sqlite", f"{W}/kept.sqlite"):
+    c = sqlite3.connect(db)
+    c.execute('CREATE INDEX idx_Call ON "_Call" ("0")')
+    c.execute("ANALYZE")
+    c.commit()
+    had[db] = objects(db)
+subprocess.run(["souffle", "-D", W, f"{W}/index.dl"], check=True)
+A.to_souffle(f"{W}/fl_norec.db", f"{W}/kept.sqlite", out, True)
+check("an append replaces the rows of the relations it writes, keeping their tables, views and indexes "
+      "(and the indexes' statistics), as Soufflé's writer does",
+      all(objects(db) == b for db, b in had.items())
+      and ("index", "idx_Call") in had[f"{W}/kept.sqlite"][0] and ("idx_Call",) in had[f"{W}/kept.sqlite"][1]
+      and len(rows(f"{W}/db.sqlite", "Call")) == 2
+      and rows(f"{W}/kept.sqlite", "Call") == [] and rows(f"{W}/kept.sqlite", "Name") == [("a",)])
+shutil.copy(f"{W}/kept.sqlite", f"{W}/wide.sqlite")
+c = sqlite3.connect(f"{W}/wide.sqlite")
+c.executescript('DROP TABLE "_Name"; CREATE TABLE "_Name" ("0" INTEGER, "1" INTEGER); INSERT INTO "_Name" VALUES (1, 2);')
+c.close()
+dump = list(sqlite3.connect(f"{W}/wide.sqlite").iterdump())
+try:
+    A.to_souffle(f"{W}/fl_out.db", f"{W}/wide.sqlite", out, True)
+    check("an append to a relation with another number of columns fails", False)
+except ValueError as e:
+    # Soufflé fails too, but with the relation emptied
+    check(f"an append to a relation with another number of columns fails, leaving the DB as it was: {e}",
+          "Name: 2 columns" in str(e) and list(sqlite3.connect(f"{W}/wide.sqlite").iterdump()) == dump)
 
 # an append interrupted after writing (part of) the DB: Ctrl-C rolls it back
 # when the connection closes, and after a kill the next connection rolls it

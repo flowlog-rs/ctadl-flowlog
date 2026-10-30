@@ -319,11 +319,14 @@ It works in three steps (`ctadl.flowlog`):
    - **Outputs:** FlowLog writes each relation as a plain table. `sqlite_layout.py` converts the
      outputs to Soufflé's layout (a `__SymbolTable`, shadow tables `_R` holding ids, and views
      `R`) and appends them to CTADL's database. CTADL's Python tooling and SQL views therefore
-     work unchanged. Output files are placed where Soufflé writes them, with record columns in
-     Soufflé's text (`[1, a]`) and a nullary fact as `()`, where FlowLog writes `True`. FlowLog
-     writes no table or file for an output that it prunes, because nothing derives it; Soufflé
-     writes an empty one, and so does the engine. FlowLog fails on an output file whose
-     directory is missing, so the engine creates the directories.
+     work unchanged. As Soufflé's writer does, the append replaces the rows of a relation that
+     the database has, and keeps its table, view and indexes: the query writes
+     `IntCInsn_InFunction` again, which CTADL indexes after the index phase. Output files are
+     placed where Soufflé writes them, with record columns in Soufflé's text (`[1, a]`) and a
+     nullary fact as `()`, where FlowLog writes `True`. FlowLog writes no table or file for an
+     output that it prunes, because nothing derives it; Soufflé writes an empty one, and so does
+     the engine. FlowLog fails on an output file whose directory is missing, so the engine
+     creates the directories.
 
    Both conversions are `INSERT ... SELECT` statements that SQLite runs on the two databases,
    attached to one connection. They intern the symbols with `INSERT OR IGNORE`, then fill each
@@ -735,7 +738,10 @@ Other checks:
   - sqlite: Soufflé writes a DB in which record columns are only ids. An input no rule reads is
     created empty, and one a rule reads is refused with an explanation. Records the port writes
     still round-trip, a nil record id is refused, without FlowLog's output DB every output is
-    created empty, and an input missing from the DB is left out.
+    created empty, and an input missing from the DB is left out. An append replaces the rows of
+    the relations it writes and keeps their tables, views, indexes and statistics, as Soufflé
+    does when it writes the DB again; where a relation has another number of columns, it fails
+    and leaves the DB as it was.
   - files, on a program with component instances: each instance's inputs and outputs keep
     Soufflé's file names (`i.A.facts`, `o.in.A.csv`). Record columns are read and written as
     Soufflé reads and writes them, compared with Soufflé's own files (spaces, quotes and escapes,
