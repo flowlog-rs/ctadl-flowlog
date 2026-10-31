@@ -1,0 +1,31 @@
+# FlowLog's run in the first sweep (before this branch's conversion change) against its run in
+# pcode.txt and jadx.txt: databases compared on every column (--keys VirtualAssign=0,...,6), so
+# equal means the same choice-domain witnesses too, and SARIF reports. No pair for lighttpd, whose
+# first-sweep run stopped when Soufflé's index failed, nor for Wikipedia, which that sweep did not run.
+bash | summary: 210 equal, 0 different; sarif: equal
+ch.blinkenlights.android.vanilla_13200 | summary: 166 equal, 0 different; sarif: equal
+com.amaze.filemanager_126 | summary: 166 equal, 0 different; sarif: different (2 places); same results up to code flows
+com.fsck.k9_39046 | summary: 166 equal, 0 different; sarif: different (2 places); same results up to code flows
+de.danoeh.antennapod_3120395 | summary: 166 equal, 0 different; sarif: equal
+de.markusfisch.android.binaryeye_180 | summary: 166 equal, 0 different; sarif: equal
+dnsmasq | summary: 210 equal, 0 different; sarif: equal
+dropbear | summary: 210 equal, 0 different; sarif: equal
+eu.faircode.netguard_2026080101 | summary: 166 equal, 0 different; sarif: different (2 places); same results up to code flows
+gzip | summary: 210 equal, 0 different; sarif: equal
+libz | summary: 210 equal, 0 different; sarif: equal
+lighttpd | no pair
+nc | summary: 210 equal, 0 different; sarif: equal
+net.sourceforge.opencamera_96 | summary: 166 equal, 0 different; sarif: equal
+openssl | summary: 210 equal, 0 different; sarif: equal
+org.billthefarmer.diary_1105 | summary: 166 equal, 0 different; sarif: different (1 places); same results up to code flows
+org.billthefarmer.editor_198 | summary: 166 equal, 0 different; sarif: equal
+org.connectbot_11101000 | summary: 166 equal, 0 different; sarif: equal
+org.schabi.newpipe_1015 | summary: 166 equal, 0 different; sarif: equal
+org.secuso.privacyfriendlynotes_105 | summary: 166 equal, 0 different; sarif: different (2 places); same results up to code flows
+org.wikipedia_50614 | no pair
+sed | summary: 210 equal, 0 different; sarif: equal
+sqlite3 | summary: 210 equal, 0 different; sarif: equal
+ssh | summary: 210 equal, 0 different; sarif: equal
+sudo | summary: 210 equal, 0 different; sarif: equal
+tar | summary: 210 equal, 0 different; sarif: equal
+wget | summary: 210 equal, 0 different; sarif: different (2 places); same results up to code flows

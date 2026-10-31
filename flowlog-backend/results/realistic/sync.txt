@@ -1,0 +1,35 @@
+# flowlog-rs/flowlog#518/#519. FlowLog's index binary on dropbear's and openssl's inputs, -w 32, three
+# runs each: base (FlowLog 03b534b, run directory on disk), nosync (with #519: SQLite output without
+# fsync), base:shm (run directory in tmpfs), base:sda:nothp (MIMALLOC_ALLOW_THP=0).
+# wall in s, peak RSS in KiB, dataflow: "Dataflow executed".
+dropbear base:sda run1 wall=12.77 rssKB=3313064 dataflow=4.564086679s db=403M
+dropbear nosync:sda run1 wall=10.65 rssKB=3374400 dataflow=4.18528093s db=403M
+dropbear base:shm run1 wall=10.65 rssKB=3438632 dataflow=4.273062306s db=403M
+dropbear base:sda:nothp run1 wall=16.80 rssKB=2770440 dataflow=4.97739092s db=403M
+dropbear base:sda run2 wall=12.83 rssKB=3534864 dataflow=4.067510364s db=403M
+dropbear nosync:sda run2 wall=10.75 rssKB=3376688 dataflow=4.191203986s db=403M
+dropbear base:shm run2 wall=10.96 rssKB=3498536 dataflow=4.255107059s db=403M
+dropbear base:sda:nothp run2 wall=15.17 rssKB=2781808 dataflow=4.734476851s db=403M
+dropbear base:sda run3 wall=13.77 rssKB=3326520 dataflow=4.694300154s db=403M
+dropbear nosync:sda run3 wall=11.34 rssKB=3374736 dataflow=4.68302343s db=403M
+dropbear base:shm run3 wall=10.78 rssKB=3493424 dataflow=4.303794646s db=403M
+dropbear base:sda:nothp run3 wall=13.55 rssKB=2787660 dataflow=4.595722121s db=403M
+openssl base:sda run1 wall=62.14 rssKB=6952008 dataflow=16.473720936s db=2077M
+openssl nosync:sda run1 wall=56.71 rssKB=6997540 dataflow=16.394040763s db=2077M
+openssl base:shm run1 wall=53.88 rssKB=6914984 dataflow=16.863119902s db=2077M
+openssl base:sda:nothp run1 wall=65.60 rssKB=5805016 dataflow=17.959701496s db=2077M
+openssl base:sda run2 wall=64.24 rssKB=6990556 dataflow=16.341147631s db=2077M
+openssl nosync:sda run2 wall=56.89 rssKB=7068184 dataflow=15.711360626s db=2077M
+openssl base:shm run2 wall=52.97 rssKB=7034252 dataflow=16.028542531s db=2077M
+openssl base:sda:nothp run2 wall=62.84 rssKB=5828300 dataflow=17.885379916s db=2077M
+openssl base:sda run3 wall=64.73 rssKB=6917548 dataflow=17.459642068s db=2077M
+openssl nosync:sda run3 wall=57.45 rssKB=7018556 dataflow=15.900237507s db=2077M
+openssl base:shm run3 wall=53.16 rssKB=7036556 dataflow=16.020040085s db=2077M
+openssl base:sda:nothp run3 wall=69.14 rssKB=5883124 dataflow=17.843170097s db=2077M
+
+A/B 2 (NewPipe JADX query, run dir on ext4 disk, ctadl query -j 32 --format sarif)
+variant  run(s)               executed(s)          after-exec(s)       engine fsyncs(s)   analyze(s)
+base     27.27 26.96 21.58    16.79 16.71 16.10    10.48 10.25 5.48    9.22 9.02 4.26     41.02 40.69 34.98
+nosync   17.43 17.46 17.36    16.17 16.18 16.09     1.26  1.28 1.27    0 0 0              30.79 31.16 31.00
+peak Dirty 2.92 GB (prep's in/ctadlir.db); Writeback 700-780 MB from ~spawn+15s; first engine fsync at spawn+16.5s (5.07 s)
+realistic-new4: NewPipe after-exec 21.18 s (run 37.15, executed 15.97); Wikipedia 11.9; K-9 10.3; others 0.1-2.2
