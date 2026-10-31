@@ -1,0 +1,49 @@
+# Inputs. Ubuntu 22.04 (jammy) binaries, from these packages' .debs (apt-get download, dpkg -x):
+# libz is libz.so.1.2.11, ssh is the client, nc is netcat-openbsd, dropbear dropbear-bin and dnsmasq
+# dnsmasq-base; F-Droid apps: https://f-droid.org/repo/<package>_<version code>.apk.
+netcat-openbsd 1.218-4ubuntu1
+gzip 1.10-4ubuntu4.2
+zlib1g 1:1.2.11.dfsg-2ubuntu9.2
+sed 4.8-1ubuntu2.1
+sudo 1.9.9-1ubuntu2.7
+wget 1.21.2-2ubuntu1.5
+tar 1.34+dfsg-1ubuntu0.1.22.04.6
+openssh-client 1:8.9p1-3ubuntu0.18
+openssl 3.0.2-0ubuntu1.30
+bash 5.1-6ubuntu1.1
+sqlite3 3.37.2-2ubuntu0.8
+dnsmasq-base_2.91-0ubuntu0.22.04.2_amd64.deb
+dropbear-bin_2020.81-5ubuntu0.1_amd64.deb
+lighttpd_1.4.63-1ubuntu3.1_amd64.deb
+
+sha256 (bins):
+6cf1f56354f25b80a77c72fabbeb2333549279b4e1ce9593e1098be279910d45  VERSIONS.txt
+59474588a312b6b6e73e5a42a59bf71e62b55416b6c9d5e4a6e1c630c2a9ecd4  bash
+59b15098e4de6ee5cf86fb9e4c68d7ae0a717ba5b48680fd87ca8e77d5f53486  dnsmasq
+d495fababd880c5eab6d5dad95c4fbe43d2a5fcf1f4655aa71ec8f20615c6e0f  dropbear
+cc789a57a20d5d48bc5eecb914dff03ccfa1f35962112093a85fb67d29812d5b  gzip
+64c206f0146cc58bbddc4f22054436f4ff278f5a554aa3ce6921ddf7e9133370  libz
+c3396563e9cb4e8fa24e283ed98c2f664062e9f7e8229ecf4dcfa4535b10e4d7  lighttpd
+0e10c84da5f1b48ebf5c283adfa5391a828cf5868320f02081c03e22f8d9b0fa  nc
+237c1db70a7d0cf34130a467d82823ab0e6d9d77ad5cf24358af6b7d7adef2de  openssl
+42e2ce00721556ff9d371778fc36adcbb7c1697f65c3f996c6c9b28206dba565  sed
+76b4c90733a4210625f954a1ae53c302de669a887164cde24bf1d6bb7df79f12  sqlite3
+acfbdc053a41d23c7200a358873f5df6fe09ba5759155cd3ef6a00f0392cf193  ssh
+5b0e68c5523dff0c71aec912775d66fe8bc885f4778978489b2adc04c51ea715  sudo
+fd0d62eed19efd3e115aa1be44160f89d777cd1e6d6d8eb0ce7c8bdc879f59e2  tar
+2f750492a5ddee86aa7ca11e29b5ae627512b371d0b1e717758638954026139b  wget
+
+sha256 (apks):
+0150f08387032ed3d5a5952dbe13646bff2878f01c2c9267e6dc32ecb8747003  ch.blinkenlights.android.vanilla_13200.apk
+627b8cd6a5f750dc8315ebb0fadeddfea8ff76700922049d4dbf0ca22f3397fd  com.amaze.filemanager_126.apk
+0f9dd57fbd06dddfd8bcf7de6106d27fa0f0297793193828c4eac904518b1e05  com.fsck.k9_39046.apk
+6e79f28f69cef1a8b2e4f5f88c9c3cf3c3d7c51356f01394ac23b0dc5d56a00b  de.danoeh.antennapod_3120395.apk
+568cec6598dbf42fbde9071af8747071ffea798473016a3d77b6ddb3bff944f1  de.markusfisch.android.binaryeye_180.apk
+158b4308da0006298d22ed557adbff24b282fddeb1bc0b3468829a60f405a8c4  eu.faircode.netguard_2026080101.apk
+ca5672ca8c7174554ca0b07b5b26e505817a05142f571cf2abe67e790c30249c  net.sourceforge.opencamera_96.apk
+979e8cd8702ab5c0440c2cd094de0d6bdf109632857002966e62af5e9add93ef  org.billthefarmer.diary_1105.apk
+343d17e11d0914e1a7708df2781580a0413e52501c0a41d91f7ef725d9615fe9  org.billthefarmer.editor_198.apk
+96cf501a83e89284ff3ec93ac06e7a6a6aa8a35c0c02486b865945fe59ac8223  org.connectbot_11101000.apk
+1d66d19eedbab969b1be2e44e0ea35f5f8921cbe83b5c5ac810767ca1a84b7e8  org.schabi.newpipe_1015.apk
+71e874f45fa4655f14296fce13791a82f994ea9bc26699f433383f0b4d334037  org.secuso.privacyfriendlynotes_105.apk
+076d19f4acf40562a06df7d7de2b9cf11b89cc7b79f6a6cf4dd0768a158289c3  org.wikipedia_50614.apk

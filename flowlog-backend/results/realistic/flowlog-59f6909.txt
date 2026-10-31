@@ -1,0 +1,42 @@
+# FlowLog main at 59f6909 (#502, a planner refactor merged after the runs on 03b534b), with this
+# branch. CTADL's FlowLog checks and the repros (results/repros/), then bench.py -j 32 on 3
+# executables and 2 apps, as in pcode.txt and jadx.txt and on their imports; libz's and Diary's
+# FlowLog runs include compiling the analyses with the new FlowLog. Last, FlowLog 59f6909's
+# databases and reports against 03b534b's (pcode.txt, jadx.txt), on every column (--keys
+# VirtualAssign=0,...,6), as in cross.txt, and a second FlowLog 59f6909 run of NetGuard and wget
+# against the first. wget's and NetGuard's reports list other equally short paths: CTADL orders
+# them by vertex ids, which FlowLog numbers in evaluation order, so they can differ between runs,
+# as wget's do between two runs of 59f6909 (flowlog-rs/ctadl-flowlog#3 orders them by the
+# vertices' contents).
+tests/flowlog/semantics/run.sh, WORKERS="1 4 32": all passed (20 cases at each worker count; 41 rejects, 7 invalid, 11 aborts, 3 warns)
+tests/flowlog/choice_mini/run.sh, WORKERS="1 4 32":
+  Reach: -w1 ok -w4 ok -w32 ok (Souffle: same-round tie broken differently)
+  NR: -w1 ok -w4 ok -w32 ok (= Souffle)
+  FwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+  BwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+tests/flowlog/adapter/run.sh: 24 of 24 ok
+run_taintfront.py --backend both: 12 of 12 programs: checks ok with both engines; summary: 120 equal, 0 different; sarif: equal
+CTADL_ENGINE=flowlog bash tests/bin/check-taintfront: exit 0 (12 programs)
+repros/check.sh: the lines of results/repros/main-b99ed29.txt
+repros/check.sh -t: the lines of results/repros/translated-b99ed29.txt
+repros/same_name.sh: a: O={1} b: O={1} (B14)
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+libz       souffle  32 |   11.72     7.93    7.93    156M |   14.85     3.07    3.07     95M | (reference)
+libz       flowlog  32 |  305.29     7.56    5.73  10330M |  135.68     1.94    1.27   5299M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+dropbear   souffle  32 |   48.36    39.56   39.56    423M |   32.66    10.34   10.34    206M | (reference)
+dropbear   flowlog  32 |   28.57    19.73   13.60   3346M |   17.53     3.03    1.72   1826M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+wget       souffle  32 |  157.98   136.92  136.92   1398M |   88.36    36.50   36.50    647M | (reference)
+wget       flowlog  32 |   81.11    59.68   40.83   5300M |   34.76     8.57    4.92   2355M | summary: 206 equal (1 up to choice-domain witnesses), 4 different; sarif: different (2 places); same results up to code flows
+org.billthefarmer.diary_1105 souffle  32 |    4.45     2.27    2.27     44M |   14.06     0.67    0.67     52M | (reference)
+org.billthefarmer.diary_1105 flowlog  32 |  272.67     3.80    3.27  10938M |  135.93     1.05    0.72   5305M | summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+eu.faircode.netguard_2026080101 souffle  32 |   25.95    19.74   19.74    348M |   19.65     4.27    4.27    184M | (reference)
+eu.faircode.netguard_2026080101 flowlog  32 |   23.49    16.24   11.69   2996M |   20.23     4.43    2.77   1915M | summary: 156 equal (1 up to choice-domain witnesses), 10 different; sarif: different (22 places); same results up to code flows
+FlowLog 59f6909 against 03b534b:
+libz | summary: 210 equal, 0 different; sarif: equal
+dropbear | summary: 210 equal, 0 different; sarif: equal
+wget | summary: 210 equal, 0 different; sarif: different (2 places); same results up to code flows
+org.billthefarmer.diary_1105 | summary: 166 equal, 0 different; sarif: equal
+eu.faircode.netguard_2026080101 | summary: 166 equal, 0 different; sarif: different (2 places); same results up to code flows
+A second FlowLog 59f6909 run, against the first:
+eu.faircode.netguard_2026080101 flowlog  32 |   24.25    18.16   13.60   2979M |   17.85     4.38    2.72   1860M | summary: 166 equal, 0 different; sarif: equal
+wget       flowlog  32 |   77.72    56.30   37.38   5271M |   34.65     8.53    4.87   2300M | summary: 210 equal, 0 different; sarif: different (2 places); same results up to code flows

@@ -1,0 +1,42 @@
+# flowlog-rs/ctadl-flowlog#3 (SARIF paths found in the order of the vertices' contents): CTADL's
+# SARIF step (ctadl query --skip-analysis --format sarif) with CTADL's main and with #3, on copies of
+# both engines' databases from pcode.txt and jadx.txt. n/m: the number of results in Soufflé's and
+# FlowLog's reports; then compare_sarif.py's verdict (JADX: on the reports that compare_jadx.py canon
+# renamed). P-code: the four programs whose reports differ in pcode.txt. With #3, the reports of
+# wget and sqlite3 differ only in CTADLStats' ctx count, tar's in three CTADLStats counts, and nc's
+# in its ctx count and in the order of a variable's aliases (read, __addr), which follows
+# CVar_SourceInfo's row order.
+pcode nc main: 27/27 | sarif: different (3 places); same results up to code flows
+pcode nc #3: 27/27 | sarif: different (3 places); same results up to code flows
+pcode wget main: 57/57 | sarif: different (3 places); same results up to code flows
+pcode wget #3: 57/57 | sarif: different (1 places); same results up to code flows
+pcode tar main: 54/54 | sarif: different (5 places); same results up to code flows
+pcode tar #3: 54/54 | sarif: different (3 places); same results up to code flows
+pcode sqlite3 main: 18/18 | sarif: different (1 places); same results up to code flows
+pcode sqlite3 #3: 18/18 | sarif: different (1 places); same results up to code flows
+jadx ch.blinkenlights.android.vanilla_13200 main: 44/44 | sarif: different (17 places); same results up to code flows
+jadx ch.blinkenlights.android.vanilla_13200 #3: 44/44 | sarif: different (15 places); same results up to code flows
+jadx com.amaze.filemanager_126 main: 60/60 | sarif: different (24 places); same results up to code flows
+jadx com.amaze.filemanager_126 #3: 60/60 | sarif: different (22 places); same results up to code flows
+jadx com.fsck.k9_39046 main: 19/19 | sarif: different (24 places); same results up to code flows
+jadx com.fsck.k9_39046 #3: 19/19 | sarif: different (22 places); same results up to code flows
+jadx de.danoeh.antennapod_3120395 main: 32/32 | sarif: different (23 places); same results up to code flows
+jadx de.danoeh.antennapod_3120395 #3: 32/32 | sarif: different (21 places); same results up to code flows
+jadx de.markusfisch.android.binaryeye_180 main: 9/9 | sarif: different (20 places); same results up to code flows
+jadx de.markusfisch.android.binaryeye_180 #3: 9/9 | sarif: different (18 places); same results up to code flows
+jadx eu.faircode.netguard_2026080101 main: 20/20 | sarif: different (22 places); same results up to code flows
+jadx eu.faircode.netguard_2026080101 #3: 20/20 | sarif: different (20 places); same results up to code flows
+jadx net.sourceforge.opencamera_96 main: 6/6 | sarif: different (20 places); same results up to code flows
+jadx net.sourceforge.opencamera_96 #3: 6/6 | sarif: different (18 places); same results up to code flows
+jadx org.billthefarmer.diary_1105 main: 10/10 | sarif: different (4 places); same results up to code flows
+jadx org.billthefarmer.diary_1105 #3: 10/10 | sarif: different (4 places); same results up to code flows
+jadx org.billthefarmer.editor_198 main: 0/0 | sarif: different (1 places); same results up to code flows
+jadx org.billthefarmer.editor_198 #3: 0/0 | sarif: different (1 places); same results up to code flows
+jadx org.connectbot_11101000 main: 10/10 | sarif: different (24 places); same results up to code flows
+jadx org.connectbot_11101000 #3: 10/10 | sarif: different (24 places); same results up to code flows
+jadx org.schabi.newpipe_1015 main: 11/12 | sarif: different (24 places)
+jadx org.schabi.newpipe_1015 #3: 12/12 | sarif: different (22 places); same results up to code flows
+jadx org.secuso.privacyfriendlynotes_105 main: 27/27 | sarif: different (20 places); same results up to code flows
+jadx org.secuso.privacyfriendlynotes_105 #3: 27/27 | sarif: different (20 places); same results up to code flows
+jadx org.wikipedia_50614 main: 16/18 | sarif: different (24 places)
+jadx org.wikipedia_50614 #3: 18/18 | sarif: different (22 places); same results up to code flows

@@ -11,11 +11,12 @@ that joins them back under the original attribute names.
 
 Both directions are driven by the schema manifest that souffle2flowlog.py
 writes with --schema (its "outputs"/"inputs" entries list the sqlite
-relations with their original and FlowLog column names and types). Each is a
-few INSERT ... SELECT statements per relation, run by SQLite on the two
-databases attached to one connection; no rows pass through Python. Each is
-one transaction: an error, Ctrl-C or kill leaves the DB it writes (with
---append, CTADL's index) as it was.
+relations with their original and FlowLog column names and types). Each is
+an INSERT ... SELECT statement per relation, run by SQLite on the two
+databases attached to one connection; no rows pass through Python, and
+to-souffle numbers new symbols (and records) with a SQL function, a lookup
+in a Python dict that runs in C. Each is one transaction: an error, Ctrl-C or
+kill leaves the DB it writes (with --append, CTADL's index) as it was.
 
   to-souffle FLDB OUTDB --schema S.json [--append]
       Copy the manifest's outputs from the FlowLog DB into OUTDB in Souffle's
@@ -46,7 +47,9 @@ import json
 import os
 import sqlite3
 import sys
+from collections import defaultdict
 from contextlib import contextmanager
+from itertools import count
 from typing import Iterable, Iterator
 
 SQL_TYPE = {
@@ -133,6 +136,51 @@ def souffle_view_sql(name: str, cols: list) -> str:
     return sql
 
 
+class Interner:
+    """Numbers the values of TABLE(id INTEGER PRIMARY KEY, KEY TEXT UNIQUE),
+    Souffle's symbol table or the record table: number(V, ALIAS) is SQL for
+    the id of V's value, its id in TABLE, else (a new value) the id after
+    the largest, as SQLite numbers the symbols Souffle adds. flush() adds
+    the new values to TABLE.
+
+    The new values' ids come from the SQL function NAME, a lookup in a dict
+    of them that runs in C, with the ids from a C iterator. A value thus
+    costs a lookup in TABLE's index (none when TABLE starts empty, as when
+    CTADL writes its index) and, if new, a hash lookup, where interning the
+    values into TABLE first, then looking them up, costs two lookups in the
+    index. As no Python code runs in NAME, Ctrl-C takes effect after the
+    statement, as it does for one without it."""
+
+    def __init__(self, conn: sqlite3.Connection, table: str, key: str, name: str):
+        self.conn, self.table, self.key, self.name = conn, table, key, name
+        self.last = 0
+        if table in existing_relations(conn):
+            self.last = (
+                conn.execute(f"SELECT max(id) FROM main.{dq(table)}").fetchone()[0] or 0
+            )
+        self.new: defaultdict = defaultdict(count(self.last + 1).__next__)
+        conn.create_function(name, 1, self.new.__getitem__)
+
+    def number(self, v: str, alias: str) -> tuple:
+        """SQL for the id of V's value, and the join of TABLE AS ALIAS that
+        it needs ("" if none)."""
+        if not self.last:
+            return f"{self.name}({v})", ""
+        join = f"LEFT JOIN main.{dq(self.table)} AS {alias} ON {alias}.{dq(self.key)} = {v}"
+        return f"coalesce({alias}.id, {self.name}({v}))", join
+
+    def flush(self) -> None:
+        if self.new:
+            self.conn.execute(
+                f"CREATE TABLE IF NOT EXISTS main.{dq(self.table)} "
+                f"(id INTEGER PRIMARY KEY, {dq(self.key)} TEXT UNIQUE)"
+            )
+            self.conn.executemany(
+                f"INSERT INTO main.{dq(self.table)} (id, {dq(self.key)}) VALUES (?, ?)",
+                ((i, v) for v, i in self.new.items()),
+            )
+
+
 def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) -> dict:
     """Returns {relation: row count}. Raises ValueError if a relation in
     OUTDB has another number of columns (Souffle fails too)."""
@@ -146,6 +194,11 @@ def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) 
         out.execute(
             f"CREATE TABLE IF NOT EXISTS {q(SYMBOL_TABLE)} (id INTEGER PRIMARY KEY, symbol TEXT UNIQUE)"
         )
+        # flush() creates the record table, with the first record
+        ids = {
+            "symbol": Interner(out, SYMBOL_TABLE, "symbol", "ctadl_symbol"),
+            "record": Interner(out, RECORD_TABLE, "fields", "ctadl_record"),
+        }
         for rel in schema["outputs"]:
             name, cols = rel["name"], rel["columns"]
             shadow = q("_" + name)
@@ -159,51 +212,26 @@ def to_souffle(fl_path: str, out_path: str, schema: dict, append: bool = False) 
                 )
             out.execute(f"DELETE FROM main.{shadow}")
             out.execute(souffle_view_sql(name, cols))
-            counts[name] = copy_to_souffle(out, name, cols) if name in have else 0
+            counts[name] = copy_to_souffle(out, name, cols, ids) if name in have else 0
+        for interner in ids.values():
+            interner.flush()
     return counts
 
 
-def copy_to_souffle(conn: sqlite3.Connection, name: str, cols: list) -> int:
-    """Interns fl.NAME's symbols and records, then fills main._NAME with
-    their ids. New ids continue from the largest one, as Souffle's do."""
-    src = f"fl.{dq(name)}"
-    recs = [c for c in cols if c["kind"] == "record"]
-    if recs and not conn.execute(f"SELECT EXISTS (SELECT 1 FROM {src})").fetchone()[0]:
-        return 0  # the record table is created with the first record
-    syms = [dq(c["fl"][0]) for c in cols if c["kind"] == "symbol"]
-    if syms:
-        conn.execute(
-            f"INSERT OR IGNORE INTO main.{q(SYMBOL_TABLE)} (symbol) "
-            + " UNION ALL ".join(f"SELECT {c} FROM {src}" for c in syms)
-        )
-    if recs:
-        conn.execute(
-            f"CREATE TABLE IF NOT EXISTS main.{dq(RECORD_TABLE)} (id INTEGER PRIMARY KEY, fields TEXT UNIQUE)"
-        )
-        conn.execute(
-            f"INSERT OR IGNORE INTO main.{dq(RECORD_TABLE)} (fields) "
-            + " UNION ALL ".join(
-                f"SELECT {record_json(c, 'r')} FROM {src} AS r" for c in recs
-            )
-        )
-    # CROSS JOIN keeps FlowLog's table as the outer loop, so that each row
-    # makes one lookup in the symbol (record) table's unique index.
-    sel, frm, where = [], [f"{src} AS r"], []
+def copy_to_souffle(conn: sqlite3.Connection, name: str, cols: list, ids: dict) -> int:
+    """Fills main._NAME with fl.NAME's rows, its symbols and records
+    numbered by the Interners IDS (by kind)."""
+    sel, joins = [], []
     for i, c in enumerate(cols):
-        if c["kind"] == "symbol":
-            frm.append(f"main.{q(SYMBOL_TABLE)} AS t{i}")
-            where.append(f"t{i}.symbol = r.{dq(c['fl'][0])}")
-        elif c["kind"] == "record":
-            frm.append(f"main.{dq(RECORD_TABLE)} AS t{i}")
-            where.append(f"t{i}.fields = {record_json(c, 'r')}")
-        else:
-            sel.append(f"r.{dq(c['fl'][0])}")
-            continue
-        sel.append(f"t{i}.id")
-    sql = f"INSERT INTO main.{q('_' + name)} SELECT {', '.join(sel)} FROM {' CROSS JOIN '.join(frm)}"
-    if where:
-        sql += " WHERE " + " AND ".join(where)
-    return conn.execute(sql).rowcount
+        v = record_json(c, "r") if c["kind"] == "record" else f"r.{dq(c['fl'][0])}"
+        if c["kind"] in ids:
+            v, join = ids[c["kind"]].number(v, f"t{i}")
+            joins.append(join)
+        sel.append(v)
+    return conn.execute(
+        f"INSERT INTO main.{q('_' + name)} SELECT {', '.join(sel)} "
+        f"FROM fl.{dq(name)} AS r {' '.join(joins)}"
+    ).rowcount
 
 
 def to_flowlog(in_path: str, fl_path: str, schema: dict) -> dict:

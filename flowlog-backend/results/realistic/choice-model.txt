@@ -1,0 +1,9 @@
+# Is FlowLog's index a choice model of CTADL's index analysis? check_choice_model.py runs Soufflé on
+# the analysis with each choice-domain relation restricted to FlowLog's witnesses (FlowLog's
+# --all-outputs index of the app's import), and compares what Soufflé derives with FlowLog's database.
+de.markusfisch.android.binaryeye_180 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+eu.faircode.netguard_2026080101 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+org.billthefarmer.diary_1105 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+org.billthefarmer.editor_198 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+org.schabi.newpipe_1015 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+org.wikipedia_50614 | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database

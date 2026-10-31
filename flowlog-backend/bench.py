@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """Benchmark CTADL's index and query phases with its Souffle and FlowLog engines.
 
-    bench.py [--jobs 1,4,16] [--backend BACKEND,...|both]
-             [--format summary|sarif] [--out DIR] [--prune | --drop-dbs] PROG.tnt...
+    bench.py [--jobs 1,4,16] [--backend BACKEND,...|both] [--lang LANG]
+             [--query MODELS] [--format summary|sarif] [--out DIR]
+             [--prune | --drop-dbs] PROG...
 
-Each program is imported once (taint-front), then indexed and queried by
-every backend and worker count in a fresh copy of the facts. The query writes
-CTADL's text summary; with --format sarif it writes a SARIF report instead,
-which can take longer than the analysis and hundreds of MB.
+Each program is imported once, into OUT/NAME/facts, by the front end of
+--lang: taint-front (the default, PROG.tnt), pcode (an executable, through
+Ghidra: needs GHIDRA_HOME and a JDK) or JADX (an APK). An import already
+there is reused. Each backend and worker count then indexes and queries a
+fresh copy of the facts. The query is the front end's default one, or
+--query's JSON models (CTADL's default P-code query names no source: use
+src/ctadl/models/pcode/default-query.json). It writes CTADL's text summary;
+with --format sarif it writes a SARIF report instead, which can take longer
+than the analysis and hundreds of MB.
 Backends: souffle, souffle-noplan, souffle-strict, flowlog, flowlog-noplan;
 both (the default) is souffle,flowlog. The *-noplan and souffle-strict
 variants run CTADL's program without its `.plan` hints (the FlowLog
@@ -24,8 +30,14 @@ Reported per phase:
   rss      peak RSS of the largest child process (the engine)
 Results of all runs are diffed against the first one (compare_db.py on the
 final database, which holds the query results, and compare_sarif.py on the
-SARIF reports). Analyses must already be compiled (run each backend once on
-a small program first).
+SARIF reports), in full in the run's compare.txt. For pcode and JADX,
+compare_pcode.py and compare_jadx.py rename the ids that CTADL computes with
+`ord` first, in JADX's reports too.
+A phase that fails (CTADL stops on errors its index derives, such as facts
+its schema rejects) skips the run's query, and the diff column ends with the
+error, or with whether it is the first run's; the databases written so far
+are still diffed. Analyses must already be compiled (run each backend once
+on a small program first).
 """
 from __future__ import annotations
 
@@ -54,6 +66,8 @@ SOUFFLE_VARIANTS = {
 }
 NOPLAN_VARIANTS = {**SOUFFLE_VARIANTS, "flowlog-noplan": ""}
 BACKENDS = ["souffle", *SOUFFLE_VARIANTS, "flowlog", "flowlog-noplan"]
+# front end -> the comparison of its databases
+COMPARE = {"taint-front": "compare_db.py", "pcode": "compare_pcode.py", "JADX": "compare_jadx.py"}
 
 
 def load_cli():
@@ -138,37 +152,58 @@ def time_flowlog_steps(cli) -> None:
     cli.FlowLogCompiledAnalysis.run = run_and_echo
 
 
-def run(cmd: list, log: Path) -> tuple[float, dict]:
+def run(cmd: list, log: Path, may_fail: bool = False) -> tuple[float, dict]:
+    """Runs CMD, its output in LOG. A failure ends the benchmark, or with MAY_FAIL is the
+    result's "error": CTADL's first `** ` message, else the last line of the output."""
     t0 = time.time()
     with open(log, "w") as f:
         f.write(f"$ {' '.join(map(str, cmd))}\n")
         f.flush()
-        r = subprocess.run(list(map(str, cmd)), stdout=f, stderr=subprocess.STDOUT)
+        r = subprocess.run(list(map(str, cmd)), stdin=subprocess.DEVNULL, stdout=f,
+                           stderr=subprocess.STDOUT)
     wall = time.time() - t0
+    text = log.read_text(errors="replace")
+    out: dict = {"wall": wall}
     if r.returncode:
-        sys.exit(f"command failed (see {log}): {' '.join(map(str, cmd))}")
-    text = log.read_text()
+        if not may_fail:
+            sys.exit(f"command failed (see {log}): {' '.join(map(str, cmd))}")
+        lines = text.splitlines()
+        out["error"] = next((s[3:] for s in lines if s.startswith("** ")), lines[-1])
     m = re.findall(r"\[bench\] analyze=([\d.]+) rss=(\d+)", text)
     e = re.findall(r"\[flowlog\] FlowLog run: ([\d.]+)s", text)
-    out = {"wall": wall}
     if m:
         out["analyze"], out["rss"] = float(m[-1][0]), int(m[-1][1])
     out["engine"] = float(e[-1]) if e else out.get("analyze")
     return wall, out
 
 
-def compare(ref: Path, other: Path, name: str, schemas: list, sarif: bool) -> str:
-    cmd = [sys.executable, HERE / "compare_db.py", ref / "ctadlir.db", other / "ctadlir.db", "-q",
+def last_line(r: subprocess.CompletedProcess) -> str:
+    return r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr.strip()
+
+
+def compare(ref: Path, other: Path, name: str, schemas: list, sarif: bool, lang: str) -> str:
+    """The summary of OTHER's run against REF's; the comparisons' output goes to
+    OTHER/compare.txt."""
+    cmd = [sys.executable, HERE / COMPARE[lang], ref / "ctadlir.db", other / "ctadlir.db", "-q",
            "--keys", "VirtualAssign=0,1,2,3,4,5,6"]
     for s in schemas:
         cmd += ["--schema", s]
     r = subprocess.run(list(map(str, cmd)), capture_output=True, text=True)
-    res = r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr.strip()
-    if not sarif:
-        return res
-    r = subprocess.run([sys.executable, str(HERE / "compare_sarif.py"),
-                        str(ref / f"{name}.sarif"), str(other / f"{name}.sarif")], capture_output=True, text=True)
-    res += "; " + (r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr.strip())
+    out, res = [r.stdout, r.stderr], last_line(r)
+    if sarif:
+        reports = [d / f"{name}.sarif" for d in (ref, other)]
+        if lang == "JADX":  # rename the ord-based ids, by each report's database
+            for d, report in zip((ref, other), reports):
+                canon = subprocess.run([sys.executable, str(HERE / "compare_jadx.py"), "canon",
+                                        str(d / "ctadlir.db"), str(report)],
+                                       capture_output=True, text=True, check=True).stdout
+                report.with_suffix(".canon.sarif").write_text(canon)
+            reports = [r.with_suffix(".canon.sarif") for r in reports]
+        r = subprocess.run([sys.executable, str(HERE / "compare_sarif.py"), *map(str, reports)],
+                           capture_output=True, text=True)
+        out += [r.stdout, r.stderr]
+        res = f"{res}; {last_line(r)}"
+    (other / "compare.txt").write_text("".join(out))
     return res
 
 
@@ -190,6 +225,10 @@ def main() -> int:
                     help="delete every database once compared (the first run's after the last run)")
     ap.add_argument("--format", choices=["summary", "sarif"], default="summary",
                     help="query output (default: summary); sarif reports are also compared")
+    ap.add_argument("--lang", choices=list(COMPARE), default="taint-front",
+                    help="the programs' front end (default: taint-front)")
+    ap.add_argument("--query", type=Path,
+                    help="JSON models for `ctadl query` (default: the front end's query)")
     args = ap.parse_args()
     out = args.out.resolve()
     jobs = [int(j) for j in args.jobs.split(",")]
@@ -205,21 +244,37 @@ def main() -> int:
         prog = prog.resolve()
         name = prog.stem
         facts = out / name / "facts"
-        facts.mkdir(parents=True, exist_ok=True)
-        run(["ctadl", "import", "taint-front", prog, "-o", facts, "-f"], out / name / "import.log")
-        ref = None
+        if not (facts.is_dir() and any(facts.iterdir())):
+            facts.mkdir(parents=True, exist_ok=True)
+            run(["ctadl", "import", args.lang, prog, "-o", facts, "-f"], out / name / "import.log")
+        ref = ref_error = None
         for b in backends:
             for j in jobs:
                 d = out / name / f"{b}-j{j}"
                 shutil.rmtree(d, ignore_errors=True)
                 shutil.copytree(facts, d)
                 drv = [sys.executable, __file__, "--shim", b]
-                _, ix = run(drv + ["--directory", d, "index", "-f", "-j", j], d / "index.log")
+                _, ix = run(drv + ["--directory", d, "index", "-f", "-j", j], d / "index.log",
+                            may_fail=True)
                 sarif = args.format == "sarif"
                 report = d / (f"{name}.sarif" if sarif else "summary.txt")
-                _, q = run(drv + ["--directory", d, "query", "-j", j, "--format", args.format,
-                                  "-o", report], d / "query.log")
-                diff = "(reference)" if ref is None else compare(ref, d, name, args.schema, sarif)
+                query = [args.query.resolve()] if args.query else []
+                q: dict = {}
+                if "error" not in ix:
+                    _, q = run(drv + ["--directory", d, "query", *query, "-j", j,
+                                      "--format", args.format, "-o", report], d / "query.log",
+                               may_fail=True)
+                error = ix.get("error") or q.get("error")
+                if ref is None:
+                    ref_error = error
+                    diff = "(reference)" + (f"; failed: {error}" if error else "")
+                else:
+                    diff = compare(ref, d, name, args.schema, sarif and not (error or ref_error),
+                                   args.lang)
+                    if error and error == ref_error:
+                        diff += "; failed as the first run"
+                    elif error or ref_error:
+                        diff += f"; failed: {error}" if error else "; the first run failed"
                 if ref is not None and (args.drop_dbs or (
                         args.prune and ", 0 different" in diff
                         and (not sarif or diff.endswith("sarif: equal")))):
@@ -227,6 +282,8 @@ def main() -> int:
                 ref = ref or d
 
                 def cols(r: dict) -> list:
+                    if not r:
+                        return ["-"] * 4
                     return [f"{r['wall']:.2f}", f"{r.get('analyze', 0):.2f}", f"{r.get('engine') or 0:.2f}",
                             f"{r.get('rss', 0)}M"]
                 print(fmt.format(name, b, j, *cols(ix), *cols(q), diff), flush=True)

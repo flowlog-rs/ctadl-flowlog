@@ -1,0 +1,11 @@
+# The P-code binaries whose thunks lacked a local entry point, re-imported with the exporter fix
+# (flowlog-rs/ctadl-flowlog#2) and run as in pcode.txt. lighttpd's rows are the P-code table's.
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+lighttpd   souffle  32 |   70.82    53.79   53.79    642M |   76.95    14.02   14.02    289M | (reference)
+lighttpd   flowlog  32 |   55.58    40.93   30.83   3727M |   21.78     4.40    2.57   1943M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+openssl    souffle  32 |  268.20   235.32  235.32   2069M |  161.82    73.45   73.45    987M | (reference)
+openssl    flowlog  32 |  126.29    89.69   58.77   6803M |   53.23    12.25    7.28   2748M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+sqlite3    souffle  32 |  357.20   306.00  306.00   3682M |  176.20   103.64  103.64   1998M | (reference)
+sqlite3    flowlog  32 |  217.49   163.07  116.57  13915M |   71.28    29.39   19.33   4110M | summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (1 places); same results up to code flows

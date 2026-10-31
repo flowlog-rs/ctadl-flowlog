@@ -19,7 +19,12 @@ rows with `--keys VirtualAssign=0,1,2,3,4,5,6`). With
 `--schema`, record-typed columns (stored as engine-specific record ids) are
 left out. Timestamp rows of CTADLConfig are ignored. Slice vertex ids are
 computed with `ord`, i.e. are engine-specific symbol ids: they are replaced
-by the vertex they denote. Views over raw symbol ids (`_R`) are skipped.
+by the vertex they denote. CTADL's views over raw symbol ids (such as
+`_flow.ReachableEdge`) are skipped; a relation whose name starts with `_`
+(JADX's facts) is the view over its raw table `__R`, and is compared.
+Souffle's SQLite I/O ends a symbol at its first NUL character (it binds C
+strings), where the port keeps the whole symbol: symbols are compared up to
+their first NUL.
 """
 from __future__ import annotations
 
@@ -103,13 +108,15 @@ def relations(db: sqlite3.Connection) -> dict[str, str]:
     souffle = db.execute("SELECT 1 FROM sqlite_master WHERE name='__SymbolTable'").fetchone() is not None
     kind = "view" if souffle else "table"
     names = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type=?", (kind,))]
-    return {n: n for n in names if not n.startswith("_") and not n.startswith("sqlite_")}
+    tables = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    return {n: n for n in names
+            if not n.startswith("sqlite_") and (not n.startswith("_") or souffle and f"_{n}" in tables)}
 
 
 def rows(db: sqlite3.Connection, name: str) -> list[tuple]:
     souffle = db.execute("SELECT 1 FROM sqlite_master WHERE name='__SymbolTable'").fetchone() is not None
     cur = db.execute(RAW_SQL[name] if souffle and name in RAW_SQL else f'SELECT * FROM "{name}"')
-    out = [tuple("" if v is None else str(v) for v in r) for r in cur]
+    out = [tuple("" if v is None else str(v).partition("\0")[0] for v in r) for r in cur]
     return [r for r in out if not r or (name, r[0]) not in IGNORED_ROWS]
 
 

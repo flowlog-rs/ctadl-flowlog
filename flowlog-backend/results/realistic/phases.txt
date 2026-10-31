@@ -1,0 +1,60 @@
+# Where the time of each FlowLog run went, from pcode.txt's and jadx.txt's logs (lighttpd: the
+# sweep's index, which failed after the engine). F prep: converting the query's inputs to FlowLog's
+# layout; F run: FlowLog's binary; F compute: its "Dataflow executed"; F emission: the rest of the
+# run (writing the output database, exiting); F conv: converting the results to CTADL's layout.
+# after_index S/F: CTADL's after_index step (page size, VACUUM, indexes) after Soufflé's and
+# FlowLog's index; visualize S/F: the SARIF step after their queries. Seconds.
+program | phase | F prep | F run | F compute | F emission | F conv | after_index S/F | visualize S/F
+bash | index | 0.0 | 95.4 | 26.3 | 69.1 | 41.4 | 43.5/51.9
+bash | query | 6.5 | 10.5 | 9.4 | 1.0 | 0.7 | | 77.5/34.0
+dnsmasq | index | 0.0 | 40.0 | 12.6 | 27.4 | 18.0 | 21.0/22.8
+dnsmasq | query | 3.8 | 7.2 | 6.8 | 0.5 | 0.3 | | 32.9/13.2
+dropbear | index | 0.0 | 13.1 | 4.4 | 8.7 | 5.9 | 7.4/7.5
+dropbear | query | 1.0 | 1.7 | 1.5 | 0.2 | 0.1 | | 11.4/4.4
+gzip | index | 0.0 | 7.9 | 3.2 | 4.7 | 3.5 | 5.5/5.6
+gzip | query | 0.7 | 1.3 | 1.1 | 0.2 | 0.1 | | 6.2/2.4
+libz | index | 0.0 | 5.2 | 2.6 | 2.6 | 1.8 | 3.5/3.5
+libz | query | 0.6 | 1.2 | 1.1 | 0.1 | 0.0 | | 1.5/1.0
+lighttpd | index | 0.0 | 18.2 | 5.6 | 12.6 | 8.8 | 10.6/12.2
+nc | index | 0.0 | 7.5 | 4.1 | 3.4 | 2.3 | 4.1/3.8
+nc | query | 0.8 | 1.2 | 1.1 | 0.1 | 0.1 | | 3.9/2.0
+openssl | index | 0.0 | 62.6 | 15.7 | 46.8 | 29.7 | 31.6/34.8
+openssl | query | 4.3 | 7.5 | 6.7 | 0.8 | 0.5 | | 63.9/19.5
+sed | index | 0.0 | 7.1 | 3.1 | 4.1 | 3.1 | 5.2/4.7
+sed | query | 0.6 | 1.1 | 1.0 | 0.1 | 0.1 | | 4.8/2.5
+sqlite3 | index | 0.0 | 100.7 | 33.0 | 67.8 | 45.9 | 50.4/53.2
+sqlite3 | query | 9.1 | 15.1 | 14.1 | 1.0 | 0.7 | | 59.3/31.5
+ssh | index | 0.0 | 86.1 | 32.2 | 53.9 | 34.4 | 42.3/39.3
+ssh | query | 7.7 | 13.1 | 12.2 | 0.8 | 0.6 | | 72.7/26.2
+sudo | index | 0.0 | 16.2 | 5.6 | 10.6 | 7.3 | 8.6/9.2
+sudo | query | 1.4 | 2.3 | 2.1 | 0.2 | 0.1 | | 17.6/6.4
+tar | index | 0.0 | 47.5 | 13.1 | 34.5 | 21.3 | 27.3/26.2
+tar | query | 3.7 | 6.2 | 5.6 | 0.6 | 0.4 | | 42.7/17.7
+wget | index | 0.0 | 40.2 | 10.7 | 29.6 | 18.4 | 20.4/20.8
+wget | query | 2.8 | 4.8 | 4.3 | 0.5 | 0.3 | | 40.3/17.9
+ch.blinkenlights.android.vanilla_13200 | index | 0.0 | 18.9 | 6.8 | 12.2 | 6.5 | 9.9/9.5
+ch.blinkenlights.android.vanilla_13200 | query | 2.2 | 3.8 | 3.4 | 0.4 | 0.2 | | 4.0/1.9
+com.amaze.filemanager_126 | index | 0.0 | 67.2 | 20.4 | 46.8 | 24.9 | 28.6/30.2
+com.amaze.filemanager_126 | query | 7.6 | 12.7 | 11.3 | 1.4 | 0.8 | | 13.9/5.2
+com.fsck.k9_39046 | index | 0.0 | 97.9 | 29.8 | 68.1 | 40.4 | 45.1/51.2
+com.fsck.k9_39046 | query | 12.5 | 28.2 | 17.9 | 10.3 | 1.5 | | 23.3/9.5
+de.danoeh.antennapod_3120395 | index | 0.0 | 78.4 | 23.2 | 55.2 | 26.0 | 32.2/39.4
+de.danoeh.antennapod_3120395 | query | 7.5 | 13.5 | 12.2 | 1.3 | 0.8 | | 12.3/4.7
+de.markusfisch.android.binaryeye_180 | index | 0.0 | 21.4 | 8.6 | 12.8 | 8.3 | 9.9/11.0
+de.markusfisch.android.binaryeye_180 | query | 2.3 | 4.7 | 4.2 | 0.4 | 0.3 | | 5.2/2.9
+eu.faircode.netguard_2026080101 | index | 0.0 | 11.5 | 5.2 | 6.4 | 4.3 | 6.2/6.3
+eu.faircode.netguard_2026080101 | query | 1.3 | 2.7 | 2.4 | 0.3 | 0.1 | | 2.6/1.4
+net.sourceforge.opencamera_96 | index | 0.0 | 39.3 | 12.4 | 26.8 | 12.9 | 14.8/19.4
+net.sourceforge.opencamera_96 | query | 3.8 | 7.1 | 6.3 | 0.9 | 0.4 | | 8.2/3.1
+org.billthefarmer.diary_1105 | index | 0.0 | 3.6 | 2.5 | 1.1 | 0.5 | 2.1/2.2
+org.billthefarmer.diary_1105 | query | 0.3 | 0.9 | 0.8 | 0.1 | 0.0 | | 0.6/0.5
+org.billthefarmer.editor_198 | index | 0.0 | 3.3 | 2.3 | 1.0 | 0.6 | 2.2/1.9
+org.billthefarmer.editor_198 | query | 0.3 | 0.8 | 0.6 | 0.1 | 0.0 | | 0.5/0.4
+org.connectbot_11101000 | index | 0.0 | 74.5 | 18.1 | 56.4 | 23.6 | 26.8/37.5
+org.connectbot_11101000 | query | 7.7 | 11.9 | 9.7 | 2.2 | 0.7 | | 16.4/6.8
+org.schabi.newpipe_1015 | index | 0.0 | 94.6 | 28.4 | 66.2 | 35.4 | 46.4/50.9
+org.schabi.newpipe_1015 | query | 10.9 | 37.1 | 16.0 | 21.2 | 1.0 | | 17.9/6.5
+org.secuso.privacyfriendlynotes_105 | index | 0.0 | 61.8 | 22.1 | 39.7 | 22.4 | 24.9/27.4
+org.secuso.privacyfriendlynotes_105 | query | 6.4 | 12.7 | 11.1 | 1.5 | 0.7 | | 15.7/5.0
+org.wikipedia_50614 | index | 0.0 | 155.0 | 35.7 | 119.3 | 49.9 | 70.1/64.5
+org.wikipedia_50614 | query | 15.8 | 34.0 | 22.1 | 11.9 | 2.7 | | 37.1/14.8

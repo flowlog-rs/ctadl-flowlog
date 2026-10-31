@@ -20,12 +20,13 @@ TARGET=${CARGO_TARGET_DIR:-$CTADL/ctadl-test-output/flowlog-target}
 # flowlog-compiler names the crate after the executable, and cargo can take
 # a build of another crate of that name in $TARGET for this one's: each run
 # compiles under a name of its own (FlowLog finding B14), and removes that
-# crate's build products from $TARGET when it exits
+# crate's build products from $TARGET when it exits (named after $BIN, which
+# FlowLog's fix, flowlog-rs/flowlog#507, suffixes with a hash)
 BIN=bin_$$
 MODE=
 case $1 in -t | -s) MODE=$1; shift ;; esac
 W=$(mktemp -d)
-trap 'rm -rf "$W" "$TARGET/release/$BIN"{,.d} "$TARGET"/release/{deps,.fingerprint}/"$BIN"-*' EXIT
+trap 'rm -rf "$W" "$TARGET"/release/{,deps/,.fingerprint/}"$BIN"{,.d,-*,_*}' EXIT
 if [ "$MODE" = -t ]; then
   { cat "$PORT/souffle2flowlog.rs"; echo; echo 'pub fn F(a: String) -> String { a }'; } > "$W/udf.rs"
 fi

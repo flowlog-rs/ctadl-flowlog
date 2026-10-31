@@ -1,0 +1,8 @@
+# The query alone: one Soufflé index of the app (-j 8), copied, then Soufflé's and FlowLog's SARIF
+# queries on the copies, compared on every column. Wikipedia's reports differ in the order of
+# equally short paths, which flowlog-rs/ctadl-flowlog#3 makes independent of vertex ids.
+org.billthefarmer.editor_198 | summary: 166 equal, 0 different | sarif: equal
+org.billthefarmer.diary_1105 | summary: 166 equal, 0 different | sarif: equal
+eu.faircode.netguard_2026080101 | summary: 166 equal (1 up to choice-domain witnesses), 0 different | sarif: equal
+org.schabi.newpipe_1015 | summary: 166 equal (1 up to choice-domain witnesses), 0 different | sarif: equal
+org.wikipedia_50614 | summary: 166 equal (1 up to choice-domain witnesses), 0 different | sarif: different (2 places)

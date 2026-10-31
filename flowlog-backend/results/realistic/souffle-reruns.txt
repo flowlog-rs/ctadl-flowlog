@@ -1,0 +1,11 @@
+# Soufflé against itself: two more -j 32 runs (index, then the SARIF query) per app, compared with
+# each other and with jadx.txt's Soufflé run, as FlowLog's runs are compared with Soufflé's.
+org.billthefarmer.diary_1105 souffle r1 vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+org.billthefarmer.diary_1105 souffle rerun vs r1: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+org.billthefarmer.diary_1105 souffle rerun vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+org.billthefarmer.editor_198 souffle r1 vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+org.billthefarmer.editor_198 souffle rerun vs r1: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+org.billthefarmer.editor_198 souffle rerun vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+eu.faircode.netguard_2026080101 souffle r1 vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+eu.faircode.netguard_2026080101 souffle rerun vs r1: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+eu.faircode.netguard_2026080101 souffle rerun vs r2: summary: 166 equal (1 up to choice-domain witnesses), 0 different; sarif: equal

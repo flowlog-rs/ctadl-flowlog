@@ -130,9 +130,11 @@ class FlowLogAnalysis:
         target = os.environ.get("CARGO_TARGET_DIR") or str(CACHE / "target")
         # flowlog-compiler names the crate after the executable. In a shared
         # target dir, cargo can take a build of another crate of the same name
-        # for this one's, and the cleanup below would remove a build still in
-        # progress: so each cache entry (built by one process at a time) gets
-        # a name of its own, even for the same analysis in another cache.
+        # for this one's (flowlog-rs/flowlog#507; FlowLog's fix adds a hash of
+        # the build dir to the name), and the cleanup below, by name, would
+        # remove a build still in progress: so each cache entry (built by one
+        # process at a time) gets a name of its own, even for the same
+        # analysis in another cache.
         name = hashlib.sha256(str(self.dir.resolve()).encode()).hexdigest()[:32]
         tmp, log = self.dir / f"ctadl_{name}", self.dir / "compile.log"
         cmd = [
@@ -155,18 +157,18 @@ class FlowLogAnalysis:
             sys.exit(1)
         os.replace(tmp, self.bin)
         # The binary is cached here: of its build, the target dir need only
-        # keep what the analyses share (the runtime and dependencies).
+        # keep what the analyses share (the runtime and dependencies). The
+        # crate's products start with its name, the executable's (suffixed
+        # with FlowLog's hash, after the fix), which no other entry's starts
+        # with.
         release = Path(target) / "release"
-        for p in [release / tmp.name, release / f"{tmp.name}.d"] + [
-            p
-            for d in ("deps", ".fingerprint")
-            for p in release.glob(f"{d}/{tmp.name}-*")
-        ]:
-            with suppress(OSError):
-                if p.is_dir():
-                    shutil.rmtree(p)
-                else:
-                    p.unlink()
+        for d in ("", "deps/", ".fingerprint/"):
+            for p in release.glob(f"{d}{tmp.name}*"):
+                with suppress(OSError):
+                    if p.is_dir():
+                        shutil.rmtree(p)
+                    else:
+                        p.unlink()
 
     def read_inputs(self, fact_dir, tmp: Path) -> tuple[Path, Path]:
         """Writes the analysis' inputs, from the Souffle fact directory

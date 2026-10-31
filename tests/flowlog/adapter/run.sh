@@ -8,6 +8,8 @@
 #   - an input that a rule reads fails with an explanation;
 #   - record columns the port writes (to-souffle) still round-trip, and a
 #     nil (or dangling) record id fails;
+#   - an append keeps the ids of the symbols and records the DB has, and
+#     numbers new ones after the largest, in the order of FlowLog's rows;
 #   - an empty record relation needs no record table, both ways;
 #   - without FlowLog's DB, to-souffle creates every output empty;
 #   - an input missing from the DB is not created (FlowLog, like Soufflé,
@@ -172,6 +174,21 @@ try:
     check("a nil record id fails", False)
 except ValueError as e:
     check(f"a nil record id fails: {e}", "record id 0 is nil or unknown" in str(e))
+for i, (calls, names) in enumerate((([(1, 7, "f")], ["a"]), ([(3, 9, "h"), (2, 8, "g"), (1, 7, "f")], ["b", "a"]))):
+    fl = sqlite3.connect(f"{W}/fl_app{i}.db")
+    fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
+    fl.executemany("INSERT INTO Call VALUES (?, ?, ?)", calls)
+    fl.execute("CREATE TABLE Name (s)")
+    fl.executemany("INSERT INTO Name VALUES (?)", [(n,) for n in names])
+    fl.commit()
+    A.to_souffle(f"{W}/fl_app{i}.db", f"{W}/app.sqlite", out, True)
+db = sqlite3.connect(f"{W}/app.sqlite")
+check("an append keeps the ids of the DB's symbols and records, and numbers new ones after the largest",
+      list(db.execute("SELECT * FROM __SymbolTable ORDER BY id")) == [(1, "a"), (2, "b")]
+      and list(db.execute("SELECT * FROM __FlowLogRecord ORDER BY id")) == [(1, '[7,"f"]'), (2, '[9,"h"]'), (3, '[8,"g"]')]
+      and rows(f"{W}/app.sqlite", "Name") == [("a",), ("b",)])
+A.to_flowlog(f"{W}/app.sqlite", f"{W}/fl_app.db", read)
+check("and its records read back", rows(f"{W}/fl_app.db", "Call") == [(1, 7, "f"), (2, 8, "g"), (3, 9, "h")])
 counts = A.to_souffle(f"{W}/missing.db", f"{W}/empty.sqlite", out, False)
 check("without FlowLog's DB, every output is created empty",
       counts == {"Call": 0, "Name": 0} and rows(f"{W}/empty.sqlite", "Call") == [])
@@ -243,8 +260,8 @@ before = list(sqlite3.connect(f"{W}/idx.sqlite").iterdump())
 def append_and(stop):
     """Appends fl_big.db's outputs to idx.sqlite, and calls STOP after Name's rows."""
     copy, cache = A.copy_to_souffle, A.CACHE_KIB
-    def copy_and_stop(conn, name, cols):
-        n = copy(conn, name, cols)
+    def copy_and_stop(conn, name, *args):
+        n = copy(conn, name, *args)
         if name == "Name":
             stop()
         return n

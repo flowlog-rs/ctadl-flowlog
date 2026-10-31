@@ -1,0 +1,42 @@
+# bench.py --lang JADX --format sarif --jobs 32 APK on each F-Droid app (inputs.txt), smallest first,
+# one at a time, reusing the imports (CTADL's JADX plugin 0.6.2). CTADL's default JADX query.
+# Columns as in pcode.txt.
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.billthefarmer.diary_1105 souffle  32 |    4.52     2.22    2.22     45M |   14.86     0.72    0.72     52M | (reference)
+org.billthefarmer.diary_1105 flowlog  32 |    6.57     4.10    3.57   2602M |   15.21     1.22    0.87   1684M | summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.billthefarmer.editor_198 souffle  32 |    4.75     2.37    2.37     49M |   14.98     0.72    0.72     52M | (reference)
+org.billthefarmer.editor_198 flowlog  32 |    6.04     3.87    3.27   2596M |   14.31     1.14    0.77   1679M | summary: 156 equal, 10 different; sarif: different (1 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+eu.faircode.netguard_2026080101 souffle  32 |   25.77    19.39   19.39    347M |   20.34     4.12    4.12    184M | (reference)
+eu.faircode.netguard_2026080101 flowlog  32 |   22.57    15.98   11.54   3008M |   19.40     4.17    2.67   1895M | summary: 156 equal (1 up to choice-domain witnesses), 10 different; sarif: different (22 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+de.markusfisch.android.binaryeye_180 souffle  32 |   51.77    41.61   41.61    790M |   27.49     9.64    9.64    387M | (reference)
+de.markusfisch.android.binaryeye_180 flowlog  32 |   41.13    29.83   21.39   4530M |   23.27     7.35    4.67   2084M | summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+ch.blinkenlights.android.vanilla_13200 souffle  32 |   39.04    28.95   28.95    497M |   23.48     6.18    6.18    259M | (reference)
+ch.blinkenlights.android.vanilla_13200 flowlog  32 |   35.39    25.60   18.95   4026M |   21.51     6.34    3.82   2000M | summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (17 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+net.sourceforge.opencamera_96 souffle  32 |   77.49    62.43   62.43    986M |   34.33    13.79   13.79    514M | (reference)
+net.sourceforge.opencamera_96 flowlog  32 |   72.24    52.51   39.27   4363M |   27.41    11.53    7.13   2266M | summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (20 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.secuso.privacyfriendlynotes_105 souffle  32 |  141.31   116.21  116.21   1671M |   55.82    26.53   26.53    881M | (reference)
+org.secuso.privacyfriendlynotes_105 flowlog  32 |  112.60    84.81   61.79   6982M |   37.10    20.06   12.65   2684M | summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+com.amaze.filemanager_126 souffle  32 |  169.06   140.20  140.20   2261M |   57.49    32.47   32.47   1084M | (reference)
+com.amaze.filemanager_126 flowlog  32 |  123.35    92.80   67.22   8600M |   37.84    21.50   12.67   2974M | summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+de.danoeh.antennapod_3120395 souffle  32 |  166.04   133.57  133.57   1988M |   54.82    29.58   29.58   1035M | (reference)
+de.danoeh.antennapod_3120395 flowlog  32 |  144.89   105.16   78.41  10318M |   39.06    22.24   13.52   2917M | summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (23 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.connectbot_11101000 souffle  32 |  162.91   135.86  135.86   1932M |   56.98    28.52   28.52    980M | (reference)
+org.connectbot_11101000 flowlog  32 |  136.77    98.94   74.52   7183M |   39.95    20.83   11.93   2770M | summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (24 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.schabi.newpipe_1015 souffle  32 |  242.93   196.34  196.34   2862M |   76.71    46.40   46.40   1488M | (reference)
+org.schabi.newpipe_1015 flowlog  32 |  182.29   131.05   94.58   9013M |   68.57    49.71   37.15   3395M | summary: 152 equal, 14 different; sarif: different (24 places)
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+com.fsck.k9_39046 souffle  32 |  281.92   236.61  236.61   3312M |   89.77    55.46   55.46   1714M | (reference)
+com.fsck.k9_39046 flowlog  32 |  191.16   139.65   97.91   9896M |   64.48    42.86   28.23   3521M | summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+org.wikipedia_50614 souffle  32 |  367.67   297.38  297.38   4108M |  127.65    76.96   76.96   2132M | (reference)
+org.wikipedia_50614 flowlog  32 |  271.36   206.54  155.04  11937M |   80.36    53.33   34.01   3860M | summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places)

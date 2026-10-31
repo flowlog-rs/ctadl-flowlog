@@ -1,0 +1,61 @@
+# FlowLog's memory floor: CTADL's compiled FlowLog index binary (FlowLog 03b534b) on empty fact
+# files, as the engine runs it (-F IN -D OUT -w N), three runs per row. assembled: RSS when worker 0
+# prints "Dataflow assembled" (dataflow built, no input read); peak: VmHWM; executed: "Dataflow
+# executed". MB are MiB. MIMALLOC_ALLOW_THP=0 stops mimalloc from using transparent huge pages.
+w=1        w=1   default                            assembled     96 MB | peak    159 MB | executed   0.22 s | wall   0.24 s
+w=1        w=1   default                            assembled     96 MB | peak    159 MB | executed   0.22 s | wall   0.23 s
+w=1        w=1   default                            assembled     96 MB | peak    159 MB | executed   0.22 s | wall   0.24 s
+w=2        w=2   default                            assembled    173 MB | peak    239 MB | executed   0.21 s | wall   0.23 s
+w=2        w=2   default                            assembled    190 MB | peak    233 MB | executed   0.22 s | wall   0.24 s
+w=2        w=2   default                            assembled    186 MB | peak    225 MB | executed   0.21 s | wall   0.23 s
+w=4        w=4   default                            assembled    326 MB | peak    363 MB | executed   0.21 s | wall   0.22 s
+w=4        w=4   default                            assembled    310 MB | peak    364 MB | executed   0.21 s | wall   0.22 s
+w=4        w=4   default                            assembled    321 MB | peak    350 MB | executed   0.20 s | wall   0.22 s
+w=8        w=8   default                            assembled    583 MB | peak    620 MB | executed   0.22 s | wall   0.24 s
+w=8        w=8   default                            assembled    569 MB | peak    644 MB | executed   0.22 s | wall   0.23 s
+w=8        w=8   default                            assembled    605 MB | peak    650 MB | executed   0.22 s | wall   0.23 s
+w=16       w=16  default                            assembled   1214 MB | peak   1256 MB | executed   0.29 s | wall   0.32 s
+w=16       w=16  default                            assembled   1240 MB | peak   1263 MB | executed   0.31 s | wall   0.33 s
+w=16       w=16  default                            assembled   1198 MB | peak   1267 MB | executed   0.29 s | wall   0.32 s
+w=32       w=32  default                            assembled   2289 MB | peak   2771 MB | executed   0.56 s | wall   0.59 s
+w=32       w=32  default                            assembled   2622 MB | peak   2775 MB | executed   0.59 s | wall   0.62 s
+w=32       w=32  default                            assembled   2681 MB | peak   2749 MB | executed   0.53 s | wall   0.56 s
+w=64       w=64  default                            assembled   5951 MB | peak   6634 MB | executed   2.02 s | wall   2.09 s
+w=64       w=64  default                            assembled   6428 MB | peak   6585 MB | executed   1.71 s | wall   1.83 s
+w=64       w=64  default                            assembled   6428 MB | peak   6504 MB | executed   2.32 s | wall   2.50 s
+w=1        w=1   MIMALLOC_ALLOW_THP=0               assembled     68 MB | peak    128 MB | executed   0.27 s | wall   0.29 s
+w=1        w=1   MIMALLOC_ALLOW_THP=0               assembled     68 MB | peak    129 MB | executed   0.27 s | wall   0.29 s
+w=1        w=1   MIMALLOC_ALLOW_THP=0               assembled     68 MB | peak    129 MB | executed   0.26 s | wall   0.29 s
+w=4        w=4   MIMALLOC_ALLOW_THP=0               assembled    221 MB | peak    264 MB | executed   0.24 s | wall   0.28 s
+w=4        w=4   MIMALLOC_ALLOW_THP=0               assembled    223 MB | peak    267 MB | executed   0.23 s | wall   0.27 s
+w=4        w=4   MIMALLOC_ALLOW_THP=0               assembled    227 MB | peak    274 MB | executed   0.24 s | wall   0.27 s
+w=32       w=32  MIMALLOC_ALLOW_THP=0               assembled   1916 MB | peak   2115 MB | executed   0.69 s | wall   0.90 s
+w=32       w=32  MIMALLOC_ALLOW_THP=0               assembled   1718 MB | peak   2124 MB | executed   0.67 s | wall   0.89 s
+w=32       w=32  MIMALLOC_ALLOW_THP=0               assembled   1847 MB | peak   2126 MB | executed   0.64 s | wall   0.86 s
+w=64       w=64  MIMALLOC_ALLOW_THP=0               assembled   5031 MB | peak   5251 MB | executed   1.73 s | wall   2.18 s
+w=64       w=64  MIMALLOC_ALLOW_THP=0               assembled   5120 MB | peak   5188 MB | executed   1.91 s | wall   2.37 s
+w=64       w=64  MIMALLOC_ALLOW_THP=0               assembled   4675 MB | peak   5186 MB | executed   1.87 s | wall   2.29 s
+
+# The three index binaries (P-code, JADX, taint-front) on empty fact files: peak (VmHWM) in KiB,
+# median of three runs. ops: calls to flowlog_runtime::operators in the generated main.rs. thp=0 sets
+# MIMALLOC_ALLOW_THP=0. per worker: (peak at 32 - peak at 8) / 24.
+P-code index       ops      4446 thp=1  w=1   162840 | w=8   653160 | w=32  2831512 | per worker  88.6 MiB
+P-code index       ops      4446 thp=0  w=1   131584 | w=8   484352 | w=32  2176512 | per worker  68.9 MiB
+JADX index         ops      3729 thp=1  w=1   167952 | w=8   695080 | w=32  2853136 | per worker  87.8 MiB
+JADX index         ops      3729 thp=0  w=1   146944 | w=8   545792 | w=32  2280952 | per worker  70.6 MiB
+taint-front index  ops      2424 thp=1  w=1   142056 | w=8   536740 | w=32  2023980 | per worker  60.5 MiB
+taint-front index  ops      2424 thp=0  w=1   115712 | w=8   370688 | w=32  1405440 | per worker  42.1 MiB
+
+# A synthetic chain of K joins in FlowLog syntax, compiled with the same FlowLog, on one fact:
+#   .decl E(x:int32, y:int32)  .input E(IO="file", filename="E.csv", delimiter=",")  E.csv: 1,2
+#   R0(x, y) :- E(x, y).   Ri(x, z) :- R{i-1}(x, y), E(y, z).  for i = 1..K   .printsize RK
+# peak (VmHWM) in KiB, three runs.
+K=100  thp=default  w=1   19724   19724   19728 | w=8   98416   90220   92828 | w=32  366368  378764  368476
+K=100  thp=off      w=1    7680    8192    7680 | w=8   28672   28160   28672 | w=32  142336  142848  141824
+K=400  thp=default  w=1   40888   40888   40896 | w=8  229920  228384  227360 | w=32 1046848 1046796 1057232
+K=400  thp=off      w=1   20992   20480   20480 | w=8  104960  106496  100864 | w=32  552960  558080  558592
+
+# Timely's options, P-code index on empty fact files with 32 workers: peak (VmHWM) in KiB, three runs.
+-w 32                         2860188 2885260 2812408
+-w 32 --progress-mode demand  2871452 2878100 2874368
+-w 32 -z (zero-copy)          3785488 3845760 3849500

@@ -10,7 +10,12 @@
   `CInsn_ModelAssign` rows that use it (each put/get uses one key).
 
     compare_jadx.py A.db B.db [compare_db.py options]
-    compare_jadx.py canon DB FILE   prints FILE (SARIF, GML) renamed by DB's ids"""
+    compare_jadx.py canon DB FILE   prints FILE (SARIF, GML) renamed by DB's ids
+    compare_jadx.py ords DB         prints the engine's number of each symbol
+                                    whose `ord` these rules take, and of the
+                                    variables jadx_lang.dl names
+                                    `autovar<ord(var)>` (for
+                                    check_choice_model.py --ord-map)"""
 import re
 import sys
 from pathlib import Path
@@ -18,7 +23,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import compare_db as c  # noqa: E402
 
-KEY = re.compile(r"\.intent\[([^\]]*)\]\.(\d+)")
+KEY = re.compile(r"\.intent\[([^\[\]]*(?:\[\])*)\]\.(\d+)")
+NUMBER = re.compile(r"/(\d+)(?!\d)")
 orig_rows = c.rows
 maps: dict = {}
 
@@ -45,15 +51,85 @@ def build(db) -> tuple:
     if len(set(keys.values())) != len(keys):
         sys.exit("intent key renaming is not injective")
     print(f"renamed {len(objs)} MakeObjectID objects, {len(keys)} intent keys", file=sys.stderr)
-    alts = sorted(objs, key=len, reverse=True)
-    obj_re = re.compile("|".join(re.escape(o) + r"(?!\d)" for o in alts)) if objs else None
-    return obj_re, objs, keys
+    # {number: [(type, renamed object)], longest type first}: rename() finds
+    # an object by the `/<number>` it ends with, in time linear in the text.
+    # One regex alternating over all objects tries each of them at every
+    # position: comparing netguard (5,005 objects) took over 28 minutes with
+    # it, 48 s without.
+    types: dict = {}
+    for obj, new in objs.items():
+        type_, _, number = obj.rpartition("/")
+        types.setdefault(number, []).append((type_, new))
+    for ts in types.values():
+        ts.sort(key=lambda t: len(t[0]), reverse=True)
+    return types, keys
+
+
+def ords(db) -> dict:
+    """{symbol: number} read back from the rows that the ids are part of. An
+    intent key is paired with its number through the put/get instruction
+    that uses it; an instruction whose key variable references several
+    strings is paired once the other instructions have paired all but one."""
+    out: dict = {}
+
+    def put(sym: str, n: int) -> None:
+        if out.setdefault(sym, n) != n:
+            sys.exit(f"{sym!r} has two numbers, {out[sym]} and {n}")
+
+    rels = c.relations(db)
+    get = lambda r: orig_rows(db, r) if r in rels else []  # noqa: E731
+    for var, path, obj in get("CisAlloc"):
+        mt = re.fullmatch(r".*/(\d+)", obj)
+        if path == "" and mt:
+            put(var, int(mt.group(1)))
+    for var, name in get("CVar_Name"):
+        mt = re.fullmatch(r"autovar(\d+)", name)
+        if mt:
+            put(var, int(mt.group(1)))
+    strs: dict = {}
+    for key, s in get("VarReferencesString"):
+        strs.setdefault(key, set()).add(s)
+    pending: dict = {}  # instruction -> ([its key strings], {their numbers})
+    for rel in ("IntentPutExtra", "IntentGetExtra"):
+        for r in get(rel):
+            pending.setdefault(r[0], (set(), set()))[0].update(strs.get(r[1], ()))
+    for r in get("CInsn_ModelAssign"):
+        for cell in r[1:]:
+            for m in KEY.finditer(cell):
+                pending.setdefault(r[0], (set(), set()))[1].add(int(m.group(2)))
+    while True:
+        paired = 0
+        for insn, (ss, ns) in list(pending.items()):
+            ss -= out.keys()
+            ns -= set(out.values())
+            if len(ss) == len(ns) == 1:
+                put(ss.pop(), ns.pop())
+                paired += 1
+            if not ns:
+                del pending[insn]
+        if not paired:
+            break
+    if pending:
+        sys.exit(f"cannot pair the intent keys of {len(pending)} instructions, e.g. {next(iter(pending))}")
+    if len(set(out.values())) != len(out):
+        sys.exit("two symbols have the same number")
+    return out
 
 
 def rename(text: str, maps: tuple) -> str:
-    obj_re, objs, keys = maps
-    if obj_re is not None:
-        text = obj_re.sub(lambda m: objs[m.group(0)], text)
+    """Renames each object leftmost first, the longest at a position, like
+    a regex alternating over the objects, longest first: an object starts
+    with a JVM type, which holds no `/<number>` that ends an object."""
+    types, keys = maps
+    parts, done = [], 0
+    for m in NUMBER.finditer(text):
+        for type_, new in types.get(m.group(1), ()):
+            start = m.start() - len(type_)
+            if start >= done and text.startswith(type_, start):
+                parts += (text[done:start], new)
+                done = m.end()
+                break
+    text = "".join(parts) + text[done:]
     return KEY.sub(
         lambda m: f".intent[{m.group(1)}].{keys.get(m.group(2), '?' + m.group(2))}", text
     )
@@ -65,6 +141,14 @@ def rows(db, name):
     return [tuple(rename(v, maps[id(db)]) for v in r) for r in orig_rows(db, name)]
 
 
+if len(sys.argv) == 3 and sys.argv[1] == "ords":
+    import sqlite3
+
+    for sym, n in ords(sqlite3.connect(sys.argv[2])).items():
+        if "\t" in sym or "\n" in sym:
+            sys.exit(f"symbol {sym!r} contains a tab or newline")
+        print(f"{sym}\t{n}")
+    sys.exit(0)
 if len(sys.argv) == 4 and sys.argv[1] == "canon":
     import sqlite3
 

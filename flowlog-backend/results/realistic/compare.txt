@@ -1,0 +1,995 @@
+# FlowLog's database and SARIF report against Soufflé's, per program, as bench.py compares them
+# (compare_pcode.py or compare_jadx.py, then compare_sarif.py), with the lines for equal relations
+# left out and two example rows per difference, cut to 200 characters. lighttpd's is from
+# thunk-fix.txt's run. JADX reports are compared once compare_jadx.py has renamed their ids.
+== pcode bash
+renamed 2001038 address ids
+renamed 2001038 address ids
+WITNESS  VirtualAssign: 1771764 rows, same choice-domain keys, 287 with another witness
+           - ('FUN_00150ec0@00150ec0:0015178d:1418', 'FUN_00150ec0@00150ec0:param_1:9454', '.*', 'FUN_00150ec0@00150ec0:param_5:13685', '.*', 'summary', '')
+           - ('FUN_00150ec0@00150ec0:0015178d:1418', 'FUN_00150ec0@00150ec0:param_1:9454', '.[-1]', 'FUN_00150ec0@00150ec0:param_5:13685', '.[-1]', 'summary', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode dnsmasq
+renamed 787111 address ids
+renamed 787111 address ids
+WITNESS  LostAssign: 24 rows, same choice-domain keys, 9 with another witness
+           - ('FUN_0010ab50@0010ab50:0010bb7f:12622', '.[4]', 'dest')
+           - ('FUN_0010ab50@0010ab50:0010bb82:112651', '.[4]', 'dest')
+WITNESS  VirtualAssign: 1655633 rows, same choice-domain keys, 200 with another witness
+           - ('FUN_00110280@00110280:001102d5:399', 'FUN_00110280@00110280:param_1:2302', '.[0]', 'FUN_00110280@00110280:param_2:2300', '.[0]', 'summary', '')
+           - ('FUN_00110280@00110280:001102d5:399', 'FUN_00110280@00110280:param_1:2302', '.[1]', 'FUN_00110280@00110280:param_2:2300', '.[1]', 'summary', '')
+summary: 210 equal (2 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode dropbear
+renamed 309971 address ids
+renamed 309971 address ids
+WITNESS  VirtualAssign: 222667 rows, same choice-domain keys, 7 with another witness
+           - ('FUN_00113f50@00113f50:001147f1:962', 'FUN_00113f50@00113f50:__ptr_00:18496', '.[0]', 'FUN_00113f50@00113f50:uVar23:50387', '.[0]', 'summary', '')
+           - ('FUN_00113f50@00113f50:001147f1:962', 'FUN_00113f50@00113f50:__ptr_00:18496', '.[1]', 'FUN_00113f50@00113f50:uVar23:50387', '.[1]', 'summary', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode gzip
+renamed 169741 address ids
+renamed 169741 address ids
+WITNESS  VirtualAssign: 199542 rows, same choice-domain keys, 4 with another witness
+           - ('FUN_00104d60@00104d60:00104de8:180', 'FUN_00104d60@00104d60:register:000000a0:835', '', 'FUN_00104d60@00104d60:param_1:1068', '', 'summary', '')
+           - ('FUN_00104fa0@00104fa0:0010576c:3792', 'FUN_00104fa0@00104fa0:puVar17:6373', '.[24]', 'FUN_00104fa0@00104fa0:piVar11:48431', '', 'move', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode libz
+renamed 71178 address ids
+renamed 71178 address ids
+WITNESS  VirtualAssign: 198471 rows, same choice-domain keys, 6 with another witness
+           - ('gzfwrite@00112260:001122b8:268', 'gzfwrite@00112260:@ret', '', 'gzfwrite@00112260:register:00000000:7', '', 'move', '')
+           - ('gzfwrite@00112260:001122b8:268', 'gzfwrite@00112260:@ret', '.*', 'gzfwrite@00112260:register:00000000:7', '.*', 'fp', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode lighttpd
+WITNESS  VirtualAssign: 367021 rows, same choice-domain keys, 33 with another witness
+           - ('FUN_0010efff@0010efff:00127746:765', 'FUN_0010efff@0010efff:in_stack_00000020:17644', '.[0]', 'FUN_0010efff@0010efff:in_stack_00000028:17643', '.[8]', 'summary', '')
+           - ('FUN_0010efff@0010efff:00127746:765', 'FUN_0010efff@0010efff:in_stack_00000028:17643', '.[40].[8]', 'FUN_0010efff@0010efff:unaff_R12:10865', '.[8].[8]', 'summary', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+renamed 427463 address ids
+renamed 427463 address ids
+sarif: equal
+== pcode nc
+renamed 99785 address ids
+renamed 99785 address ids
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 1, flowlog-only 1
+           - ('ctx', '2')
+           + ('ctx', '3')
+summary: 209 equal, 1 different
+A: pcode/nc/souffle-j32/nc.sarif
+B: pcode/nc/flowlog-j32/nc.sarif
+.runs[0].logicalLocations: 3 items only in A, 3 only in B
+  - {"decoratedName": "FUN_001027e0@001027e0:__addr:8073", "fullyQualifiedName": "FUN_001027e0@001027e0::read", "kind": "variable", "name": "read", "parent": "function:FUN_001027e0@001027e0"}
+  - {"decoratedName": "FUN_001051c0@001051c0:001056da:1229", "fullyQualifiedName": "FUN_001051c0@001051c0:001056da:1229", "kind": "member", "name": "FUN_001051c0@001051c0:001056da:1229", "parent": "fu
+.runs[0].results: 12 items only in A, 12 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 17 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 17 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+.runs[0].tool.driver.properties.stats.ctx: 2 != 3
+sarif: different (3 places); same results up to code flows
+== pcode openssl
+renamed 1418360 address ids
+renamed 1418360 address ids
+WITNESS  VirtualAssign: 1195408 rows, same choice-domain keys, 1 with another witness
+           - ('FUN_001a6a40@001a6a40:001a6e40:641', 'FUN_001a6a40@001a6a40:piVar8:10358', '.[0]', 'FUN_001a6a40@001a6a40:iVar5:10356', '', 'move', '')
+           + ('FUN_001a6a40@001a6a40:001a6dfb:634', 'FUN_001a6a40@001a6a40:piVar8:10358', '.[0]', 'FUN_001a6a40@001a6a40:iVar5:10356', '', 'move', '')
+summary: 210 equal (1 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode sed
+renamed 150902 address ids
+renamed 150902 address ids
+summary: 210 equal, 0 different
+sarif: equal
+== pcode sqlite3
+renamed 1872659 address ids
+renamed 1872659 address ids
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 1, flowlog-only 1
+           - ('ctx', '28')
+           + ('ctx', '27')
+WITNESS  VirtualAssign: 4129310 rows, same choice-domain keys, 162 with another witness
+           - ('FUN_00113c20@00113c20:00113d54:236', 'FUN_00113c20@00113c20:@ret', '', 'FUN_00113c20@00113c20:uVar3:1952', '', 'move', '')
+           - ('FUN_0011b410@0011b410:0011b4b9:205', 'FUN_0011b410@0011b410:param_1:1609', '.[64]', 'FUN_0011b410@0011b410:local_28:1802', '', 'move', '')
+summary: 209 equal (1 up to choice-domain witnesses), 1 different
+A: pcode/sqlite3/souffle-j32/sqlite3.sarif
+B: pcode/sqlite3/flowlog-j32/sqlite3.sarif
+.runs[0].tool.driver.properties.stats.ctx: 28 != 27
+sarif: different (1 places); same results up to code flows
+== pcode ssh
+renamed 1502681 address ids
+renamed 1502681 address ids
+WITNESS  LostAssign: 1 rows, same choice-domain keys, 1 with another witness
+           - ('FUN_00144ec0@00144ec0!copy_formal', '.[40]', 'dest')
+           + ('FUN_00144ec0@00144ec0!copy_formal', '.[32]', 'dest')
+WITNESS  VirtualAssign: 3635449 rows, same choice-domain keys, 83 with another witness
+           - ('FUN_0011b9d0@0011b9d0:0011d102:5710', 'FUN_0011b9d0@0011b9d0:unique:00004b00:3034', '.[0]', 'FUN_0011b9d0@0011b9d0:lVar13:32743', '.[0]', 'summary', '')
+           - ('FUN_0011b9d0@0011b9d0:0011d102:5710', 'FUN_0011b9d0@0011b9d0:unique:00004b00:3034', '.[0]', 'FUN_0011b9d0@0011b9d0:lVar13:32743', '.[24]', 'summary', '')
+summary: 210 equal (2 up to choice-domain witnesses), 0 different
+sarif: equal
+== pcode sudo
+renamed 376039 address ids
+renamed 376039 address ids
+summary: 210 equal, 0 different
+sarif: equal
+== pcode tar
+renamed 1033691 address ids
+renamed 1033691 address ids
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 3, flowlog-only 3
+           - ('ctx', '27')
+           - ('virtual-assign-fp', '680697')
+WITNESS  VirtualAssign: 1222939 rows, same choice-domain keys, 12 with another witness
+           - ('FUN_00119860@00119860:00119b19:905', 'FUN_00119860@00119860:puVar14:2445', '.[24]', 'FUN_00119860@00119860:param_5:6220', '', 'move', '')
+           - ('FUN_001360c0@001360c0:00137889:5791', 'FUN_001360c0@001360c0:puVar37:63622', '.[4]', 'FUN_001360c0@001360c0:uVar39:87802', '', 'move', '')
+summary: 209 equal (1 up to choice-domain witnesses), 1 different
+A: pcode/tar/souffle-j32/tar.sarif
+B: pcode/tar/flowlog-j32/tar.sarif
+.runs[0].logicalLocations: 2 items only in A, 2 only in B
+  - {"decoratedName": "FUN_00114ce0@00114ce0:00115960:29824", "fullyQualifiedName": "FUN_00114ce0@00114ce0:00115960:29824", "kind": "member", "name": "FUN_00114ce0@00114ce0:00115960:29824", "parent": 
+  - {"decoratedName": "FUN_00114ce0@00114ce0:DAT_00180560:93570", "fullyQualifiedName": "FUN_00114ce0@00114ce0::DAT_00180560", "kind": "variable", "name": "DAT_00180560", "parent": "function:FUN_00114
+.runs[0].results: 12 items only in A, 12 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 37 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 38 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+.runs[0].tool.driver.properties.stats.ctx: 27 != 29
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 680697 != 680695
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 4328 != 4330
+sarif: different (5 places); same results up to code flows
+== pcode wget
+renamed 934444 address ids
+renamed 934444 address ids
+DIFF     CTADLStats: souffle 59, flowlog 59, souffle-only 1, flowlog-only 1
+           - ('ctx', '11')
+           + ('ctx', '12')
+WITNESS  VirtualAssign: 764312 rows, same choice-domain keys, 49 with another witness
+           - ('FUN_00114a50@00114a50:00115627:1643', 'FUN_00114a50@00114a50:puVar23:3943', '.[0]', 'FUN_00114a50@00114a50:local_5c8:433379', '', 'summary', '')
+           - ('FUN_00114a50@00114a50:00115627:1643', 'FUN_00114a50@00114a50:puVar23:3943', '.[10]', 'FUN_00114a50@00114a50:local_5c8:433379', '', 'summary', '')
+DIFF     forward_flow.ReachableEdge: souffle 5831, flowlog 5831, souffle-only 3, flowlog-only 3
+           - ('FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0:', 'FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0:', 'FUN_00119610@00119610:0011a868:3690', 'move')
+           - ('FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0:', 'FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0:', 'FUN_00119610@00119610:0011a868:3690', 'move')
+DIFF     natural_flow.ReachableEdge: souffle 5831, flowlog 5831, souffle-only 3, flowlog-only 3
+           - ('FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:0011a868:3690', 'move', 'f')
+           - ('FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:0011a868:3690', 'move', 'f')
+DIFF     reverse_flow.ReachableEdge: souffle 5831, flowlog 5831, souffle-only 3, flowlog-only 3
+           - ('FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:0011a868:3690', 'move', 'f')
+           - ('FUN_00119610@00119610:param_2:38238:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:param_1:38230:.[0]:Env:restricted:0::f', 'FUN_00119610@00119610:0011a868:3690', 'move', 'f')
+summary: 206 equal (1 up to choice-domain witnesses), 4 different
+A: pcode/wget/souffle-j32/wget.sarif
+B: pcode/wget/flowlog-j32/wget.sarif
+.runs[0].logicalLocations: 13 items only in A, 14 only in B
+  - {"decoratedName": "FUN_00124870@00124870!copy_formal", "fullyQualifiedName": "FUN_00124870@00124870!copy_formal", "kind": "member", "name": "FUN_00124870@00124870!copy_formal", "parent": "function
+  - {"decoratedName": "FUN_00124870@00124870", "fullyQualifiedName": "FUN_00124870@00124870", "kind": "function", "name": "FUN_00124870"}
+.runs[0].results: 21 items only in A, 21 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 17 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 18 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+.runs[0].tool.driver.properties.stats.ctx: 11 != 12
+sarif: different (3 places); same results up to code flows
+== jadx ch.blinkenlights.android.vanilla_13200
+renamed 5214 MakeObjectID objects, 43 intent keys
+renamed 5214 MakeObjectID objects, 43 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 15, flowlog-only 15
+           - ('CInsn_Call', '46876')
+           - ('ContextObj', '11022')
+DIFF     CallEdge: souffle 46876, flowlog 46891, souffle-only 55, flowlog-only 70
+           - ('Landroidx/appcompat/view/menu/MenuBuilder;.dispatchPresenterUpdate:(Z)V/B:12:0x0030/0/15', 'Landroidx/appcompat/view/menu/MenuBuilder;.startDispatchingItemsChanged:()V', 'Landroidx/appc
+           - ('Landroidx/appcompat/view/menu/MenuBuilder;.dispatchPresenterUpdate:(Z)V/B:5:0x0009/0/4', 'Landroidx/appcompat/view/menu/MenuBuilder;.stopDispatchingItemsChanged:()V', 'Landroidx/appcomp
+WITNESS  LostAssign: 30 rows, same choice-domain keys, 13 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$2;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroid/content/Context;Landroid/database/Cursor;ZLandroidx/appcompat
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$3;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController;)V/B:2:0x0000/0/0', '.val$dial
+DIFF     SummaryAlloc: souffle 24169, flowlog 24193, souffle-only 40, flowlog-only 64
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;', '-3', '.EMPTY_INTS
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;', '-3', '.EMPTY_LONG
+DIFF     SummaryFlow: souffle 11920, flowlog 11919, souffle-only 6, flowlog-only 5
+           - ('Landroidx/collection/SimpleArrayMap;.indexOfKey:(Ljava/lang/Object;)I', '-1', '', 'Landroidx/collection/SimpleArrayMap;.indexOfKey:(Ljava/lang/Object;)I', '0', '.mSize:<I>', 'Landroidx/
+           - ('Lcom/google/android/material/floatingactionbutton/FloatingActionButtonImpl;.onPaddingUpdated:(Landroid/graphics/Rect;)V', '-3', '.ELEVATION_ANIM_INTERPOLATOR@Lcom/google/android/materia
+DIFF     Vertex: souffle 330175, flowlog 330186, souffle-only 3, flowlog-only 14
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+DIFF     VirtualAlloc: souffle 29824, flowlog 29849, souffle-only 49, flowlog-only 74
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+DIFF     VirtualAssign: souffle 155578, flowlog 155577, souffle-only 243, flowlog-only 242 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=155578 flowlog=155577]
+           - ('Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:(I)[Landroid/support/v4/media/MediaMetadataCompat;/B:3:0x0002/0/1', 'Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:
+           - ('Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:(I)[Landroid/support/v4/media/MediaMetadataCompat;/B:3:0x0002/0/1', 'Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:
+summary: 159 equal (1 up to choice-domain witnesses), 7 different
+A: jadx/ch.blinkenlights.android.vanilla_13200/souffle-j32/ch.blinkenlights.android.vanilla_13200.canon.sarif
+B: jadx/ch.blinkenlights.android.vanilla_13200/flowlog-j32/ch.blinkenlights.android.vanilla_13200.canon.sarif
+.runs[0].logicalLocations: 7 items only in A, 8 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromResourcesFontFile:(Landroid/content/Context;Landroid/content/res/Resources;ILjava/lang/String;I)Landroid/graphics/Typef
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromResourcesFontFile:(Landroid/content/Context;Landroid/content/res/Resources;ILjava/lang/String;I)Landroid/graphics/Typef
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 46876 != 46891
+.runs[0].tool.driver.properties.stats.ContextObj: 11022 != 11069
+.runs[0].tool.driver.properties.stats.LocallyReachable: 92100 != 92099
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 1639 != 1638
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 18084 != 18164
+.runs[0].tool.driver.properties.stats.ParthianVertex: 44104 != 44126
+.runs[0].tool.driver.properties.stats.ctx: 1711 != 1718
+.runs[0].tool.driver.properties.stats.import-vertex: 330175 != 330186
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 155578 != 155577
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 7582 != 7624
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 713 != 712
+.runs[0].tool.driver.properties.stats.vertex: 330175 != 330186
+.runs[0].tool.driver.properties.stats.virtual-alloc: 27563 != 27576
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 2261 != 2273
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 1405 != 1404
+sarif: different (17 places); same results up to code flows
+== jadx com.amaze.filemanager_126
+renamed 39451 MakeObjectID objects, 48 intent keys
+renamed 39451 MakeObjectID objects, 48 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 22, flowlog-only 22
+           - ('CInsn_Call', '182794')
+           - ('ContextObj', '160265')
+DIFF     CallEdge: souffle 182794, flowlog 182843, souffle-only 1499, flowlog-only 1548
+           - ('Landroidx/appcompat/app/AppCompatDelegate$SerialExecutor;.execute:(Ljava/lang/Runnable;)V/B:6:0x0012/0/5', 'Landroidx/appcompat/app/AppCompatDelegate$SerialExecutor;.scheduleNext:()V', 
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.selectDrawable:(I)Z/B:25:0x0051/0/30', 'Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.ini
+WITNESS  LostAssign: 68 rows, same choice-domain keys, 8 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$3;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController;)V/B:2:0x0000/0/0', '.val$dial
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$4;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController$RecycleListView;Landroidx/appc
+DIFF     SummaryAlloc: souffle 221269, flowlog 222769, souffle-only 1008, flowlog-only 2508
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.DEFA
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.LOCK
+DIFF     SummaryFlow: souffle 101001, flowlog 100791, souffle-only 16175, flowlog-only 15965
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.createFromXmlInner:(Landroid/content/Context;Landroid/content/res/Resources;Landroid/content/res/XmlResourceParser
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.getFilters:([Landroid/text/InputFilter;)[Landroid/text/InputFilter;', '-1', '', 'Landroidx/appcompat/widget/AppCompatEmojiTextHelper
+DIFF     Vertex: souffle 1524093, flowlog 1525265, souffle-only 663, flowlog-only 1835
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r7v2', '.array:<[
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r7v2', '.hashes:<
+DIFF     VirtualAlloc: souffle 509745, flowlog 511399, souffle-only 1282, flowlog-only 2936
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+DIFF     VirtualAssign: souffle 1094455, flowlog 1093155, souffle-only 31910, flowlog-only 30610 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=1094455 flowlog=1093155]
+           - ('Landroidx/appcompat/app/AlertDialog;.<init>:(Landroid/view/ContextThemeWrapper;I)V/B:2:0x0000/1/4', 'Landroidx/appcompat/app/AlertDialog;.<init>:(Landroid/view/ContextThemeWrapper;I)V/<
+           - ('Landroidx/appcompat/app/AlertDialog;.<init>:(Landroid/view/ContextThemeWrapper;I)V/B:2:0x0000/1/4', 'Landroidx/appcompat/app/AlertDialog;.<init>:(Landroid/view/ContextThemeWrapper;I)V/<
+DIFF     flow.ReachableVertex: souffle 10080, flowlog 10082, souffle-only 37, flowlog-only 39
+           - ('Landroidx/core/os/LocaleListPlatformWrapper$$ExternalSyntheticApiModelOutline0;.m:(Ljava/util/concurrent/ExecutorService;)V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider
+           - ('Landroidx/documentfile/provider/TreeDocumentFile;.listFiles:()[Landroidx/documentfile/provider/DocumentFile;/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'rest
+DIFF     forward_flow.ReachableEdge: souffle 21267, flowlog 21270, souffle-only 71, flowlog-only 74
+           - ('Landroidx/core/os/LocaleListPlatformWrapper$$ExternalSyntheticApiModelOutline0;.m:(Ljava/util/concurrent/ExecutorService;)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:I
+           - ('Landroidx/documentfile/provider/TreeDocumentFile;.listFiles:()[Landroidx/documentfile/provider/DocumentFile;/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:
+DIFF     forward_flow.ReachableVertex: souffle 10080, flowlog 10082, souffle-only 37, flowlog-only 39
+           - ('Landroidx/core/os/LocaleListPlatformWrapper$$ExternalSyntheticApiModelOutline0;.m:(Ljava/util/concurrent/ExecutorService;)V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider
+           - ('Landroidx/documentfile/provider/TreeDocumentFile;.listFiles:()[Landroidx/documentfile/provider/DocumentFile;/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'rest
+DIFF     isTaintedArgUnmodeled: souffle 1184, flowlog 1185, souffle-only 0, flowlog-only 1
+           + ('IO', 'Ljava/util/concurrent/atomic/AtomicInteger;.set:(I)V', '-3', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'forward')
+DIFF     natural_flow.ReachableEdge: souffle 21267, flowlog 21270, souffle-only 71, flowlog-only 74
+           - ('Landroidx/core/os/LocaleListPlatformWrapper$$ExternalSyntheticApiModelOutline0;.m:(Ljava/util/concurrent/ExecutorService;)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:I
+           - ('Landroidx/documentfile/provider/TreeDocumentFile;.listFiles:()[Landroidx/documentfile/provider/DocumentFile;/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:
+DIFF     reverse_flow.ReachableEdge: souffle 21267, flowlog 21270, souffle-only 71, flowlog-only 74
+           - ('Landroidx/documentfile/provider/DocumentFile;.findFile:(Ljava/lang/String;)Landroidx/documentfile/provider/DocumentFile;/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:r
+           - ('Landroidx/documentfile/provider/TreeDocumentFile;.listFiles:()[Landroidx/documentfile/provider/DocumentFile;/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:
+summary: 153 equal (1 up to choice-domain witnesses), 13 different
+A: jadx/com.amaze.filemanager_126/souffle-j32/com.amaze.filemanager_126.canon.sarif
+B: jadx/com.amaze.filemanager_126/flowlog-j32/com.amaze.filemanager_126.canon.sarif
+.runs[0].logicalLocations: 11 items only in A, 12 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+.runs[0].results: 16 items only in A, 16 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 17 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 21 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mes
+.runs[0].tool.driver.properties.stats.CInsn_Call: 182794 != 182843
+.runs[0].tool.driver.properties.stats.ContextObj: 160265 != 160472
+.runs[0].tool.driver.properties.stats.LocallyReachable: 731627 != 731665
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 47598 != 47089
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 170380 != 170388
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 145543 != 145669
+.runs[0].tool.driver.properties.stats.ParthianVertex: 195010 != 195124
+.runs[0].tool.driver.properties.stats.ctx: 7820 != 7848
+.runs[0].tool.driver.properties.stats.import-vertex: 1524093 != 1525265
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 1094455 != 1093155
+.runs[0].tool.driver.properties.stats.obj-ctx: 10011 != 10010
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 56983 != 57105
+.runs[0].tool.driver.properties.stats.summary-flow: 71306 != 71377
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 29695 != 29414
+.runs[0].tool.driver.properties.stats.tainted-vertex: 2731 != 2735
+.runs[0].tool.driver.properties.stats.vertex: 1524093 != 1525265
+.runs[0].tool.driver.properties.stats.virtual-alloc: 482470 != 483940
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 27275 != 27459
+.runs[0].tool.driver.properties.stats.virtual-assign: 1057122 != 1057025
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 37333 != 36130
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 275483 != 275315
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 317111 != 317183
+sarif: different (24 places); same results up to code flows
+== jadx com.fsck.k9_39046
+renamed 47826 MakeObjectID objects, 137 intent keys
+renamed 47826 MakeObjectID objects, 137 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 22, flowlog-only 22
+           - ('CInsn_Call', '273715')
+           - ('ContextObj', '105026')
+DIFF     CallEdge: souffle 273715, flowlog 273629, souffle-only 1405, flowlog-only 1319
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.selectDrawable:(I)Z/B:25:0x0051/0/30', 'Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.ini
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.selectDrawable:(I)Z/B:25:0x0051/0/30', 'Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.ini
+WITNESS  LostAssign: 260 rows, same choice-domain keys, 31 with another witness
+           - ('Landroidx/activity/OnBackPressedDispatcher$OnBackPressedEventInput$$ExternalSyntheticLambda0;.<init>:(ILjava/lang/Object;)V/B:2:0x0000/1/1', '.f$0:<Ljava/lang/Object;>.subject:<Ljava/la
+           - ('Landroidx/activity/OnBackPressedDispatcher$OnBackPressedEventInput$$ExternalSyntheticLambda0;.doDbWork:(Landroid/database/sqlite/SQLiteDatabase;)Ljava/lang/Object;/B:61:0x01c8/0/157', '
+DIFF     SummaryAlloc: souffle 333109, flowlog 351409, souffle-only 9054, flowlog-only 27354
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.DEFA
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.LOCK
+DIFF     SummaryFlow: souffle 100244, flowlog 100330, souffle-only 2084, flowlog-only 2170
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.createFromXmlInner:(Landroid/content/Context;Landroid/content/res/Resources;Landroid/content/res/XmlResourceParser
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.getFilters:([Landroid/text/InputFilter;)[Landroid/text/InputFilter;', '-1', '', 'Landroidx/appcompat/widget/AppCompatEmojiTextHelper
+DIFF     Vertex: souffle 2329821, flowlog 2331559, souffle-only 2372, flowlog-only 4110
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r6v2', '.array:<[
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r6v2', '.hashes:<
+DIFF     VirtualAlloc: souffle 659331, flowlog 668284, souffle-only 20805, flowlog-only 29758
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+DIFF     VirtualAssign: souffle 1447566, flowlog 1445993, souffle-only 10112, flowlog-only 8539 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=1447566 flowlog=1445993]
+           - ('Landroidx/activity/ComponentActivity$$ExternalSyntheticLambda1;.invoke:()Ljava/lang/Object;/B:5:0x0011/0/6', 'Landroidx/activity/ComponentActivity$$ExternalSyntheticLambda1;.invoke:()Lj
+           - ('Landroidx/activity/ComponentActivity$$ExternalSyntheticLambda1;.invoke:()Ljava/lang/Object;/B:5:0x0011/0/6', 'Landroidx/activity/ComponentActivity$$ExternalSyntheticLambda1;.invoke:()Lj
+DIFF     flow.ReachableVertex: souffle 40732, flowlog 41630, souffle-only 88, flowlog-only 986
+           - ('Landroidx/appcompat/widget/DrawableUtils;.<clinit>:()V/<globals>', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 'IO', 'restricted', '0', 'Landroidx/app
+           - ('Landroidx/appcompat/widget/DrawableUtils;.fixDrawable:(Landroid/graphics/drawable/Drawable;)V/<globals>', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 
+DIFF     forward_flow.ReachableEdge: souffle 111412, flowlog 112176, souffle-only 768, flowlog-only 1532
+           - ('Landroidx/appcompat/widget/DrawableUtils;.<clinit>:()V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:restricted:0:Landroidx/appcompat/graphics
+           - ('Landroidx/appcompat/widget/DrawableUtils;.fixDrawable:(Landroid/graphics/drawable/Drawable;)V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:re
+DIFF     forward_flow.ReachableVertex: souffle 40732, flowlog 41630, souffle-only 88, flowlog-only 986
+           - ('Landroidx/appcompat/widget/DrawableUtils;.<clinit>:()V/<globals>', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 'IO', 'restricted', '0', 'Landroidx/app
+           - ('Landroidx/appcompat/widget/DrawableUtils;.fixDrawable:(Landroid/graphics/drawable/Drawable;)V/<globals>', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 
+DIFF     isTaintedArgUnmodeled: souffle 3368, flowlog 3374, souffle-only 0, flowlog-only 6
+           + ('IO', 'Landroid/hardware/camera2/CameraAccessException;.getReason:()I', '-3', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 'forward')
+           + ('IO', 'Landroid/os/SystemClock;.elapsedRealtimeNanos:()J', '-3', '.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;', 'forward')
+DIFF     natural_flow.ReachableEdge: souffle 111412, flowlog 112176, souffle-only 768, flowlog-only 1532
+           - ('Landroidx/appcompat/widget/DrawableUtils;.<clinit>:()V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:restricted:0:Landroidx/appcompat/graphics
+           - ('Landroidx/appcompat/widget/DrawableUtils;.fixDrawable:(Landroid/graphics/drawable/Drawable;)V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:re
+DIFF     reverse_flow.ReachableEdge: souffle 111412, flowlog 112176, souffle-only 768, flowlog-only 1532
+           - ('Landroidx/appcompat/widget/DrawableUtils;.fixDrawable:(Landroid/graphics/drawable/Drawable;)V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:re
+           - ('Landroidx/appcompat/widget/ResourceManagerInternal;.<clinit>:()V/<globals>:.FD_SIZE_LIST@Lcom/bumptech/glide/load/resource/bitmap/HardwareConfigState;:IO:restricted:0:Landroidx/appcompa
+summary: 153 equal (1 up to choice-domain witnesses), 13 different
+A: jadx/com.fsck.k9_39046/souffle-j32/com.fsck.k9_39046.canon.sarif
+B: jadx/com.fsck.k9_39046/flowlog-j32/com.fsck.k9_39046.canon.sarif
+.runs[0].logicalLocations: 8 items only in A, 7 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi21Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi21Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 273715 != 273629
+.runs[0].tool.driver.properties.stats.ContextObj: 105026 != 107982
+.runs[0].tool.driver.properties.stats.LocallyReachable: 641544 != 641624
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 142047 != 138597
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 248933 != 248971
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 262118 != 263436
+.runs[0].tool.driver.properties.stats.ParthianVertex: 312030 != 312516
+.runs[0].tool.driver.properties.stats.ctx: 12139 != 12291
+.runs[0].tool.driver.properties.stats.import-vertex: 2329821 != 2331559
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 1447566 != 1445993
+.runs[0].tool.driver.properties.stats.obj-ctx: 12795 != 12921
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 55924 != 55854
+.runs[0].tool.driver.properties.stats.summary-flow: 82413 != 82549
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 17831 != 17781
+.runs[0].tool.driver.properties.stats.tainted-vertex: 9479 != 9555
+.runs[0].tool.driver.properties.stats.vertex: 2329821 != 2331559
+.runs[0].tool.driver.properties.stats.virtual-alloc: 321797 != 326213
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 337534 != 342071
+.runs[0].tool.driver.properties.stats.virtual-assign: 1372231 != 1371852
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 75335 != 74141
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 496537 != 496052
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 219973 != 220086
+sarif: different (24 places); same results up to code flows
+== jadx de.danoeh.antennapod_3120395
+renamed 24261 MakeObjectID objects, 79 intent keys
+renamed 24261 MakeObjectID objects, 79 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 21, flowlog-only 21
+           - ('CInsn_Call', '175634')
+           - ('ContextObj', '46575')
+DIFF     CallEdge: souffle 175634, flowlog 175655, souffle-only 835, flowlog-only 856
+           - ('Landroidx/appcompat/app/AlertDialog;.getButton:(I)Landroid/widget/Button;/B:3:0x0006/0/1', 'Landroidx/appcompat/app/AlertController;.getButton:(I)Landroid/widget/Button;', 'Lde/danoeh/a
+           - ('Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.selectDrawable:(I)Z/B:20:0x003d/0/21', 'Landroidx/appcompat/graphics/drawable/DrawableContainerCompat$DrawableContainerSta
+WITNESS  LostAssign: 62 rows, same choice-domain keys, 4 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams;.createListView:(Landroidx/appcompat/app/AlertController;)V/B:6:0x0014/3/15', '.mButtonPositiveMessage:<Landroid/os/Message;>', 'dest
+           - ('Landroidx/appcompat/app/AlertController$AlertParams;.createListView:(Landroidx/appcompat/app/AlertController;)V/B:7:0x0027/1/42', '.mButtonPositiveMessage:<Landroid/os/Message;>', 'dest
+DIFF     SummaryAlloc: souffle 127051, flowlog 127895, souffle-only 1248, flowlog-only 2092
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;', '-3', '.EMPTY_INTS
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;', '-3', '.EMPTY_LONG
+DIFF     SummaryFlow: souffle 87182, flowlog 87186, souffle-only 589, flowlog-only 593
+           - ('Landroidx/appcompat/widget/ResourceManagerInternal;.checkVectorDrawableSetup:(Landroid/content/Context;)V', '-3', '.DEFAULT_MODE@Landroidx/appcompat/widget/ResourceManagerInternal;', 'L
+           - ('Landroidx/appcompat/widget/ResourceManagerInternal;.createDrawableIfNeeded:(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;', '-3', '.DEFAULT_MODE@Landroidx/appcompat/wi
+DIFF     Vertex: souffle 1382610, flowlog 1383452, souffle-only 598, flowlog-only 1440
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+DIFF     VirtualAlloc: souffle 158946, flowlog 159817, souffle-only 1356, flowlog-only 2227
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putBitmap:(Ljava/lang/String;Landroid/graphics/Bitmap;)Landroid/support/v4/media/MediaMetadataCompat$Builder;/<globals>', '.EMPTY_
+DIFF     VirtualAssign: souffle 677421, flowlog 677373, souffle-only 3836, flowlog-only 3788 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=677421 flowlog=677373]
+           - ('Landroidx/appcompat/app/AlertDialog;.getButton:(I)Landroid/widget/Button;/B:3:0x0006/0/1', 'Landroidx/appcompat/app/AlertDialog;.getButton:(I)Landroid/widget/Button;/ssa/r2v1', '', 'Lan
+           - ('Landroidx/appcompat/app/AlertDialog;.getButton:(I)Landroid/widget/Button;/B:3:0x0006/0/1', 'Landroidx/appcompat/app/AlertDialog;.getButton:(I)Landroid/widget/Button;/ssa/r2v1', '', 'Lan
+DIFF     flow.ReachableVertex: souffle 2539, flowlog 2539, souffle-only 4, flowlog-only 4
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.<clinit>:()V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Lcom/google/android
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.getDuration:()I/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Lcom/google/andr
+DIFF     forward_flow.ReachableEdge: souffle 4233, flowlog 4233, souffle-only 4, flowlog-only 4
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.<clinit>:()V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Lcom/google/android/material/snack
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.getDuration:()I/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Lcom/google/android/material/sn
+DIFF     forward_flow.ReachableVertex: souffle 2539, flowlog 2539, souffle-only 4, flowlog-only 4
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.<clinit>:()V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Lcom/google/android
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.getDuration:()I/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Lcom/google/andr
+DIFF     natural_flow.ReachableEdge: souffle 4233, flowlog 4233, souffle-only 4, flowlog-only 4
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.<clinit>:()V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Lcom/google/android/material/snack
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.getDuration:()I/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Lcom/google/android/material/sn
+DIFF     reverse_flow.ReachableEdge: souffle 4233, flowlog 4233, souffle-only 4, flowlog-only 4
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.getDuration:()I/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Lcom/google/android/material/sn
+           - ('Lcom/google/android/material/snackbar/BaseTransientBottomBar;.show:()V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0::f', 'Lcom/google/android/material/sna
+summary: 154 equal (1 up to choice-domain witnesses), 12 different
+A: jadx/de.danoeh.antennapod_3120395/souffle-j32/de.danoeh.antennapod_3120395.canon.sarif
+B: jadx/de.danoeh.antennapod_3120395/flowlog-j32/de.danoeh.antennapod_3120395.canon.sarif
+.runs[0].logicalLocations: 7 items only in A, 8 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromInputStream:(Landroid/content/Context;Ljava/io/InputStream;)Landroid/graphics/Typeface;", "fullyQualifiedName": "Landro
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromInputStream:(Landroid/content/Context;Ljava/io/InputStream;)Landroid/graphics/Typeface;/B:10:0x001a/0/7", "fullyQualifi
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 175634 != 175655
+.runs[0].tool.driver.properties.stats.ContextObj: 46575 != 46731
+.runs[0].tool.driver.properties.stats.LocallyReachable: 383886 != 383820
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 26224 != 26242
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 187498 != 187495
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 86823 != 86857
+.runs[0].tool.driver.properties.stats.ParthianVertex: 176773 != 176813
+.runs[0].tool.driver.properties.stats.ctx: 6929 != 6942
+.runs[0].tool.driver.properties.stats.import-vertex: 1382610 != 1383452
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 677421 != 677373
+.runs[0].tool.driver.properties.stats.obj-ctx: 6541 != 6540
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 34039 != 34178
+.runs[0].tool.driver.properties.stats.summary-flow: 77506 != 77503
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 9676 != 9683
+.runs[0].tool.driver.properties.stats.vertex: 1382610 != 1383452
+.runs[0].tool.driver.properties.stats.virtual-alloc: 141833 != 142656
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 17113 != 17161
+.runs[0].tool.driver.properties.stats.virtual-assign: 661917 != 661868
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 15504 != 15505
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 147162 != 147134
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 104888 != 104865
+sarif: different (23 places); same results up to code flows
+== jadx de.markusfisch.android.binaryeye_180
+renamed 14083 MakeObjectID objects, 41 intent keys
+renamed 14083 MakeObjectID objects, 41 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 18, flowlog-only 18
+           - ('CInsn_Call', '74029')
+           - ('ContextObj', '35404')
+DIFF     CallEdge: souffle 74029, flowlog 74027, souffle-only 237, flowlog-only 235
+           - ('La7;.p:(Landroid/content/Context;)Lzm0;/B:12:0x0028/0/12', 'Lan0;.isEmpty:()Z', 'Lb6;.attachBaseContext:(Landroid/content/Context;)V#Lde/markusfisch/android/binaryeye/activity/PickActiv
+           - ('La7;.p:(Landroid/content/Context;)Lzm0;/B:12:0x0028/0/12', 'Lcn0;.isEmpty:()Z', 'Lb6;.attachBaseContext:(Landroid/content/Context;)V#Lde/markusfisch/android/binaryeye/activity/PickActiv
+WITNESS  LostAssign: 28 rows, same choice-domain keys, 5 with another witness
+           - ('Lho0;.A:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/B:8:0x002f/0/10', '.Y:<Ljava/lang/Object;>.a:<Ljava/util/regex/Matcher;>', 'dest')
+           - ('Lmh1;.j:(ILjava/lang/Object;)V/B:7:0x000c/0/6', '.y0:<Ljava/lang/Object;>', 'dest')
+DIFF     SummaryAlloc: souffle 98039, flowlog 97976, souffle-only 508, flowlog-only 445
+           - ('La7;.p:(Landroid/content/Context;)Lzm0;', '-3', '.c@Lan0;', '[Ljava/util/Locale;/@Lan0;.<clinit>:()V/ssa/r1v0', 'Lb6;.attachBaseContext:(Landroid/content/Context;)V#Lde/markusfisch/andr
+           - ('Landroidx/appcompat/widget/SearchView$SearchAutoComplete;.<init>:(Landroid/content/Context;)V', '-3', '.a@Lmh1;', '[Ljava/lang/Object;/@Lmh1;.<clinit>:()V/ssa/r1v0', '')
+DIFF     SummaryFlow: souffle 34239, flowlog 34242, souffle-only 250, flowlog-only 253
+           - ('Lc0;.q:(Ljava/lang/Object;)Lc0;', '-1', '', 'Lc0;.q:(Ljava/lang/Object;)Lc0;', '0', '', 'Lxz0;.b:(Lqx;Lm;)Lsx;#')
+           - ('Lc0;.q:(Ljava/lang/Object;)Lc0;', '-1', '.*', 'Lc0;.q:(Ljava/lang/Object;)Lc0;', '0', '.*', 'Lxz0;.b:(Lqx;Lm;)Lsx;#')
+DIFF     Vertex: souffle 583799, flowlog 583711, souffle-only 185, flowlog-only 97
+           - ('La7;.<init>:(Landroid/content/Context;Landroid/view/Window;Le6;Ljava/lang/Object;)V/ssa/r6v2', '.X:<[I>')
+           - ('La7;.<init>:(Landroid/content/Context;Landroid/view/Window;Le6;Ljava/lang/Object;)V/ssa/r6v2', '.Y:<[Ljava/lang/Object;>')
+DIFF     VirtualAlloc: souffle 150737, flowlog 150699, souffle-only 550, flowlog-only 512
+           - ('La7;.p:(Landroid/content/Context;)Lzm0;/<globals>', '.c@Lan0;', '[Ljava/util/Locale;/@Lan0;.<clinit>:()V/ssa/r1v0', 'Lb6;.attachBaseContext:(Landroid/content/Context;)V#Lde/markusfisch/
+           - ('Landroidx/appcompat/widget/SearchView$SearchAutoComplete;.<init>:(Landroid/content/Context;)V/<globals>', '.a@Lmh1;', '[Ljava/lang/Object;/@Lmh1;.<clinit>:()V/ssa/r1v0', '')
+DIFF     VirtualAssign: souffle 377532, flowlog 377554, souffle-only 10951, flowlog-only 10973 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=377532 flowlog=377554]
+           - ('La50;.engineTranslateKey:(Ljava/security/Key;)Ljava/security/Key;/B:6:0x0008/0/4', 'La50;.engineTranslateKey:(Ljava/security/Key;)Ljava/security/Key;/@retparameter', '', 'La50;.engineTr
+           - ('La7;.<init>:(Landroid/content/Context;Landroid/view/Window;Le6;Ljava/lang/Object;)V/B:17:0x0053/1/37', 'La7;.<init>:(Landroid/content/Context;Landroid/view/Window;Le6;Ljava/lang/Object;
+DIFF     flow.ReachableVertex: souffle 1913, flowlog 1913, souffle-only 44, flowlog-only 44
+           - ('Lc9;.<clinit>:()V/<globals>', '.a@Lps0;', 'IO', 'restricted', '0', 'Li61;.i:(Ljava/lang/Object;)V#', 'f')
+           - ('Lc9;.<clinit>:()V/<globals>', '.w0@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Li61;.i:(Ljava/lang/Object;)V#', 'f')
+DIFF     forward_flow.ReachableEdge: souffle 2850, flowlog 2850, souffle-only 70, flowlog-only 70
+           - ('Lc9;.<clinit>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#', 'Lc9;.<init>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#', 'Lc9;.<init>:(
+           - ('Lc9;.<clinit>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#', 'Lc9;.addLast:(Ljava/lang/Object;)V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)
+DIFF     forward_flow.ReachableVertex: souffle 1913, flowlog 1913, souffle-only 44, flowlog-only 44
+           - ('Lc9;.<clinit>:()V/<globals>', '.a@Lps0;', 'IO', 'restricted', '0', 'Li61;.i:(Ljava/lang/Object;)V#')
+           - ('Lc9;.<clinit>:()V/<globals>', '.w0@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Li61;.i:(Ljava/lang/Object;)V#')
+DIFF     natural_flow.ReachableEdge: souffle 2850, flowlog 2850, souffle-only 70, flowlog-only 70
+           - ('Lc9;.<clinit>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.<init>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.<ini
+           - ('Lc9;.<clinit>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.addLast:(Ljava/lang/Object;)V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object
+DIFF     reverse_flow.ReachableEdge: souffle 2850, flowlog 2850, souffle-only 70, flowlog-only 70
+           - ('Lc9;.<init>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.<clinit>:()V/<globals>:.a@Lps0;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.<ini
+           - ('Lc9;.<init>:()V/<globals>:.w0@Landroidx/core/content/FileProvider;:IO:restricted:0:Li61;.i:(Ljava/lang/Object;)V#:f', 'Lc9;.<clinit>:()V/<globals>:.w0@Landroidx/core/content/FileProvide
+summary: 154 equal (1 up to choice-domain witnesses), 12 different
+A: jadx/de.markusfisch.android.binaryeye_180/souffle-j32/de.markusfisch.android.binaryeye_180.canon.sarif
+B: jadx/de.markusfisch.android.binaryeye_180/flowlog-j32/de.markusfisch.android.binaryeye_180.canon.sarif
+.runs[0].logicalLocations: 6 items only in A, 8 only in B
+  - {"decoratedName": "Loh1;.k:(Landroid/content/Context;[Lc70;I)Landroid/graphics/Typeface;", "fullyQualifiedName": "Loh1;.k:(Landroid/content/Context;[Lc70;I)Landroid/graphics/Typeface;", "kind": "f
+  - {"decoratedName": "Loh1;.k:(Landroid/content/Context;[Lc70;I)Landroid/graphics/Typeface;/B:28:0x0065/0/30", "fullyQualifiedName": "Loh1;.k:(Landroid/content/Context;[Lc70;I)Landroid/graphics/Typef
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 74029 != 74027
+.runs[0].tool.driver.properties.stats.ContextObj: 35404 != 35433
+.runs[0].tool.driver.properties.stats.LocallyReachable: 222222 != 222256
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 5392 != 5404
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 63919 != 63918
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 37725 != 37674
+.runs[0].tool.driver.properties.stats.ParthianVertex: 67124 != 67091
+.runs[0].tool.driver.properties.stats.ctx: 1993 != 2000
+.runs[0].tool.driver.properties.stats.import-vertex: 583799 != 583711
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 377532 != 377554
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 17162 != 17143
+.runs[0].tool.driver.properties.stats.summary-flow: 32792 != 32793
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 1447 != 1449
+.runs[0].tool.driver.properties.stats.vertex: 583799 != 583711
+.runs[0].tool.driver.properties.stats.virtual-alloc: 142375 != 142315
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 8362 != 8384
+.runs[0].tool.driver.properties.stats.virtual-assign: 374249 != 374256
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 3283 != 3298
+sarif: different (20 places); same results up to code flows
+== jadx eu.faircode.netguard_2026080101
+renamed 5005 MakeObjectID objects, 34 intent keys
+renamed 5005 MakeObjectID objects, 34 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 20, flowlog-only 20
+           - ('CInsn_Call', '39128')
+           - ('ContextObj', '8876')
+DIFF     CallEdge: souffle 39128, flowlog 39140, souffle-only 57, flowlog-only 69
+           - ('LM/j;.d:(LM/j;)V/B:2:0x0000/0/2', 'Lf0/d;.i:(Landroidx/collection/b;)V', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;Lcom/bumptech/glide/load/DataSource;)Lcom/bumptech/glid
+           - ('LU/q;.e:(LU/y;Landroid/graphics/BitmapFactory$Options;LU/n;Lcom/bumptech/glide/load/DecodeFormat;Lcom/bumptech/glide/load/PreferredColorSpace;ZIIZLU/p;)Landroid/graphics/Bitmap;/B:204:0
+WITNESS  LostAssign: 27 rows, same choice-domain keys, 7 with another witness
+           - ('LK/d;.<init>:(LK/g;LK/e;)V/B:10:0x0000/0/0', '.f114d:<LK/g;>.f123c:<Ljava/io/File;>', 'dest')
+           - ('LK/g;.r:(Ljava/lang/String;)V/B:65:0x006c/0/38', '.f114d:<LK/g;>.f123c:<Ljava/io/File;>', 'dest')
+DIFF     SummaryAlloc: souffle 15601, flowlog 15855, souffle-only 97, flowlog-only 351
+           - ('LM/j;.d:(LM/j;)V', '-3', '.f1199e@Landroidx/collection/n;', '[Ljava/lang/Object;/@Landroidx/collection/n;.a:(I)V/ssa/r6v9', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;Lcom
+           - ('LM/j;.d:(LM/j;)V', '-3', '.f1200g@Landroidx/collection/n;', '[Ljava/lang/Object;/@Landroidx/collection/n;.a:(I)V/ssa/r6v9', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;Lcom
+DIFF     SummaryFlow: souffle 8854, flowlog 9028, souffle-only 109, flowlog-only 283
+           - ('LM/j;.d:(LM/j;)V', '-3', '.f1199e@Landroidx/collection/n;', 'LM/j;.d:(LM/j;)V', '-3', '.f1200g@Landroidx/collection/n;', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;Lcom/bu
+           - ('LM/j;.d:(LM/j;)V', '-3', '.f1200g@Landroidx/collection/n;', 'LM/j;.d:(LM/j;)V', '-3', '.f1199e@Landroidx/collection/n;', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;Lcom/bu
+DIFF     Vertex: souffle 232771, flowlog 232973, souffle-only 50, flowlog-only 252
+           - ('LY/l;.<init>:(Lcom/bumptech/glide/d;LL/e;IILT/f;Landroid/graphics/Bitmap;)V/ssa/r2v1', '.overrideHeight:<I>')
+           - ('LY/l;.<init>:(Lcom/bumptech/glide/d;LL/e;IILT/f;Landroid/graphics/Bitmap;)V/ssa/r2v1', '.overrideWidth:<I>')
+DIFF     VirtualAlloc: souffle 20772, flowlog 21022, souffle-only 115, flowlog-only 365
+           - ('LM/j;.d:(LM/j;)V/<globals>', '.f1199e@Landroidx/collection/n;', '[Ljava/lang/Object;/@Landroidx/collection/n;.a:(I)V/ssa/r6v9', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;
+           - ('LM/j;.d:(LM/j;)V/<globals>', '.f1200g@Landroidx/collection/n;', '[Ljava/lang/Object;/@Landroidx/collection/n;.a:(I)V/ssa/r6v9', 'Lcom/bumptech/glide/load/engine/r;.g:(Ljava/lang/Object;
+DIFF     VirtualAssign: souffle 109652, flowlog 109793, souffle-only 363, flowlog-only 504 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=109652 flowlog=109793]
+           - ('LA/c;.l:(Lv0/b;)Ljava/lang/Class;/B:4:0x0011/0/6', 'LA/c;.l:(Lv0/b;)Ljava/lang/Class;/@retparameter', '', 'LA/c;.l:(Lv0/b;)Ljava/lang/Class;/ssa/r2v2', '', 'move', '')
+           - ('LA/c;.m:(III)I/B:13:0x0010/0/10', 'LA/c;.m:(III)I/ssa/r0v7', '', 'LA/c;.m:(III)I/ssa/r3v0', '', 'move', '')
+DIFF     forward_flow.ReachableEdge: souffle 1710, flowlog 1710, souffle-only 2, flowlog-only 2
+           - ('Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSequence;/@retparameter::Personal:restricted:0:', 'Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSequ
+           - ('Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Ljava/lang/String;)Ljava/lang/String;/@retparameter::Personal:restricted:0:', 'Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Ljav
+DIFF     natural_flow.ReachableEdge: souffle 1710, flowlog 1710, souffle-only 2, flowlog-only 2
+           - ('Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSequence;/@retparameter::Personal:restricted:0::f', 'Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSe
+           - ('Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Ljava/lang/String;)Ljava/lang/String;/@retparameter::Personal:restricted:0::f', 'Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Lj
+DIFF     reverse_flow.ReachableEdge: souffle 1710, flowlog 1710, souffle-only 2, flowlog-only 2
+           - ('Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSequence;/ssa/r2v0::Personal:restricted:0::f', 'Landroidx/core/app/t;.b:(Ljava/lang/CharSequence;)Ljava/lang/CharSequenc
+           - ('Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Ljava/lang/String;)Ljava/lang/String;/ssa/r3v0::Personal:restricted:0::f', 'Leu/faircode/netguard/AdapterLog;.getKnownAddress:(Ljava/l
+summary: 156 equal (1 up to choice-domain witnesses), 10 different
+A: jadx/eu.faircode.netguard_2026080101/souffle-j32/eu.faircode.netguard_2026080101.canon.sarif
+B: jadx/eu.faircode.netguard_2026080101/flowlog-j32/eu.faircode.netguard_2026080101.canon.sarif
+.runs[0].logicalLocations: 8 items only in A, 6 only in B
+  - {"decoratedName": "Landroidx/core/graphics/j;.a:(Landroid/content/Context;Landroidx/core/content/res/f;Landroid/content/res/Resources;I)Landroid/graphics/Typeface;", "fullyQualifiedName": "Landroi
+  - {"decoratedName": "Landroidx/core/graphics/j;.a:(Landroid/content/Context;Landroidx/core/content/res/f;Landroid/content/res/Resources;I)Landroid/graphics/Typeface;/B:12:0x0028/0/25", "fullyQualifi
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 39128 != 39140
+.runs[0].tool.driver.properties.stats.ContextObj: 8876 != 8889
+.runs[0].tool.driver.properties.stats.LocallyReachable: 55231 != 55487
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 2676 != 2816
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 26434 != 26591
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 12051 != 12073
+.runs[0].tool.driver.properties.stats.ParthianVertex: 32646 != 32647
+.runs[0].tool.driver.properties.stats.ctx: 1147 != 1158
+.runs[0].tool.driver.properties.stats.import-vertex: 232771 != 232973
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 109652 != 109793
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 5649 != 5656
+.runs[0].tool.driver.properties.stats.summary-flow: 7768 != 7872
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 1086 != 1156
+.runs[0].tool.driver.properties.stats.vertex: 232771 != 232973
+.runs[0].tool.driver.properties.stats.virtual-alloc: 19588 != 19743
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 1184 != 1279
+.runs[0].tool.driver.properties.stats.virtual-assign: 108229 != 108298
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 1423 != 1495
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 21606 != 21580
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 11847 != 11929
+sarif: different (22 places); same results up to code flows
+== jadx net.sourceforge.opencamera_96
+renamed 13346 MakeObjectID objects, 50 intent keys
+renamed 13346 MakeObjectID objects, 50 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 18, flowlog-only 18
+           - ('CInsn_Call', '110643')
+           - ('ContextObj', '15444')
+DIFF     CallEdge: souffle 110643, flowlog 110656, souffle-only 159, flowlog-only 172
+           - ('Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.selectDrawable:(I)Z/B:20:0x003d/0/22', 'Landroidx/appcompat/graphics/drawable/DrawableContainerCompat$DrawableContainerSta
+           - ('Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.selectDrawable:(I)Z/B:35:0x007c/0/46', 'Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.animate:(Z)V', 'Lan
+WITNESS  LostAssign: 13 rows, same choice-domain keys, 3 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams;.createListView:(Landroidx/appcompat/app/AlertController;)V/B:6:0x0014/3/15', '.mButtonPositiveMessage:<Landroid/os/Message;>', 'dest
+           - ('Landroidx/appcompat/app/AlertController$AlertParams;.createListView:(Landroidx/appcompat/app/AlertController;)V/B:7:0x0027/1/45', '.mButtonPositiveMessage:<Landroid/os/Message;>', 'dest
+DIFF     SummaryAlloc: souffle 40386, flowlog 41558, souffle-only 223, flowlog-only 1395
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     SummaryFlow: souffle 26425, flowlog 26424, souffle-only 51, flowlog-only 50
+           - ('Landroidx/appcompat/widget/ResourceManagerInternal;.checkVectorDrawableSetup:(Landroid/content/Context;)V', '-3', '.DEFAULT_MODE@Landroidx/appcompat/widget/ResourceManagerInternal;', 'L
+           - ('Landroidx/appcompat/widget/ResourceManagerInternal;.getDrawable:(Landroid/content/Context;I)Landroid/graphics/drawable/Drawable;', '-3', '.DEFAULT_MODE@Landroidx/appcompat/widget/Resour
+DIFF     Vertex: souffle 622896, flowlog 624004, souffle-only 62, flowlog-only 1170
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     VirtualAlloc: souffle 53612, flowlog 54845, souffle-only 284, flowlog-only 1517
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     VirtualAssign: souffle 290111, flowlog 290121, souffle-only 513, flowlog-only 523 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=290111 flowlog=290121]
+           - ('Landroid/support/v4/media/MediaBrowserCompat$MediaBrowserImplBase;.onLoadChildren:(Landroid/os/Messenger;Ljava/lang/String;Ljava/util/List;Landroid/os/Bundle;Landroid/os/Bundle;)V/B:21:
+           - ('Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:(I)[Landroid/support/v4/media/MediaMetadataCompat;/B:3:0x0002/0/1', 'Landroid/support/v4/media/MediaMetadataCompat$1;.newArray:
+summary: 159 equal (1 up to choice-domain witnesses), 7 different
+A: jadx/net.sourceforge.opencamera_96/souffle-j32/net.sourceforge.opencamera_96.canon.sarif
+B: jadx/net.sourceforge.opencamera_96/flowlog-j32/net.sourceforge.opencamera_96.canon.sarif
+.runs[0].logicalLocations: 7 items only in A, 6 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromInputStream:(Landroid/content/Context;Ljava/io/InputStream;)Landroid/graphics/Typeface;", "fullyQualifiedName": "Landro
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatBaseImpl;.createFromInputStream:(Landroid/content/Context;Ljava/io/InputStream;)Landroid/graphics/Typeface;/B:10:0x001a/0/7", "fullyQualifi
+.runs[0].results: 1 items only in A, 1 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 110643 != 110656
+.runs[0].tool.driver.properties.stats.ContextObj: 15444 != 15482
+.runs[0].tool.driver.properties.stats.LocallyReachable: 165700 != 165685
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 4073 != 4091
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 26430 != 26433
+.runs[0].tool.driver.properties.stats.ParthianVertex: 74873 != 74868
+.runs[0].tool.driver.properties.stats.ctx: 2177 != 2197
+.runs[0].tool.driver.properties.stats.import-vertex: 622896 != 624004
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 290111 != 290121
+.runs[0].tool.driver.properties.stats.obj-ctx: 3658 != 3656
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 10563 != 10571
+.runs[0].tool.driver.properties.stats.summary-flow: 25123 != 25122
+.runs[0].tool.driver.properties.stats.vertex: 622896 != 624004
+.runs[0].tool.driver.properties.stats.virtual-alloc: 49129 != 50120
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 4483 != 4725
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 4230 != 4240
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 53319 != 53320
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 35877 != 35873
+sarif: different (20 places); same results up to code flows
+== jadx org.billthefarmer.diary_1105
+renamed 594 MakeObjectID objects, 6 intent keys
+renamed 594 MakeObjectID objects, 6 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 4, flowlog-only 4
+           - ('ctx', '193')
+           - ('import-vertex', '23996')
+DIFF     CallEdge: souffle 4884, flowlog 4884, souffle-only 15, flowlog-only 15
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/B:3:0x0010/0/2', 'Lorg/commonmark/internal/DocumentParser;.getActiveBlockPa
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/B:5:0x0017/0/8', 'Lorg/commonmark/internal/DocumentParser;.getActiveBlockPa
+DIFF     SummaryAlloc: souffle 1400, flowlog 1412, souffle-only 54, flowlog-only 66
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V', '-3', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;', 'Lj
+           - ('Lorg/commonmark/internal/DocumentParser;.addDefinitionsFrom:(Lorg/commonmark/internal/ParagraphParser;)V', '-3', '.UNESCAPE_REPLACER@Lorg/commonmark/internal/util/Escaping;', 'Lorg/comm
+DIFF     Vertex: souffle 23996, flowlog 24008, souffle-only 4, flowlog-only 16
+           - ('Lorg/commonmark/internal/DocumentParser;.parse:(Ljava/io/Reader;)Lorg/commonmark/node/Document;/<globals>', '.UNESCAPE_REPLACER@Lorg/commonmark/internal/util/Escaping;')
+           - ('Lorg/commonmark/internal/DocumentParser;.parse:(Ljava/io/Reader;)Lorg/commonmark/node/Document;/<globals>', '.URI_REPLACER@Lorg/commonmark/internal/util/Escaping;')
+DIFF     VirtualAlloc: souffle 2257, flowlog 2269, souffle-only 58, flowlog-only 70
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/<globals>', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;',
+           - ('Lorg/commonmark/internal/DocumentParser;.addDefinitionsFrom:(Lorg/commonmark/internal/ParagraphParser;)V/<globals>', '.UNESCAPE_REPLACER@Lorg/commonmark/internal/util/Escaping;', 'Lorg/
+DIFF     VirtualAssign: souffle 9416, flowlog 9416, souffle-only 14, flowlog-only 14 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=9416 flowlog=9416]
+           - ('Lorg/commonmark/internal/DocumentParser;.advance:()V/B:2:0x0000/0/2', 'Lorg/commonmark/internal/DocumentParser;.advance:()V/ssa/r0v1', '', 'Lorg/commonmark/internal/DocumentParser;.adva
+           - ('Lorg/commonmark/internal/DocumentParser;.finalizeAndProcess:()Lorg/commonmark/node/Document;/B:3:0x0012/0/5', 'Lorg/commonmark/internal/DocumentParser;.finalizeAndProcess:()Lorg/commonm
+summary: 160 equal, 6 different
+A: jadx/org.billthefarmer.diary_1105/souffle-j32/org.billthefarmer.diary_1105.canon.sarif
+B: jadx/org.billthefarmer.diary_1105/flowlog-j32/org.billthefarmer.diary_1105.canon.sarif
+.runs[0].tool.driver.properties.stats.ctx: 193 != 192
+.runs[0].tool.driver.properties.stats.import-vertex: 23996 != 24008
+.runs[0].tool.driver.properties.stats.vertex: 23996 != 24008
+.runs[0].tool.driver.properties.stats.virtual-alloc: 2161 != 2173
+sarif: different (4 places); same results up to code flows
+== jadx org.billthefarmer.editor_198
+renamed 609 MakeObjectID objects, 6 intent keys
+renamed 609 MakeObjectID objects, 6 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 1, flowlog-only 1
+           - ('ctx', '108')
+           + ('ctx', '103')
+DIFF     CallEdge: souffle 4312, flowlog 4312, souffle-only 13, flowlog-only 13
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/B:3:0x0010/0/2', 'Lorg/commonmark/internal/DocumentParser;.getActiveBlockPa
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/B:5:0x0017/0/8', 'Lorg/commonmark/internal/DocumentParser;.getActiveBlockPa
+DIFF     SummaryAlloc: souffle 910, flowlog 910, souffle-only 4, flowlog-only 4
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V', '-3', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;', 'Lj
+           - ('Lorg/commonmark/internal/DocumentParser;.addLine:()V', '-3', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;', 'Ljava/util/LinkedHashSet;/@Lorg/commonmark/internal/Documen
+DIFF     VirtualAlloc: souffle 1528, flowlog 1528, souffle-only 4, flowlog-only 4
+           - ('Lorg/commonmark/internal/DocumentParser;.addChild:(Lorg/commonmark/internal/DocumentParser$OpenBlockParser;)V/<globals>', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;',
+           - ('Lorg/commonmark/internal/DocumentParser;.addLine:()V/<globals>', '.CORE_FACTORY_TYPES@Lorg/commonmark/internal/DocumentParser;', 'Ljava/util/LinkedHashSet;/@Lorg/commonmark/internal/Doc
+DIFF     VirtualAssign: souffle 15287, flowlog 15287, souffle-only 17, flowlog-only 17 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=15287 flowlog=15287]
+           - ('Lorg/billthefarmer/editor/Editor;.onCreate:(Landroid/os/Bundle;)V/B:88:0x0240/0/163', 'Lorg/billthefarmer/editor/Editor;.onCreate:(Landroid/os/Bundle;)V/ssa/r11v0', '.content:<Landroid/
+           - ('Lorg/commonmark/internal/DocumentParser;.advance:()V/B:2:0x0000/0/2', 'Lorg/commonmark/internal/DocumentParser;.advance:()V/ssa/r0v1', '', 'Lorg/commonmark/internal/DocumentParser;.adva
+DIFF     flow.ReachableVertex: souffle 559, flowlog 559, souffle-only 10, flowlog-only 10
+           - ('Lorg/commonmark/internal/Definitions;.addDefinitions:(Lorg/commonmark/node/DefinitionMap;)V/<globals>', '.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;', 'IO', 'restricted', '0'
+           - ('Lorg/commonmark/internal/Definitions;.getMap:(Ljava/lang/Class;)Lorg/commonmark/node/DefinitionMap;/<globals>', '.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;', 'IO', 'restrict
+DIFF     forward_flow.ReachableEdge: souffle 1060, flowlog 1060, souffle-only 18, flowlog-only 18
+           - ('Lorg/commonmark/internal/Definitions;.addDefinitions:(Lorg/commonmark/node/DefinitionMap;)V/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg/commonm
+           - ('Lorg/commonmark/internal/Definitions;.getMap:(Ljava/lang/Class;)Lorg/commonmark/node/DefinitionMap;/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg
+DIFF     forward_flow.ReachableVertex: souffle 559, flowlog 559, souffle-only 10, flowlog-only 10
+           - ('Lorg/commonmark/internal/Definitions;.addDefinitions:(Lorg/commonmark/node/DefinitionMap;)V/<globals>', '.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;', 'IO', 'restricted', '0'
+           - ('Lorg/commonmark/internal/Definitions;.getMap:(Ljava/lang/Class;)Lorg/commonmark/node/DefinitionMap;/<globals>', '.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;', 'IO', 'restrict
+DIFF     natural_flow.ReachableEdge: souffle 1060, flowlog 1060, souffle-only 18, flowlog-only 18
+           - ('Lorg/commonmark/internal/Definitions;.addDefinitions:(Lorg/commonmark/node/DefinitionMap;)V/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg/commonm
+           - ('Lorg/commonmark/internal/Definitions;.getMap:(Ljava/lang/Class;)Lorg/commonmark/node/DefinitionMap;/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg
+DIFF     reverse_flow.ReachableEdge: souffle 1060, flowlog 1060, souffle-only 18, flowlog-only 18
+           - ('Lorg/commonmark/internal/Definitions;.addDefinitions:(Lorg/commonmark/node/DefinitionMap;)V/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg/commonm
+           - ('Lorg/commonmark/internal/DocumentParser;.<clinit>:()V/<globals>:.DEVICE_ROOT@Landroid/support/v4/content/FileProvider;:IO:restricted:0:Lorg/commonmark/internal/DocumentParser;.parse:(Lj
+summary: 156 equal, 10 different
+A: jadx/org.billthefarmer.editor_198/souffle-j32/org.billthefarmer.editor_198.canon.sarif
+B: jadx/org.billthefarmer.editor_198/flowlog-j32/org.billthefarmer.editor_198.canon.sarif
+.runs[0].tool.driver.properties.stats.ctx: 108 != 103
+sarif: different (1 places); same results up to code flows
+== jadx org.connectbot_11101000
+renamed 22456 MakeObjectID objects, 17 intent keys
+renamed 22456 MakeObjectID objects, 17 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 22, flowlog-only 22
+           - ('CInsn_Call', '129027')
+           - ('ContextObj', '50912')
+DIFF     CallEdge: souffle 129027, flowlog 129029, souffle-only 742, flowlog-only 744
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.setAllCaps:(Z)V/B:2:0x0000/0/3', 'Landroidx/emoji2/viewsintegration/EmojiTextViewHelper$SkippingHelper19;.setAllCaps:(Z)V', 'Landroi
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.setEnabled:(Z)V/B:2:0x0000/0/3', 'Landroidx/emoji2/viewsintegration/EmojiTextViewHelper$SkippingHelper19;.setEnabled:(Z)V', 'Landroi
+WITNESS  LostAssign: 39 rows, same choice-domain keys, 3 with another witness
+           - ('Lorg/connectbot/data/migration/DatabaseMigrator;.readLegacyData:()Lorg/connectbot/data/migration/LegacyData;/B:49:0x0132/0/207', '.hostKeyAlgo:<Ljava/lang/String;>', 'dest')
+           - ('Lorg/connectbot/data/migration/LegacyHostDatabaseReader;.readHosts:()Ljava/util/ArrayList;/B:9:0x0046/0/29', '.color:<Ljava/lang/String;>', 'dest')
+DIFF     SummaryAlloc: souffle 216249, flowlog 211675, souffle-only 13326, flowlog-only 8752
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V', '-3', '.EMPTY_INTS@Landroidx/collection/internal/
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V', '-3', '.EMPTY_LONGS@Landroidx/collection/internal
+DIFF     SummaryFlow: souffle 63471, flowlog 63288, souffle-only 1538, flowlog-only 1355
+           - ('Landroidx/collection/MutableIntObjectMap;.findAbsoluteInsertIndex:(I)I', '-1', '', 'Landroidx/collection/MutableIntObjectMap;.findAbsoluteInsertIndex:(I)I', '0', '._capacity:<I>', 'Land
+           - ('Landroidx/collection/MutableIntObjectMap;.findAbsoluteInsertIndex:(I)I', '-1', '', 'Landroidx/collection/MutableIntObjectMap;.findAbsoluteInsertIndex:(I)I', '0', '._capacity:<I>', 'Land
+DIFF     Vertex: souffle 1413148, flowlog 1405483, souffle-only 9514, flowlog-only 1849
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V/<globals>', '.EMPTY_INTS@Landroidx/collection/inter
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V/<globals>', '.EMPTY_LONGS@Landroidx/collection/inte
+DIFF     VirtualAlloc: souffle 302707, flowlog 295286, souffle-only 16806, flowlog-only 9385
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V/<globals>', '.EMPTY_INTS@Landroidx/collection/inter
+           - ('Landroidx/appcompat/app/AlertController;.<init>:(Landroid/content/Context;Landroidx/appcompat/app/AlertDialog;Landroid/view/Window;)V/<globals>', '.EMPTY_LONGS@Landroidx/collection/inte
+DIFF     VirtualAssign: souffle 916556, flowlog 913917, souffle-only 9051, flowlog-only 6412 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=916556 flowlog=913917]
+           - ('Landroidx/activity/OnBackPressedDispatcher$$ExternalSyntheticLambda0;.invoke:()Ljava/lang/Object;/B:101:0x01d4/0/211', 'Landroidx/activity/OnBackPressedDispatcher$$ExternalSyntheticLamb
+           - ('Landroidx/activity/OnBackPressedDispatcher$$ExternalSyntheticLambda0;.invoke:()Ljava/lang/Object;/B:101:0x01d4/0/211', 'Landroidx/activity/OnBackPressedDispatcher$$ExternalSyntheticLamb
+DIFF     flow.ReachableVertex: souffle 4291, flowlog 4289, souffle-only 29, flowlog-only 27
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>', '.terminfoPath@Lorg/connectbot/util/InstallMosh;', 'IO', 'restricted', '0', 'Landroidx/compose/material3
+           - ('Landroidx/collection/MutableScatterMap;.<init>:(I)V/<globals>', '.terminfoPath@Lorg/connectbot/util/InstallMosh;', 'IO', 'restricted', '0', 'Landroidx/compose/runtime/ParcelableSnapshot
+DIFF     forward_flow.ReachableEdge: souffle 8944, flowlog 8940, souffle-only 40, flowlog-only 36
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/material3/ProgressIndica
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/material3/ProgressIndica
+DIFF     forward_flow.ReachableVertex: souffle 4291, flowlog 4289, souffle-only 29, flowlog-only 27
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>', '.terminfoPath@Lorg/connectbot/util/InstallMosh;', 'IO', 'restricted', '0', 'Landroidx/compose/material3
+           - ('Landroidx/collection/MutableScatterMap;.<init>:(I)V/<globals>', '.terminfoPath@Lorg/connectbot/util/InstallMosh;', 'IO', 'restricted', '0', 'Landroidx/compose/runtime/ParcelableSnapshot
+DIFF     natural_flow.ReachableEdge: souffle 8944, flowlog 8940, souffle-only 40, flowlog-only 36
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/material3/ProgressIndica
+           - ('Landroidx/collection/MutableIntObjectMap;.set:(ILjava/lang/Object;)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/material3/ProgressIndica
+DIFF     reverse_flow.ReachableEdge: souffle 8944, flowlog 8940, souffle-only 40, flowlog-only 36
+           - ('Landroidx/collection/MutableScatterMap;.<init>:(I)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/runtime/ParcelableSnapshotMutableFloatSta
+           - ('Landroidx/collection/MutableScatterMap;.<init>:(I)V/<globals>:.terminfoPath@Lorg/connectbot/util/InstallMosh;:IO:restricted:0:Landroidx/compose/runtime/ParcelableSnapshotMutableFloatSta
+summary: 154 equal (1 up to choice-domain witnesses), 12 different
+A: jadx/org.connectbot_11101000/souffle-j32/org.connectbot_11101000.canon.sarif
+B: jadx/org.connectbot_11101000/flowlog-j32/org.connectbot_11101000.canon.sarif
+.runs[0].logicalLocations: 7 items only in A, 9 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+.runs[0].results: 2 items only in A, 2 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 6 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 129027 != 129029
+.runs[0].tool.driver.properties.stats.ContextObj: 50912 != 51001
+.runs[0].tool.driver.properties.stats.LocallyReachable: 421630 != 421196
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 55963 != 53443
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 140368 != 140148
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 117439 != 119080
+.runs[0].tool.driver.properties.stats.ParthianVertex: 156993 != 158377
+.runs[0].tool.driver.properties.stats.ctx: 5720 != 5952
+.runs[0].tool.driver.properties.stats.import-vertex: 1413148 != 1405483
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 916556 != 913917
+.runs[0].tool.driver.properties.stats.obj-ctx: 6280 != 6277
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 28646 != 28877
+.runs[0].tool.driver.properties.stats.summary-flow: 52830 != 52730
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 10641 != 10558
+.runs[0].tool.driver.properties.stats.tainted-vertex: 1708 != 1707
+.runs[0].tool.driver.properties.stats.vertex: 1413148 != 1405483
+.runs[0].tool.driver.properties.stats.virtual-alloc: 204573 != 199789
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 98134 != 95497
+.runs[0].tool.driver.properties.stats.virtual-assign: 886403 != 884765
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 30153 != 29152
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 291464 != 289960
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 194819 != 194691
+sarif: different (24 places); same results up to code flows
+== jadx org.schabi.newpipe_1015
+renamed 35518 MakeObjectID objects, 78 intent keys
+renamed 35518 MakeObjectID objects, 78 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 22, flowlog-only 22
+           - ('CInsn_Call', '237652')
+           - ('ContextObj', '102630')
+DIFF     CallEdge: souffle 237652, flowlog 237663, souffle-only 1421, flowlog-only 1432
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putLong:(Ljava/lang/String;J)V/B:3:0x0006/0/1', 'Landroidx/collection/SimpleArrayMap;.containsKey:(Ljava/lang/Object;)Z', 'Lcom/go
+           - ('Landroid/support/v4/media/MediaMetadataCompat$Builder;.putLong:(Ljava/lang/String;J)V/B:5:0x0012/0/3', 'Landroidx/collection/SimpleArrayMap;.get:(Ljava/lang/Object;)Ljava/lang/Object;',
+DIFF     LostAssign: souffle 67, flowlog 62, souffle-only 11, flowlog-only 6
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$3;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController;)V/B:2:0x0000/0/0', '.val$dial
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$4;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController$RecycleListView;Landroidx/appc
+DIFF     SummaryAlloc: souffle 250508, flowlog 254956, souffle-only 8044, flowlog-only 12492
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.DEFA
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;', '-3', '.LOCK
+DIFF     SummaryFlow: souffle 137053, flowlog 137765, souffle-only 3252, flowlog-only 3964
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.getFilters:([Landroid/text/InputFilter;)[Landroid/text/InputFilter;', '-1', '', 'Landroidx/appcompat/widget/AppCompatEmojiTextHelper
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.getFilters:([Landroid/text/InputFilter;)[Landroid/text/InputFilter;', '-1', '.*', 'Landroidx/appcompat/widget/AppCompatEmojiTextHelp
+DIFF     Vertex: souffle 2134498, flowlog 2139396, souffle-only 2237, flowlog-only 7135
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r6v2', '.array:<[
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.<init>:(Landroid/content/Context;Landroid/view/Window;Landroidx/appcompat/app/AppCompatCallback;Ljava/lang/Object;)V/ssa/r6v2', '.hashes:<
+DIFF     VirtualAlloc: souffle 410867, flowlog 415344, souffle-only 12774, flowlog-only 17251
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+           - ('Landroidx/appcompat/app/AppCompatDelegateImpl;.onCreateView:(Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;/<globals>', '.
+DIFF     VirtualAssign: souffle 1386775, flowlog 1387247, souffle-only 11905, flowlog-only 12377 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=1386775 flowlog=1387247]
+           - ('Landroidx/activity/result/ActivityResultRegistry$register$2;.launch:(Ljava/lang/Object;)V/B:12:0x002d/0/19', 'Landroidx/activity/result/ActivityResultRegistry$register$2;.launch:(Ljava/
+           - ('Landroidx/activity/result/ActivityResultRegistry$register$2;.launch:(Ljava/lang/Object;)V/B:12:0x002d/0/19', 'Landroidx/activity/result/ActivityResultRegistry$register$2;.launch:(Ljava/
+DIFF     flow.ReachableVertex: souffle 2961, flowlog 2942, souffle-only 119, flowlog-only 100
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter', '', 'Data', 'restricted', '0', 'Lorg/mozilla/javascript/Context;.compileR
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/B:7:0x000c/0/0/bound_result', '', 'Data', 'restricted', '0', 'Lorg/mozilla/javascript/Con
+DIFF     forward_flow.ReachableEdge: souffle 5684, flowlog 5653, souffle-only 151, flowlog-only 120
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileReader:(Ljava/io
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileReader:(Ljava/io
+DIFF     forward_flow.ReachableVertex: souffle 2961, flowlog 2942, souffle-only 119, flowlog-only 100
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter', '', 'Data', 'restricted', '0', 'Lorg/mozilla/javascript/Context;.compileR
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/B:7:0x000c/0/0/bound_result', '', 'Data', 'restricted', '0', 'Lorg/mozilla/javascript/Con
+DIFF     isTaintedArgUnmodeled: souffle 885, flowlog 883, souffle-only 2, flowlog-only 0
+           - ('Data', 'Ljava/lang/IllegalArgumentException;.<init>:(Ljava/lang/String;)V', '0', '', 'forward')
+           - ('Data', 'Ljava/lang/String;.length:()I', '0', '', 'forward')
+DIFF     natural_flow.ReachableEdge: souffle 5684, flowlog 5653, souffle-only 151, flowlog-only 120
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileReader:(Ljava/io
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/@retparameter::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileReader:(Ljava/io
+DIFF     reverse_flow.ReachableEdge: souffle 5684, flowlog 5653, souffle-only 151, flowlog-only 120
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/B:7:0x000c/0/0/bound_result::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileRe
+           - ('Landroidx/compose/ui/node/Owner$-CC;.m:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;/ssa/r2v0::Data:restricted:0:Lorg/mozilla/javascript/Context;.compileReader:(Ljava/io/Read
+summary: 152 equal, 14 different
+A: jadx/org.schabi.newpipe_1015/souffle-j32/org.schabi.newpipe_1015.canon.sarif
+B: jadx/org.schabi.newpipe_1015/flowlog-j32/org.schabi.newpipe_1015.canon.sarif
+.runs[0].logicalLocations: 0 items only in A, 13 only in B
+  + {"decoratedName": "Lorg/schabi/newpipe/player/datasource/YoutubeHttpDataSource;.makeConnection:(Ljava/net/URL;JJZZLjava/util/Map;)Ljava/net/HttpURLConnection;/B:29:0x00a2/1/65", "fullyQualifiedNam
+  + {"decoratedName": "Lorg/schabi/newpipe/player/datasource/YoutubeHttpDataSource;.makeConnection:(Ljava/net/URL;JJZZLjava/util/Map;)Ljava/net/HttpURLConnection;/B:33:0x00c0/0/70", "fullyQualifiedNam
+.runs[0].results: 0 items only in A, 1 only in B
+  + {"codeFlows": [{"message": {"text": "Path from source to sink with 3 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 237652 != 237663
+.runs[0].tool.driver.properties.stats.ContextObj: 102630 != 102644
+.runs[0].tool.driver.properties.stats.LocallyReachable: 679458 != 679278
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 89149 != 90607
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 250267 != 250445
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 192962 != 191949
+.runs[0].tool.driver.properties.stats.ParthianVertex: 255761 != 255133
+.runs[0].tool.driver.properties.stats.ctx: 10306 != 10429
+.runs[0].tool.driver.properties.stats.import-vertex: 2134498 != 2139396
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 1386775 != 1387247
+.runs[0].tool.driver.properties.stats.obj-ctx: 10631 != 10642
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 50182 != 50070
+.runs[0].tool.driver.properties.stats.summary-flow: 110939 != 111171
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 26114 != 26594
+.runs[0].tool.driver.properties.stats.tainted-vertex: 1925 != 1896
+.runs[0].tool.driver.properties.stats.vertex: 2134498 != 2139396
+.runs[0].tool.driver.properties.stats.virtual-alloc: 328584 != 333198
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 82283 != 82146
+.runs[0].tool.driver.properties.stats.virtual-assign: 1337096 != 1337050
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 49679 != 50197
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 520872 != 520673
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 222953 != 222901
+sarif: different (24 places)
+== jadx org.secuso.privacyfriendlynotes_105
+renamed 22538 MakeObjectID objects, 72 intent keys
+renamed 22538 MakeObjectID objects, 72 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 20, flowlog-only 20
+           - ('CInsn_Call', '180671')
+           - ('ContextObj', '31509')
+DIFF     CallEdge: souffle 180671, flowlog 180678, souffle-only 262, flowlog-only 269
+           - ('Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.selectDrawable:(I)Z/B:20:0x003d/0/22', 'Landroidx/appcompat/graphics/drawable/DrawableContainerCompat$DrawableContainerSta
+           - ('Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.selectDrawable:(I)Z/B:35:0x007c/0/44', 'Landroidx/appcompat/graphics/drawable/DrawableContainerCompat;.animate:(Z)V', 'Lan
+WITNESS  LostAssign: 23 rows, same choice-domain keys, 6 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$2;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroid/content/Context;Landroid/database/Cursor;ZLandroidx/appcompat
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$3;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController;)V/B:2:0x0000/0/0', '.val$dial
+DIFF     SummaryAlloc: souffle 86336, flowlog 88867, souffle-only 426, flowlog-only 2957
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     SummaryFlow: souffle 51011, flowlog 51344, souffle-only 182, flowlog-only 515
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.createFromXmlInner:(Landroid/content/Context;Landroid/content/res/Resources;Lorg/xmlpull/v1/XmlPullParser;Landroid
+DIFF     Vertex: souffle 1107441, flowlog 1110623, souffle-only 277, flowlog-only 3459
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     VirtualAlloc: souffle 111321, flowlog 114058, souffle-only 469, flowlog-only 3206
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+           - ('Landroidx/appcompat/graphics/drawable/AnimatedStateListDrawableCompat;.create:(Landroid/content/Context;ILandroid/content/res/Resources$Theme;)Landroidx/appcompat/graphics/drawable/Anim
+DIFF     VirtualAssign: souffle 520646, flowlog 521578, souffle-only 1109, flowlog-only 2041 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=520646 flowlog=521578]
+           - ('Landroidx/activity/ComponentDialog;.<init>:(Landroid/content/Context;IILkotlin/jvm/internal/DefaultConstructorMarker;)V/ssa/r2v1/PhiAssign/0', 'Landroidx/activity/ComponentDialog;.<init
+           - ('Landroidx/activity/OnBackPressedDispatcher;.<init>:(Ljava/lang/Runnable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V/ssa/r1v1/PhiAssign/0', 'Landroidx/activity/OnBackPressedDispatc
+DIFF     flow.ReachableVertex: souffle 2098, flowlog 2098, souffle-only 5, flowlog-only 5
+           - ('Ljava/io/File;.exists:()Z/@this', '', 'IO', 'restricted', '0', 'Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriend
+           - ('Ljava/io/File;.isDirectory:()Z/@this', '', 'IO', 'restricted', '0', 'Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyf
+DIFF     forward_flow.ReachableEdge: souffle 3888, flowlog 3888, souffle-only 5, flowlog-only 5
+           - ('Ljava/io/File;.exists:()Z/@this::IO:restricted:0:Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriendlynotes/ui/note
+           - ('Ljava/io/File;.isDirectory:()Z/@this::IO:restricted:0:Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriendlynotes/ui
+DIFF     forward_flow.ReachableVertex: souffle 2098, flowlog 2098, souffle-only 5, flowlog-only 5
+           - ('Ljava/io/File;.exists:()Z/@this', '', 'IO', 'restricted', '0', 'Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriend
+           - ('Ljava/io/File;.isDirectory:()Z/@this', '', 'IO', 'restricted', '0', 'Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyf
+DIFF     natural_flow.ReachableEdge: souffle 3888, flowlog 3888, souffle-only 5, flowlog-only 5
+           - ('Ljava/io/File;.exists:()Z/@this::IO:restricted:0:Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriendlynotes/ui/note
+           - ('Ljava/io/File;.isDirectory:()Z/@this::IO:restricted:0:Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages$default:(Lorg/secuso/privacyfriendlynotes/ui
+DIFF     reverse_flow.ReachableEdge: souffle 3888, flowlog 3888, souffle-only 5, flowlog-only 5
+           - ('Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages:(Ljava/io/File;Ljava/lang/String;ILjava/io/OutputStream;Z)V/ssa/r10v1::IO:free:0:Lorg/secuso/priva
+           - ('Lorg/secuso/privacyfriendlynotes/ui/notes/TextNoteActivity$Companion;.exportWithImages:(Ljava/io/File;Ljava/lang/String;ILjava/io/OutputStream;Z)V/ssa/r10v1::IO:free:0:Lorg/secuso/priva
+summary: 154 equal (1 up to choice-domain witnesses), 12 different
+A: jadx/org.secuso.privacyfriendlynotes_105/souffle-j32/org.secuso.privacyfriendlynotes_105.canon.sarif
+B: jadx/org.secuso.privacyfriendlynotes_105/flowlog-j32/org.secuso.privacyfriendlynotes_105.canon.sarif
+.runs[0].tool.driver.properties.stats.CInsn_Call: 180671 != 180678
+.runs[0].tool.driver.properties.stats.ContextObj: 31509 != 31795
+.runs[0].tool.driver.properties.stats.LocallyReachable: 321098 != 322090
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 6732 != 6789
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 136501 != 136700
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 53598 != 53725
+.runs[0].tool.driver.properties.stats.ParthianVertex: 135393 != 135440
+.runs[0].tool.driver.properties.stats.ctx: 4558 != 4599
+.runs[0].tool.driver.properties.stats.import-vertex: 1107441 != 1110623
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 520646 != 521578
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 22336 != 22537
+.runs[0].tool.driver.properties.stats.summary-flow: 48035 != 48341
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 2976 != 3003
+.runs[0].tool.driver.properties.stats.vertex: 1107441 != 1110623
+.runs[0].tool.driver.properties.stats.virtual-alloc: 104359 != 106791
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 6962 != 7267
+.runs[0].tool.driver.properties.stats.virtual-assign: 515014 != 515911
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 5632 != 5667
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 119304 != 119455
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 62662 != 63395
+sarif: different (20 places); same results up to code flows
+== jadx org.wikipedia_50614
+renamed 48010 MakeObjectID objects, 159 intent keys
+renamed 48010 MakeObjectID objects, 159 intent keys
+DIFF     CTADLStats: souffle 60, flowlog 60, souffle-only 22, flowlog-only 22
+           - ('CInsn_Call', '311405')
+           - ('ContextObj', '130203')
+DIFF     CallEdge: souffle 311405, flowlog 311372, souffle-only 1562, flowlog-only 1529
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.getFilters:([Landroid/text/InputFilter;)[Landroid/text/InputFilter;/B:3:0x000a/0/3', 'Landroidx/emoji2/viewsintegration/EmojiTextVie
+           - ('Landroidx/appcompat/widget/AppCompatEmojiTextHelper;.setAllCaps:(Z)V/B:2:0x0000/0/3', 'Landroidx/emoji2/viewsintegration/EmojiTextViewHelper$SkippingHelper19;.setAllCaps:(Z)V', 'Landroi
+WITNESS  LostAssign: 36 rows, same choice-domain keys, 9 with another witness
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$3;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController;)V/B:2:0x0000/0/0', '.val$dial
+           - ('Landroidx/appcompat/app/AlertController$AlertParams$4;.<init>:(Landroidx/appcompat/app/AlertController$AlertParams;Landroidx/appcompat/app/AlertController$RecycleListView;Landroidx/appc
+DIFF     SummaryAlloc: souffle 667649, flowlog 605360, souffle-only 101948, flowlog-only 39659
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V', '-3', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[0]', 'Lkot
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V', '-3', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[10]', 'Lko
+DIFF     SummaryFlow: souffle 135256, flowlog 132428, souffle-only 6611, flowlog-only 3783
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V', '-3', '.DIRECTORY_SEPARATOR@Lokio/Path;', 'Landroidx/activity/OnBackPressedCallback$OnBackPress
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V', '-3', '.DefaultBackgroundColor@Landroidx/compose/ui/text/SpanStyleKt;', 'Landroidx/activity/OnB
+DIFF     Vertex: souffle 3101802, flowlog 3029708, souffle-only 78341, flowlog-only 6247
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V/<globals>', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[0]')
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V/<globals>', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[10]')
+DIFF     VirtualAlloc: souffle 1058316, flowlog 984835, souffle-only 115625, flowlog-only 42144
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V/<globals>', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[0]', '
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V/<globals>', '.$$delegatedProperties@Landroidx/compose/ui/semantics/SemanticsPropertiesKt;.[10]', 
+DIFF     VirtualAssign: souffle 1955039, flowlog 1950231, souffle-only 18646, flowlog-only 13838 [projection [0, 1, 2, 3, 4, 5, 6]; full rows souffle=1955039 flowlog=1950231]
+           - ('Landroidx/activity/EdgeToEdgeApi35;.setUp:(Landroidx/activity/SystemBarStyle;Landroidx/activity/SystemBarStyle;Landroid/view/Window;Landroid/view/View;ZZ)V/B:40:0x0099/0/59', 'Landroidx
+           - ('Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackCompleted:()V/B:132:0x0314/0/323', 'Landroidx/activity/OnBackPressedCallback$OnBackPressedEventHandler;.onBackC
+DIFF     flow.ReachableVertex: souffle 123919, flowlog 123828, souffle-only 1347, flowlog-only 1256
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Landroidx/g
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.getTheme:()Landroid/content/res/Resources$Theme;/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 
+DIFF     forward_flow.ReachableEdge: souffle 562857, flowlog 561488, souffle-only 3605, flowlog-only 2236
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Landroidx/glance/appwidget
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Landroidx/glance/appwidget
+DIFF     forward_flow.ReachableVertex: souffle 123919, flowlog 123828, souffle-only 1347, flowlog-only 1256
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 'Landroidx/g
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.getTheme:()Landroid/content/res/Resources$Theme;/<globals>', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'IO', 'restricted', '0', 
+DIFF     isTaintedArgUnmodeled: souffle 2609, flowlog 2605, souffle-only 4, flowlog-only 0
+           - ('IO', 'Landroid/view/Choreographer;.postFrameCallback:(Landroid/view/Choreographer$FrameCallback;)V', '-3', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'forward')
+           - ('IO', 'Lapp/rive/Fit$Contain;.<clinit>():void', '-3', '.DEVICE_ROOT@Landroidx/core/content/FileProvider;', 'forward')
+DIFF     natural_flow.ReachableEdge: souffle 562857, flowlog 561488, souffle-only 3605, flowlog-only 2236
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Landroidx/glance/appwidget
+           - ('Landroidx/appcompat/view/ContextThemeWrapper;.<init>:(Landroid/content/Context;I)V/<globals>:.DEVICE_ROOT@Landroidx/core/content/FileProvider;:IO:restricted:0:Landroidx/glance/appwidget
+DIFF     reverse_flow.ReachableEdge: souffle 562857, flowlog 561488, souffle-only 3605, flowlog-only 2236
+           - ('Landroidx/appcompat/widget/PopupMenu$1;.pathStringToNodes$default:(Landroidx/appcompat/widget/PopupMenu$1;Ljava/lang/String;)Ljava/util/ArrayList;/<globals>:.DEVICE_ROOT@Landroidx/core/
+           - ('Landroidx/appcompat/widget/PopupMenu$1;.pathStringToNodes$default:(Landroidx/appcompat/widget/PopupMenu$1;Ljava/lang/String;)Ljava/util/ArrayList;/<globals>:.DEVICE_ROOT@Landroidx/core/
+summary: 153 equal (1 up to choice-domain witnesses), 13 different
+A: jadx/org.wikipedia_50614/souffle-j32/org.wikipedia_50614.canon.sarif
+B: jadx/org.wikipedia_50614/flowlog-j32/org.wikipedia_50614.canon.sarif
+.runs[0].logicalLocations: 9 items only in A, 25 only in B
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+  - {"decoratedName": "Landroidx/core/graphics/TypefaceCompatApi24Impl;.createFromFontFamilyFilesResourceEntry:(Landroid/content/Context;Landroidx/core/content/res/FontResourcesParserCompat$FontFamily
+.runs[0].results: 2 items only in A, 4 only in B
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+  - {"codeFlows": [{"message": {"text": "Path from source to sink with 4 intermediate instructions"}, "threadFlows": [{"locations": [{"kinds": ["acquire", "taint"], "location": {"annotations": [{"mess
+.runs[0].tool.driver.properties.stats.CInsn_Call: 311405 != 311372
+.runs[0].tool.driver.properties.stats.ContextObj: 130203 != 128495
+.runs[0].tool.driver.properties.stats.LocallyReachable: 874795 != 872133
+.runs[0].tool.driver.properties.stats.LocallyReachable-ctx: 191699 != 187005
+.runs[0].tool.driver.properties.stats.LocallyReachableSources: 308825 != 306199
+.runs[0].tool.driver.properties.stats.ParthianFlowEdge: 354664 != 334684
+.runs[0].tool.driver.properties.stats.ParthianVertex: 389244 != 379267
+.runs[0].tool.driver.properties.stats.ctx: 14634 != 14924
+.runs[0].tool.driver.properties.stats.import-vertex: 3101802 != 3029708
+.runs[0].tool.driver.properties.stats.import-virtual-assign: 1955039 != 1950231
+.runs[0].tool.driver.properties.stats.obj-ctx: 14253 != 14239
+.runs[0].tool.driver.properties.stats.obj-reachable-vertex: 69892 != 69041
+.runs[0].tool.driver.properties.stats.summary-flow: 107621 != 105015
+.runs[0].tool.driver.properties.stats.summary-flow-ctx: 27635 != 27413
+.runs[0].tool.driver.properties.stats.tainted-vertex: 7717 != 7691
+.runs[0].tool.driver.properties.stats.vertex: 3101802 != 3029708
+.runs[0].tool.driver.properties.stats.virtual-alloc: 569623 != 501650
+.runs[0].tool.driver.properties.stats.virtual-alloc-ctx: 488693 != 483185
+.runs[0].tool.driver.properties.stats.virtual-assign: 1854122 != 1851051
+.runs[0].tool.driver.properties.stats.virtual-assign-ctx: 100917 != 99180
+.runs[0].tool.driver.properties.stats.virtual-assign-fp: 657299 != 656738
+.runs[0].tool.driver.properties.stats.virtual-assign-summary: 371253 != 368924
+sarif: different (24 places)
