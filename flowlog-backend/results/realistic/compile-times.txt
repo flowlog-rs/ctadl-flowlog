@@ -1,0 +1,42 @@
+# Compiling CTADL's analyses, as `ctadl index` and `ctadl query` do on an analysis' first use:
+# Soufflé 2.5 (souffle -o, which runs g++ 11.4.0 on one generated C++ file) and FlowLog `main` at
+# 03b534b (flowlog-compiler, which generates a Rust crate and builds it with cargo), the versions
+# of pcode.txt and jadx.txt. bench.py ran libz's and Diary's index and query phases with 32
+# workers, as in those files, with each engine's compiler wrapped to time each call alone.
+#   pass1: empty analysis caches and an empty cargo target dir: FlowLog's first compilation (the
+#          P-code index) also builds its runtime and dependencies, 261 MB
+#   pass2: empty analysis caches, pass1's cargo target dir
+#   pass3: pass2's caches, nothing to compile
+# s: wall seconds of the compiler call; peak: peak RSS of its largest process, MiB; binary: the
+# cached analysis, MB (10^6 bytes).
+souffle  pass1  pcode-index    234.6 s  peak   2883 MiB  binary   10.6 MB
+souffle  pass1  pcode-query     68.3 s  peak   1470 MiB  binary    4.1 MB
+flowlog  pass1  pcode-index    323.8 s  peak  10322 MiB  binary  245.5 MB
+flowlog  pass1  pcode-query    120.7 s  peak   5300 MiB  binary  113.6 MB
+souffle  pass1  jadx-index     236.2 s  peak   3290 MiB  binary   11.5 MB
+souffle  pass1  jadx-query      67.9 s  peak   1469 MiB  binary    4.1 MB
+flowlog  pass1  jadx-index     266.6 s  peak  11030 MiB  binary  224.9 MB
+flowlog  pass1  jadx-query     120.1 s  peak   5318 MiB  binary  113.6 MB
+souffle  pass2  pcode-index    234.1 s  peak   2885 MiB  binary   10.6 MB
+souffle  pass2  pcode-query     68.2 s  peak   1464 MiB  binary    4.1 MB
+flowlog  pass2  pcode-index    293.0 s  peak  10354 MiB  binary  245.5 MB
+flowlog  pass2  pcode-query    120.2 s  peak   5302 MiB  binary  113.6 MB
+souffle  pass2  jadx-index     235.5 s  peak   3290 MiB  binary   11.5 MB
+souffle  pass2  jadx-query      67.8 s  peak   1468 MiB  binary    4.1 MB
+flowlog  pass2  jadx-index     269.8 s  peak  10814 MiB  binary  224.9 MB
+flowlog  pass2  jadx-query     121.3 s  peak   5324 MiB  binary  113.6 MB
+
+# bench.py's rows: in pass1 and pass2, idx and query include compiling, and rss is the
+# compiler's; in pass3, nothing is compiled.
+pass1  libz       souffle  32 |  246.95     7.93    7.93   2884M |   83.23     3.07    3.07   1470M | (reference)
+pass1  libz       flowlog  32 |  335.55     7.13    5.28  10323M |  134.10     1.60    0.92   5300M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+pass1  org.billthefarmer.diary_1105 souffle  32 |  240.71     2.22    2.22   3291M |   82.57     0.67    0.67   1470M | (reference)
+pass1  org.billthefarmer.diary_1105 flowlog  32 |  273.18     3.71    3.18  11031M |  134.47     1.05    0.72   5319M | summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+pass2  libz       souffle  32 |  246.81     7.93    7.93   2885M |   84.02     3.02    3.02   1464M | (reference)
+pass2  libz       flowlog  32 |  304.80     6.96    5.13  10355M |  133.78     1.59    0.92   5302M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+pass2  org.billthefarmer.diary_1105 souffle  32 |  239.85     2.22    2.22   3290M |   83.52     0.72    0.72   1469M | (reference)
+pass2  org.billthefarmer.diary_1105 flowlog  32 |  276.70     4.01    3.47  10815M |  136.22     1.15    0.82   5325M | summary: 160 equal, 6 different; sarif: different (5 places); same results up to code flows
+pass3  libz       souffle  32 |   11.96     7.93    7.93    159M |   14.97     3.07    3.07     95M | (reference)
+pass3  libz       flowlog  32 |   11.14     7.27    5.43   3045M |   13.63     1.59    0.92   1752M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+pass3  org.billthefarmer.diary_1105 souffle  32 |    4.54     2.22    2.22     45M |   15.52     0.67    0.67     52M | (reference)
+pass3  org.billthefarmer.diary_1105 flowlog  32 |    6.30     3.91    3.37   2546M |   16.02     1.10    0.77   1648M | summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows

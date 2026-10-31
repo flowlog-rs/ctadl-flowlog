@@ -1186,7 +1186,8 @@ Each cell gives the wall time of the `ctadl` command in seconds, the engine's ti
 Soufflé's wall time over FlowLog's. Facts is the size of the import. Relations equal counts the
 relations of the final database that have the same rows, once the ids that CTADL computes with
 `ord` are renamed, and up to `choice-domain` witnesses. SARIF is *equal* when the reports are, and
-*same results* when they report the same results.
+*same results* when they report the same results. No time includes compiling the analyses
+(**Compiling**, below).
 
 | Program | Facts | Index, Soufflé | Index, FlowLog | × | Query, Soufflé | Query, FlowLog | × | Relations equal | SARIF |
 |---|---|---|---|---|---|---|---|---|---|
@@ -1316,6 +1317,28 @@ K joins costs about 6.2 KiB per operator call and worker. This is
 [flowlog-rs/flowlog#521](https://github.com/flowlog-rs/flowlog/issues/521), which also traces
 where the memory goes: the construction of each operator by each worker, and, for the N² term,
 timely's in-process channels, which give every worker a pusher to every other.
+
+**Compiling** (`compile-times.txt`). Each engine compiles an analysis on its first use and caches
+the binary ([Usage](#usage)); the runs in `pcode.txt` and `jadx.txt` found theirs compiled. With
+empty caches, libz's and Diary's index and query phases compiled the four analyses, twice, with
+each compiler call timed alone:
+
+| Analysis | Soufflé compile | Soufflé binary | FlowLog compile | FlowLog binary |
+|---|---|---|---|---|
+| P-code index | 3 min 54 s, 2.8 GB | 10.6 MB | 4 min 53 s, 10.1 GB | 245 MB |
+| P-code query | 1 min 8 s, 1.4 GB | 4.1 MB | 2 min 0 s, 5.2 GB | 114 MB |
+| JADX index | 3 min 56 s, 3.2 GB | 11.5 MB | 4 min 30 s, 10.6 GB | 225 MB |
+| JADX query | 1 min 8 s, 1.4 GB | 4.1 MB | 2 min 1 s, 5.2 GB | 114 MB |
+
+Each compile cell gives the second run's time and the compiler's peak memory. The two runs agree
+within 4 s, but for FlowLog's first compilation, which in an empty cargo target dir also builds
+FlowLog's runtime and dependencies: 5 min 24 s for the P-code index. A front end's two analyses
+take 6 min 53 s (P-code) and 6 min 31 s (JADX) to compile with FlowLog, and 5 min 2 s and 5 min
+3 s with Soufflé. FlowLog's extra 1 min 51 s and 1 min 28 s are paid back, on average, by the
+phases of about one executable or two apps: with each compilation counted once, the 14
+executables' phases take 1,976 s with FlowLog and 3,476 s with Soufflé, and the 13 apps' 2,225 s
+and 2,693 s. A small program's first run is slower with FlowLog: libz's index and query take
+438.6 s, against Soufflé's 330.8 s, compilations included.
 
 **On FlowLog's latest `main`** (`flowlog-59f6909.txt`). After these runs, FlowLog's `main` moved
 to `59f6909`, a planner refactor ([#502](https://github.com/flowlog-rs/flowlog/pull/502)). On it,
@@ -1547,10 +1570,13 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
    [Performance](#performance)); with #499, 5.4 s, 11.5 s and 18.6 s.
    [#503](https://github.com/flowlog-rs/flowlog/pull/503), open, writes that layout for a
    `--str-intern` program; the engine has not been tried with it.
-7. **Compile time and binary size.** CTADL's index and query take 3 min 8 s and 2 min 3 s to
-   compile, against Soufflé's 2 min 43 s and 1 min 10 s. The binaries are 19–28× larger (168 and
-   116 MB). Both engines cache the binary, so this cost is paid once per version of the analysis,
-   but it slows down work on the analysis itself.
+7. **Compile time and binary size.** CTADL's taint-front index and query take 3 min 8 s and 2 min
+   3 s to compile, against Soufflé's 2 min 43 s and 1 min 10 s; its P-code and JADX ones take
+   4 min 30 s–4 min 53 s and 2 min, against about 3 min 55 s and 1 min 8 s, and an index's
+   compilation peaks at 10–11 GB of memory, against 3 GB ([Realistic
+   programs](#realistic-programs)). The binaries are 19–28× larger (168 and 116 MB). Both engines
+   cache the binary, so this cost is paid once per version of the analysis, but it slows down work
+   on the analysis itself.
 8. **Memory.** FlowLog's memory has a floor that grows with the number of workers, whatever the
    program: CTADL's index of a small Android app takes 0.15 GB with 1 worker, 0.33 GB with 4 and
    2.3 GB with 32, where Soufflé takes 0.05 GB. On empty inputs, the P-code index peaks at about
