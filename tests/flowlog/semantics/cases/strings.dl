@@ -1,0 +1,110 @@
+// Strings: strlen and substr count bytes, to_number's prefix rules, escape
+// sequences, cat, contains, match, symbol comparison and ord. Rows carry ids
+// rather than strings with tabs or newlines, which would break TSV rows.
+.decl W(id: number, w: symbol)
+W(0, ""). W(1, "a"). W(2, "héllo"). W(3, "日本語"). W(4, "q\"t\\b\tz").
+W(5, "http://x.y/z"). W(6, "abcabc"). W(7, "/*not a comment*/").
+
+.decl Len(id: number, n: number)
+.output Len
+Len(id, strlen(w)) :- W(id, w).
+
+// substr(s, i, n) on bytes: "" when i is outside 0..=strlen(s), the rest of
+// s when n is negative. Offsets stay on character boundaries: Souffle cuts a
+// UTF-8 sequence where the port substitutes U+FFFD.
+.decl Cut(i: number, n: number)
+Cut(0, 0). Cut(0, 1). Cut(1, 2). Cut(3, 100). Cut(1, -1). Cut(-1, 2). Cut(6, 1). Cut(7, 1). Cut(0, 6).
+.decl Sub(id: number, i: number, n: number, s: symbol)
+.output Sub
+Sub(id, i, n, substr(w, i, n)) :- W(id, w), Cut(i, n), id != 3, id != 4.
+Sub(3, i, n, substr(w, i, n)) :- W(3, w), (i = 0 ; i = 3 ; i = 9 ; i = 10), (n = 3 ; n = -1).
+Sub(4, 1, 3, s) :- W(4, w), s = substr(w, 1, 3).
+
+// to_number: 0x/-0x hex, 0b/-0b binary, otherwise decimal; leading white
+// space, a sign and a longest valid prefix, as std::stoll.
+.decl TN(id: number, s: symbol)
+TN(0, "42"). TN(1, "-17"). TN(2, "  12"). TN(3, "+5"). TN(4, "0x1F"). TN(5, "0X1F").
+TN(6, "-0x10"). TN(7, "0b101"). TN(8, "-0b11"). TN(9, "12abc"). TN(10, "007").
+TN(11, "9223372036854775807"). TN(12, "-9223372036854775808"). TN(13, "0x").
+TN(14, "\t7"). TN(15, "0x7fffffffffffffff"). TN(16, " 0x10"). TN(17, "1e3"). TN(18, "-0").
+.decl Num(id: number, n: number)
+.output Num
+Num(id, to_number(s)) :- TN(id, s).
+
+// to_string and back.
+.decl NS(n: number)
+NS(0). NS(-5). NS(3000000000). NS(-9223372036854775807 - 1).
+.decl ToStr(n: number, s: symbol, m: number)
+.output ToStr
+ToStr(n, to_string(n), to_number(to_string(n))) :- NS(n).
+ToStr(n, cat("#", to_string(n / 2)), strlen(to_string(n))) :- NS(n).
+
+// to_string of a symbol (as in CTADL's JADX object ids) is the symbol.
+.type Name <: symbol
+.decl Named(n: Name)
+Named("n1"). Named("héllo").
+.decl SymStr(s: symbol)
+.output SymStr
+SymStr(to_string(w)) :- W(1, w).
+SymStr(cat(to_string(n), "/", to_string(to_string(7)))) :- Named(n).
+
+// Escape sequences.
+.decl Esc(id: number, s: symbol)
+Esc(0, "q\"t"). Esc(1, "a\\b"). Esc(2, "\t\n\r"). Esc(3, "\a\b\f\v"). Esc(4, "it\'s").
+Esc(5, "/* x */"). Esc(6, "// y"). Esc(7, "\\n").
+.decl EscLen(id: number, n: number)
+.output EscLen
+EscLen(id, strlen(s)) :- Esc(id, s).
+.decl EscEq(id: number)
+.output EscEq
+EscEq(0) :- Esc(0, s), s = cat("q", "\"", "t").
+EscEq(1) :- Esc(1, s), s = cat("a", cat("\\", "b")).
+EscEq(2) :- Esc(2, s), substr(s, 0, 1) = "\t", substr(s, 1, 1) = "\n".
+EscEq(7) :- Esc(7, s), s != "\n", strlen(s) = 2.
+
+// cat with several arguments and nested calls.
+.decl Cat(id: number, s: symbol)
+.output Cat
+Cat(0, cat("x", "-", "y")).
+Cat(1, cat(w, "|", w, "|", w)) :- W(1, w).
+Cat(2, cat(cat("a", "b"), "c")).
+Cat(3, cat(substr(w, 0, 1), to_string(strlen(w)))) :- W(2, w).
+
+// contains(needle, haystack) and match(pattern, text): full-string matches.
+.decl Pat(id: number, p: symbol)
+Pat(0, "a.*"). Pat(1, ".*b.*"). Pat(2, "abc|xyz"). Pat(3, "h.llo"). Pat(4, "[0-9]+").
+Pat(5, ""). Pat(6, "(a|h)(b|e).*"). Pat(7, "x*").
+.decl Txt(id: number, t: symbol)
+Txt(0, "abc"). Txt(1, "xyz"). Txt(2, "habc"). Txt(3, "hello"). Txt(4, "123"). Txt(5, "12a").
+Txt(6, ""). Txt(7, "abcx"). Txt(8, "zxyz").
+.decl M(p: number, t: number)
+.output M
+M(p, t) :- Pat(p, ps), Txt(t, ts), match(ps, ts).
+.decl NM(p: number, t: number)
+.output NM
+NM(p, t) :- Pat(p, ps), Txt(t, ts), !match(ps, ts).
+.decl Ct(a: number, b: number)
+.output Ct
+Ct(a, b) :- Txt(a, sa), Txt(b, sb), contains(sa, sb).
+.decl NCt(a: number, b: number)
+.output NCt
+NCt(a, b) :- Txt(a, sa), Txt(b, sb), !contains(sa, sb).
+.decl MConst(id: number)
+.output MConst
+MConst(t) :- Txt(t, ts), match("[a-z]+", ts), contains("b", ts).
+
+// Symbol order is byte-lexicographic.
+.decl Lt(a: number, b: number)
+.output Lt
+Lt(a, b) :- Txt(a, sa), Txt(b, sb), sa < sb.
+Lt(a + 100, b + 100) :- W(a, sa), W(b, sb), sa <= sb, a != b.
+
+// ord is engine-specific, but identifies symbols. The translation keeps
+// FlowLog's `ord`, widened, so that FlowLog loads the facts on one worker
+// (deterministic ids).
+// expect-fl: souffle_ord(ord(
+.decl Ord(n: number)
+.output Ord
+Ord(n) :- n = count : { Txt(_, a), Txt(_, b), ord(a) < ord(b) }.
+Ord(100 + n) :- n = count : { Txt(_, a), Txt(_, b), ord(a) = ord(b) }.
+Ord(200 + n) :- n = count : { Txt(_, a), W(_, b), ord(a) = ord(b) }.

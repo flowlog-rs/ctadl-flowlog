@@ -1,0 +1,11 @@
+// Soufflé types each disjunct as its own clause: p is an A in the first and
+// a B in the second, which tests [9] = [2], so O is empty. The translator
+// types a rule's variable names once, so it rejects the rule.
+.type A = [a: number]
+.type B = [b: number]
+.decl RA(p: A)
+.decl RB(p: B)
+RB([9]).
+.decl O(v: number)
+O(1) :- (RA(p), p = [1]; RB(p), p = [2]).
+.output O

@@ -1,0 +1,4 @@
+// A constant fact: Souffle evaluates it when the program runs.
+.decl O(n: number)
+.output O
+O(1 / 0).

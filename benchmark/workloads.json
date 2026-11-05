@@ -1,0 +1,585 @@
+{
+  "schema_version": 1,
+  "source": "https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/results/realistic/inputs.txt",
+  "workloads": [
+    {
+      "id": "smoke",
+      "lang": "taint-front",
+      "filename": "ex3.tnt",
+      "source_file": "tests/taint-front/ex3.tnt",
+      "sha256": "4318a7456009f4a2a83c78801476c411895e6cf67571d0533de4956e74292c64",
+      "format": "summary",
+      "suites": [
+        "smoke"
+      ]
+    },
+    {
+      "id": "syn10",
+      "lang": "taint-front",
+      "filename": "syn10.tnt",
+      "sha256": "dd10f2f32d96a319fd1558559c677d8884ea16dcad5f74c32e9d44f4d0e194ac",
+      "generate": [
+        "--funcs",
+        "10",
+        "--stmts",
+        "12",
+        "--seed",
+        "1"
+      ],
+      "format": "summary",
+      "suites": [
+        "synthetic",
+        "all"
+      ]
+    },
+    {
+      "id": "syn25",
+      "lang": "taint-front",
+      "filename": "syn25.tnt",
+      "sha256": "1e3251860e9bc669ed46ea42cdae2182f0f3a7a181e029ba42a6ef7b722f1e79",
+      "generate": [
+        "--funcs",
+        "25",
+        "--stmts",
+        "12",
+        "--seed",
+        "1"
+      ],
+      "format": "summary",
+      "suites": [
+        "synthetic",
+        "all"
+      ]
+    },
+    {
+      "id": "libz",
+      "lang": "pcode",
+      "filename": "libz",
+      "package": "zlib1g",
+      "version": "1:1.2.11.dfsg-2ubuntu9.2",
+      "architecture": "amd64",
+      "deb": "zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb",
+      "member": "libz.so.1.2.11",
+      "sha256": "64c206f0146cc58bbddc4f22054436f4ff278f5a554aa3ce6921ddf7e9133370",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/z/zlib/zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/z/zlib/zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/z/zlib/zlib1g_1.2.11.dfsg-2ubuntu9.2_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "nc",
+      "lang": "pcode",
+      "filename": "nc",
+      "package": "netcat-openbsd",
+      "version": "1.218-4ubuntu1",
+      "architecture": "amd64",
+      "deb": "netcat-openbsd_1.218-4ubuntu1_amd64.deb",
+      "member": "nc.openbsd",
+      "sha256": "0e10c84da5f1b48ebf5c283adfa5391a828cf5868320f02081c03e22f8d9b0fa",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/n/netcat-openbsd/netcat-openbsd_1.218-4ubuntu1_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/n/netcat-openbsd/netcat-openbsd_1.218-4ubuntu1_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/n/netcat-openbsd/netcat-openbsd_1.218-4ubuntu1_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "sed",
+      "lang": "pcode",
+      "filename": "sed",
+      "package": "sed",
+      "version": "4.8-1ubuntu2.1",
+      "architecture": "amd64",
+      "deb": "sed_4.8-1ubuntu2.1_amd64.deb",
+      "member": "sed",
+      "sha256": "42e2ce00721556ff9d371778fc36adcbb7c1697f65c3f996c6c9b28206dba565",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/s/sed/sed_4.8-1ubuntu2.1_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/s/sed/sed_4.8-1ubuntu2.1_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/s/sed/sed_4.8-1ubuntu2.1_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "gzip",
+      "lang": "pcode",
+      "filename": "gzip",
+      "package": "gzip",
+      "version": "1.10-4ubuntu4.2",
+      "architecture": "amd64",
+      "deb": "gzip_1.10-4ubuntu4.2_amd64.deb",
+      "member": "gzip",
+      "sha256": "cc789a57a20d5d48bc5eecb914dff03ccfa1f35962112093a85fb67d29812d5b",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/g/gzip/gzip_1.10-4ubuntu4.2_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/g/gzip/gzip_1.10-4ubuntu4.2_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/g/gzip/gzip_1.10-4ubuntu4.2_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "dropbear",
+      "lang": "pcode",
+      "filename": "dropbear",
+      "package": "dropbear-bin",
+      "version": "2020.81-5ubuntu0.1",
+      "architecture": "amd64",
+      "deb": "dropbear-bin_2020.81-5ubuntu0.1_amd64.deb",
+      "member": "dropbear",
+      "sha256": "d495fababd880c5eab6d5dad95c4fbe43d2a5fcf1f4655aa71ec8f20615c6e0f",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/universe/d/dropbear/dropbear-bin_2020.81-5ubuntu0.1_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/universe/d/dropbear/dropbear-bin_2020.81-5ubuntu0.1_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/universe/d/dropbear/dropbear-bin_2020.81-5ubuntu0.1_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "sudo",
+      "lang": "pcode",
+      "filename": "sudo",
+      "package": "sudo",
+      "version": "1.9.9-1ubuntu2.7",
+      "architecture": "amd64",
+      "deb": "sudo_1.9.9-1ubuntu2.7_amd64.deb",
+      "member": "sudo",
+      "sha256": "5b0e68c5523dff0c71aec912775d66fe8bc885f4778978489b2adc04c51ea715",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/s/sudo/sudo_1.9.9-1ubuntu2.7_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/s/sudo/sudo_1.9.9-1ubuntu2.7_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/s/sudo/sudo_1.9.9-1ubuntu2.7_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "lighttpd",
+      "lang": "pcode",
+      "filename": "lighttpd",
+      "package": "lighttpd",
+      "version": "1.4.63-1ubuntu3.1",
+      "architecture": "amd64",
+      "deb": "lighttpd_1.4.63-1ubuntu3.1_amd64.deb",
+      "member": "lighttpd",
+      "sha256": "c3396563e9cb4e8fa24e283ed98c2f664062e9f7e8229ecf4dcfa4535b10e4d7",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/universe/l/lighttpd/lighttpd_1.4.63-1ubuntu3.1_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/universe/l/lighttpd/lighttpd_1.4.63-1ubuntu3.1_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/universe/l/lighttpd/lighttpd_1.4.63-1ubuntu3.1_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "dnsmasq",
+      "lang": "pcode",
+      "filename": "dnsmasq",
+      "package": "dnsmasq-base",
+      "version": "2.91-0ubuntu0.22.04.2",
+      "architecture": "amd64",
+      "deb": "dnsmasq-base_2.91-0ubuntu0.22.04.2_amd64.deb",
+      "member": "dnsmasq",
+      "sha256": "59b15098e4de6ee5cf86fb9e4c68d7ae0a717ba5b48680fd87ca8e77d5f53486",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/d/dnsmasq/dnsmasq-base_2.91-0ubuntu0.22.04.2_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/d/dnsmasq/dnsmasq-base_2.91-0ubuntu0.22.04.2_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/d/dnsmasq/dnsmasq-base_2.91-0ubuntu0.22.04.2_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "wget",
+      "lang": "pcode",
+      "filename": "wget",
+      "package": "wget",
+      "version": "1.21.2-2ubuntu1.5",
+      "architecture": "amd64",
+      "deb": "wget_1.21.2-2ubuntu1.5_amd64.deb",
+      "member": "wget",
+      "sha256": "2f750492a5ddee86aa7ca11e29b5ae627512b371d0b1e717758638954026139b",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/w/wget/wget_1.21.2-2ubuntu1.5_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/w/wget/wget_1.21.2-2ubuntu1.5_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/w/wget/wget_1.21.2-2ubuntu1.5_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "tar",
+      "lang": "pcode",
+      "filename": "tar",
+      "package": "tar",
+      "version": "1.34+dfsg-1ubuntu0.1.22.04.6",
+      "architecture": "amd64",
+      "deb": "tar_1.34+dfsg-1ubuntu0.1.22.04.6_amd64.deb",
+      "member": "tar",
+      "sha256": "fd0d62eed19efd3e115aa1be44160f89d777cd1e6d6d8eb0ce7c8bdc879f59e2",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.6_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.6_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.6_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "ssh",
+      "lang": "pcode",
+      "filename": "ssh",
+      "package": "openssh-client",
+      "version": "1:8.9p1-3ubuntu0.18",
+      "architecture": "amd64",
+      "deb": "openssh-client_8.9p1-3ubuntu0.18_amd64.deb",
+      "member": "ssh",
+      "sha256": "acfbdc053a41d23c7200a358873f5df6fe09ba5759155cd3ef6a00f0392cf193",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.18_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.18_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/o/openssh/openssh-client_8.9p1-3ubuntu0.18_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "openssl",
+      "lang": "pcode",
+      "filename": "openssl",
+      "package": "openssl",
+      "version": "3.0.2-0ubuntu1.30",
+      "architecture": "amd64",
+      "deb": "openssl_3.0.2-0ubuntu1.30_amd64.deb",
+      "member": "openssl",
+      "sha256": "237c1db70a7d0cf34130a467d82823ab0e6d9d77ad5cf24358af6b7d7adef2de",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/o/openssl/openssl_3.0.2-0ubuntu1.30_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_3.0.2-0ubuntu1.30_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_3.0.2-0ubuntu1.30_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "bash",
+      "lang": "pcode",
+      "filename": "bash",
+      "package": "bash",
+      "version": "5.1-6ubuntu1.1",
+      "architecture": "amd64",
+      "deb": "bash_5.1-6ubuntu1.1_amd64.deb",
+      "member": "bash",
+      "sha256": "59474588a312b6b6e73e5a42a59bf71e62b55416b6c9d5e4a6e1c630c2a9ecd4",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/b/bash/bash_5.1-6ubuntu1.1_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/b/bash/bash_5.1-6ubuntu1.1_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/b/bash/bash_5.1-6ubuntu1.1_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "sqlite3",
+      "lang": "pcode",
+      "filename": "sqlite3",
+      "package": "sqlite3",
+      "version": "3.37.2-2ubuntu0.8",
+      "architecture": "amd64",
+      "deb": "sqlite3_3.37.2-2ubuntu0.8_amd64.deb",
+      "member": "sqlite3",
+      "sha256": "76b4c90733a4210625f954a1ae53c302de669a887164cde24bf1d6bb7df79f12",
+      "urls": [
+        "https://snapshot.ubuntu.com/ubuntu/20261031T000000Z/pool/main/s/sqlite3/sqlite3_3.37.2-2ubuntu0.8_amd64.deb",
+        "https://archive.ubuntu.com/ubuntu/pool/main/s/sqlite3/sqlite3_3.37.2-2ubuntu0.8_amd64.deb",
+        "https://security.ubuntu.com/ubuntu/pool/main/s/sqlite3/sqlite3_3.37.2-2ubuntu0.8_amd64.deb"
+      ],
+      "format": "sarif",
+      "query": "src/ctadl/models/pcode/default-query.json",
+      "suites": [
+        "pcode",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "vanilla",
+      "lang": "JADX",
+      "filename": "ch.blinkenlights.android.vanilla_13200.apk",
+      "sha256": "0150f08387032ed3d5a5952dbe13646bff2878f01c2c9267e6dc32ecb8747003",
+      "urls": [
+        "https://f-droid.org/repo/ch.blinkenlights.android.vanilla_13200.apk",
+        "https://f-droid.org/archive/ch.blinkenlights.android.vanilla_13200.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "amaze",
+      "lang": "JADX",
+      "filename": "com.amaze.filemanager_126.apk",
+      "sha256": "627b8cd6a5f750dc8315ebb0fadeddfea8ff76700922049d4dbf0ca22f3397fd",
+      "urls": [
+        "https://f-droid.org/repo/com.amaze.filemanager_126.apk",
+        "https://f-droid.org/archive/com.amaze.filemanager_126.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "k9",
+      "lang": "JADX",
+      "filename": "com.fsck.k9_39046.apk",
+      "sha256": "0f9dd57fbd06dddfd8bcf7de6106d27fa0f0297793193828c4eac904518b1e05",
+      "urls": [
+        "https://f-droid.org/repo/com.fsck.k9_39046.apk",
+        "https://f-droid.org/archive/com.fsck.k9_39046.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "antennapod",
+      "lang": "JADX",
+      "filename": "de.danoeh.antennapod_3120395.apk",
+      "sha256": "6e79f28f69cef1a8b2e4f5f88c9c3cf3c3d7c51356f01394ac23b0dc5d56a00b",
+      "urls": [
+        "https://f-droid.org/repo/de.danoeh.antennapod_3120395.apk",
+        "https://f-droid.org/archive/de.danoeh.antennapod_3120395.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "binaryeye",
+      "lang": "JADX",
+      "filename": "de.markusfisch.android.binaryeye_180.apk",
+      "sha256": "568cec6598dbf42fbde9071af8747071ffea798473016a3d77b6ddb3bff944f1",
+      "urls": [
+        "https://f-droid.org/repo/de.markusfisch.android.binaryeye_180.apk",
+        "https://f-droid.org/archive/de.markusfisch.android.binaryeye_180.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "netguard",
+      "lang": "JADX",
+      "filename": "eu.faircode.netguard_2026080101.apk",
+      "sha256": "158b4308da0006298d22ed557adbff24b282fddeb1bc0b3468829a60f405a8c4",
+      "urls": [
+        "https://f-droid.org/repo/eu.faircode.netguard_2026080101.apk",
+        "https://f-droid.org/archive/eu.faircode.netguard_2026080101.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "opencamera",
+      "lang": "JADX",
+      "filename": "net.sourceforge.opencamera_96.apk",
+      "sha256": "ca5672ca8c7174554ca0b07b5b26e505817a05142f571cf2abe67e790c30249c",
+      "urls": [
+        "https://f-droid.org/repo/net.sourceforge.opencamera_96.apk",
+        "https://f-droid.org/archive/net.sourceforge.opencamera_96.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "diary",
+      "lang": "JADX",
+      "filename": "org.billthefarmer.diary_1105.apk",
+      "sha256": "979e8cd8702ab5c0440c2cd094de0d6bdf109632857002966e62af5e9add93ef",
+      "urls": [
+        "https://f-droid.org/repo/org.billthefarmer.diary_1105.apk",
+        "https://f-droid.org/archive/org.billthefarmer.diary_1105.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "editor",
+      "lang": "JADX",
+      "filename": "org.billthefarmer.editor_198.apk",
+      "sha256": "343d17e11d0914e1a7708df2781580a0413e52501c0a41d91f7ef725d9615fe9",
+      "urls": [
+        "https://f-droid.org/repo/org.billthefarmer.editor_198.apk",
+        "https://f-droid.org/archive/org.billthefarmer.editor_198.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "connectbot",
+      "lang": "JADX",
+      "filename": "org.connectbot_11101000.apk",
+      "sha256": "96cf501a83e89284ff3ec93ac06e7a6a6aa8a35c0c02486b865945fe59ac8223",
+      "urls": [
+        "https://f-droid.org/repo/org.connectbot_11101000.apk",
+        "https://f-droid.org/archive/org.connectbot_11101000.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "newpipe",
+      "lang": "JADX",
+      "filename": "org.schabi.newpipe_1015.apk",
+      "sha256": "1d66d19eedbab969b1be2e44e0ea35f5f8921cbe83b5c5ac810767ca1a84b7e8",
+      "urls": [
+        "https://f-droid.org/repo/org.schabi.newpipe_1015.apk",
+        "https://f-droid.org/archive/org.schabi.newpipe_1015.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "notes",
+      "lang": "JADX",
+      "filename": "org.secuso.privacyfriendlynotes_105.apk",
+      "sha256": "71e874f45fa4655f14296fce13791a82f994ea9bc26699f433383f0b4d334037",
+      "urls": [
+        "https://f-droid.org/repo/org.secuso.privacyfriendlynotes_105.apk",
+        "https://f-droid.org/archive/org.secuso.privacyfriendlynotes_105.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    },
+    {
+      "id": "wikipedia",
+      "lang": "JADX",
+      "filename": "org.wikipedia_50614.apk",
+      "sha256": "076d19f4acf40562a06df7d7de2b9cf11b89cc7b79f6a6cf4dd0768a158289c3",
+      "urls": [
+        "https://f-droid.org/repo/org.wikipedia_50614.apk",
+        "https://f-droid.org/archive/org.wikipedia_50614.apk"
+      ],
+      "format": "sarif",
+      "suites": [
+        "jadx",
+        "realistic",
+        "all"
+      ]
+    }
+  ]
+}

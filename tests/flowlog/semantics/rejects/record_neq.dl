@@ -1,0 +1,7 @@
+// Record disequality would need a disjunction over the fields.
+.type P = [a: number, b: number]
+.decl R(p: P)
+R([1, 2]). R([1, 3]).
+.decl O(a: number)
+.output O
+O(a) :- R(p), R(q), p != q, p = [a, _].

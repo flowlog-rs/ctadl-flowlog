@@ -15,3 +15,13 @@ lib/*
 *.sarif
 *.csv
 /docs/_build
+*.egg-info/
+/benchmark/inputs/
+/benchmark/runs/
+/benchmark/local.env
+/benchmark/compiler.json
+/benchmark/.run.lock
+/.venv/
+/.local/
+/build/
+/dist/

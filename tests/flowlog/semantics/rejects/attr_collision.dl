@@ -1,0 +1,6 @@
+// Two attributes that FlowLog spells alike: fn is a FlowLog keyword, so it
+// becomes fn_k, and a record attribute p flattens to p_a.
+.type P = [a: number]
+.decl R(fn: number, fn_k: number)
+R(1, 2).
+.output R

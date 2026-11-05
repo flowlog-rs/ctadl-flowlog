@@ -1,0 +1,86 @@
+// Arithmetic on Souffle's 64-bit `number` (CTADL requires a Souffle built
+// with -DSOUFFLE_DOMAIN_64BIT=ON): precedence and associativity as parsed by
+// Souffle, truncating / and %, ^ through std::pow, shifts and bitwise ops.
+
+// Constant expressions.
+.decl A(name: symbol, v: number)
+.output A
+A("1 + 2 * 3", 1 + 2 * 3).
+A("(1 + 2) * 3", (1 + 2) * 3).
+A("10 - 3 - 2", 10 - 3 - 2).
+A("100 / 10 / 5", 100 / 10 / 5).
+A("2 * 7 % 4", 2 * 7 % 4).
+A("-(3 - 5)", -(3 - 5)).
+A("-2 ^ 2", -2 ^ 2).
+A("2 ^ 3 ^ 2", 2 ^ 3 ^ 2).
+A("(2 ^ 3) ^ 2", (2 ^ 3) ^ 2).
+A("0 ^ 0", 0 ^ 0).
+A("1 ^ -1", 1 ^ -1).
+A("2 ^ -1", 2 ^ -1).
+A("(-1) ^ -3", (-1) ^ -3).
+A("3 ^ 39", 3 ^ 39).
+A("2 ^ 62", 2 ^ 62).
+A("1 bor 2 band 3", 1 bor 2 band 3).
+A("1 bxor 3 band 2", 1 bxor 3 band 2).
+A("6 bor 1 bxor 3", 6 bor 1 bxor 3).
+A("1 bshl 2 + 1", 1 bshl 2 + 1).
+A("2 * 3 bshl 1", 2 * 3 bshl 1).
+A("-8 bshr 1 + 1", -8 bshr 1 + 1).
+A("3 band 5 bshl 1", 3 band 5 bshl 1).
+A("3000000000 + 3000000000", 3000000000 + 3000000000).
+A("100000 * 100000", 100000 * 100000).
+A("max", 9223372036854775807).
+A("min", -9223372036854775807 - 1).
+A("-(-5)", -(-5)).
+A("10 - -3", 10 - -3).
+
+// The same operators on values read from a relation.
+.decl P(a: number, b: number)
+P(-7, 2). P(7, -3). P(-7, -3). P(9, 4). P(-16, 2). P(1, 40). P(3000000000, 7).
+.decl Q(op: symbol, a: number, b: number, v: number)
+.output Q
+Q("+", a, b, a + b) :- P(a, b).
+Q("-", a, b, a - b) :- P(a, b).
+Q("*", a, b, a * b) :- P(a, b).
+Q("/", a, b, a / b) :- P(a, b).
+Q("%", a, b, a % b) :- P(a, b).
+Q("^", a, b, a ^ b) :- P(a, b), a < 100.
+Q("bshl", a, b, a bshl b) :- P(a, b), b >= 0, b < 20.
+Q("bshr", a, b, a bshr b) :- P(a, b), b >= 0.
+Q("bshru", a, b, a bshru b) :- P(a, b), b >= 0.
+Q("band", a, b, a band b) :- P(a, b).
+Q("bor", a, b, a bor b) :- P(a, b).
+Q("bxor", a, b, a bxor b) :- P(a, b).
+Q("-a", a, b, -a) :- P(a, b).
+Q("-a * b", a, b, -a * b) :- P(a, b).
+Q("a - b * a", a, b, a - b * a) :- P(a, b).
+Q("-a ^ 2", a, b, -a ^ 2) :- P(a, b), a < 100.
+Q("(a - b) * (a + b)", a, b, (a - b) * (a + b)) :- P(a, b).
+Q("a - (b - a)", a, b, a - (b - a)) :- P(a, b).
+Q("a / (b / 2)", a, b, a / (b / 2)) :- P(a, b), b / 2 != 0.
+
+// Comparisons, including arithmetic on both sides.
+.decl Cmp(op: symbol, a: number, b: number)
+.output Cmp
+Cmp("<", a, b) :- P(a, b), a < b.
+Cmp("<=", a, b) :- P(a, b), a <= b.
+Cmp(">", a, b) :- P(a, b), a > b.
+Cmp(">=", a, b) :- P(a, b), a >= b.
+Cmp("=", a, b) :- P(a, b), a * 2 = b - 8 + a.
+Cmp("!=", a, b) :- P(a, b), a + 1 != b - 1.
+
+// Subtypes of number.
+.type Id <: number
+.type Weight = number
+.decl T(i: Id, w: Weight)
+T(1, 5). T(2, -5).
+.decl TO(i: Id, w: Weight)
+.output TO
+TO(i, w * w + i) :- T(i, w).
+
+// unsigned is uint64.
+.decl U(x: unsigned)
+U(5). U(4000000000).
+.decl UO(x: unsigned, y: unsigned)
+.output UO
+UO(x, x * 3 + 1) :- U(x).

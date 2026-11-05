@@ -1,0 +1,2898 @@
+{
+ "outputs": [
+  {
+   "name": "CTADLStats",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "stat_name",
+     "kind": "symbol",
+     "fl": [
+      "stat_name"
+     ]
+    },
+    {
+     "attr": "n",
+     "kind": "number",
+     "fl": [
+      "n"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CTADLError",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "msg",
+     "kind": "symbol",
+     "fl": [
+      "msg"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "IntraObjectAliasedBy",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "targetv",
+     "kind": "symbol",
+     "fl": [
+      "targetv"
+     ]
+    },
+    {
+     "attr": "f",
+     "kind": "symbol",
+     "fl": [
+      "f"
+     ]
+    },
+    {
+     "attr": "g",
+     "kind": "symbol",
+     "fl": [
+      "g"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "isComputedAccessPath",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "ap",
+     "kind": "symbol",
+     "fl": [
+      "ap"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Vertex",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "path",
+     "kind": "symbol",
+     "fl": [
+      "path"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "VirtualAssign",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "v1",
+     "kind": "symbol",
+     "fl": [
+      "v1"
+     ]
+    },
+    {
+     "attr": "p1",
+     "kind": "symbol",
+     "fl": [
+      "p1"
+     ]
+    },
+    {
+     "attr": "v2",
+     "kind": "symbol",
+     "fl": [
+      "v2"
+     ]
+    },
+    {
+     "attr": "p2",
+     "kind": "symbol",
+     "fl": [
+      "p2"
+     ]
+    },
+    {
+     "attr": "reason",
+     "kind": "symbol",
+     "fl": [
+      "reason"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CallEdge",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "SummaryFlow",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "m1",
+     "kind": "symbol",
+     "fl": [
+      "m1"
+     ]
+    },
+    {
+     "attr": "n1",
+     "kind": "number",
+     "fl": [
+      "n1"
+     ]
+    },
+    {
+     "attr": "p1",
+     "kind": "symbol",
+     "fl": [
+      "p1"
+     ]
+    },
+    {
+     "attr": "m2",
+     "kind": "symbol",
+     "fl": [
+      "m2"
+     ]
+    },
+    {
+     "attr": "n2",
+     "kind": "number",
+     "fl": [
+      "n2"
+     ]
+    },
+    {
+     "attr": "p2",
+     "kind": "symbol",
+     "fl": [
+      "p2"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "VirtualAlloc",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "to",
+     "kind": "symbol",
+     "fl": [
+      "to"
+     ]
+    },
+    {
+     "attr": "to_path",
+     "kind": "symbol",
+     "fl": [
+      "to_path"
+     ]
+    },
+    {
+     "attr": "obj",
+     "kind": "symbol",
+     "fl": [
+      "obj"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "SummaryAlloc",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "f",
+     "kind": "symbol",
+     "fl": [
+      "f"
+     ]
+    },
+    {
+     "attr": "n",
+     "kind": "number",
+     "fl": [
+      "n"
+     ]
+    },
+    {
+     "attr": "p",
+     "kind": "symbol",
+     "fl": [
+      "p"
+     ]
+    },
+    {
+     "attr": "obj",
+     "kind": "symbol",
+     "fl": [
+      "obj"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "IntCInsn_InFunction",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "AliasedBy",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "targetv",
+     "kind": "symbol",
+     "fl": [
+      "targetv"
+     ]
+    },
+    {
+     "attr": "targetp",
+     "kind": "symbol",
+     "fl": [
+      "targetp"
+     ]
+    },
+    {
+     "attr": "aliasv",
+     "kind": "symbol",
+     "fl": [
+      "aliasv"
+     ]
+    },
+    {
+     "attr": "aliasp",
+     "kind": "symbol",
+     "fl": [
+      "aliasp"
+     ]
+    },
+    {
+     "attr": "ctx",
+     "kind": "symbol",
+     "fl": [
+      "ctx"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CCall_ActualParam",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "param",
+     "kind": "symbol",
+     "fl": [
+      "param"
+     ]
+    },
+    {
+     "attr": "ap",
+     "kind": "symbol",
+     "fl": [
+      "ap"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CCall_VirtualBase",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_Arity",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "arity",
+     "kind": "number",
+     "fl": [
+      "arity"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_FormalParam",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "param",
+     "kind": "symbol",
+     "fl": [
+      "param"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_ModelAssign",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function_to",
+     "kind": "symbol",
+     "fl": [
+      "function_to"
+     ]
+    },
+    {
+     "attr": "param_to",
+     "kind": "number",
+     "fl": [
+      "param_to"
+     ]
+    },
+    {
+     "attr": "ap_to",
+     "kind": "symbol",
+     "fl": [
+      "ap_to"
+     ]
+    },
+    {
+     "attr": "function_from",
+     "kind": "symbol",
+     "fl": [
+      "function_from"
+     ]
+    },
+    {
+     "attr": "param_from",
+     "kind": "number",
+     "fl": [
+      "param_from"
+     ]
+    },
+    {
+     "attr": "ap_from",
+     "kind": "symbol",
+     "fl": [
+      "ap_from"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_ModelInfluenceFrom",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "to_param",
+     "kind": "number",
+     "fl": [
+      "to_param"
+     ]
+    },
+    {
+     "attr": "to_ap",
+     "kind": "symbol",
+     "fl": [
+      "to_ap"
+     ]
+    },
+    {
+     "attr": "from_param",
+     "kind": "number",
+     "fl": [
+      "from_param"
+     ]
+    },
+    {
+     "attr": "from_ap",
+     "kind": "symbol",
+     "fl": [
+      "from_ap"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_ModelInfluenceTo",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "to_param",
+     "kind": "number",
+     "fl": [
+      "to_param"
+     ]
+    },
+    {
+     "attr": "to_ap",
+     "kind": "symbol",
+     "fl": [
+      "to_ap"
+     ]
+    },
+    {
+     "attr": "from_param",
+     "kind": "number",
+     "fl": [
+      "from_param"
+     ]
+    },
+    {
+     "attr": "from_ap",
+     "kind": "symbol",
+     "fl": [
+      "from_ap"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_Name",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "name",
+     "kind": "symbol",
+     "fl": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_OmitSummaries",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_Signature",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "signature",
+     "kind": "symbol",
+     "fl": [
+      "signature"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_SourceInfo",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "key",
+     "kind": "symbol",
+     "fl": [
+      "key"
+     ]
+    },
+    {
+     "attr": "value",
+     "kind": "symbol",
+     "fl": [
+      "value"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFunction_isFormalParamByRef",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_Call",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_InFunction",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_ModelAssign",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "var_to",
+     "kind": "symbol",
+     "fl": [
+      "var_to"
+     ]
+    },
+    {
+     "attr": "to_ap",
+     "kind": "symbol",
+     "fl": [
+      "to_ap"
+     ]
+    },
+    {
+     "attr": "var_from",
+     "kind": "symbol",
+     "fl": [
+      "var_from"
+     ]
+    },
+    {
+     "attr": "from_ap",
+     "kind": "symbol",
+     "fl": [
+      "from_ap"
+     ]
+    },
+    {
+     "attr": "assign_type",
+     "kind": "symbol",
+     "fl": [
+      "assign_type"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_Move",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "to",
+     "kind": "symbol",
+     "fl": [
+      "to"
+     ]
+    },
+    {
+     "attr": "to_path",
+     "kind": "symbol",
+     "fl": [
+      "to_path"
+     ]
+    },
+    {
+     "attr": "from",
+     "kind": "symbol",
+     "fl": [
+      "from"
+     ]
+    },
+    {
+     "attr": "from_path",
+     "kind": "symbol",
+     "fl": [
+      "from_path"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_SourceInfo",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "key",
+     "kind": "symbol",
+     "fl": [
+      "key"
+     ]
+    },
+    {
+     "attr": "value",
+     "kind": "symbol",
+     "fl": [
+      "value"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_UnsuspiciousCall",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_Use",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "v",
+     "kind": "symbol",
+     "fl": [
+      "v"
+     ]
+    },
+    {
+     "attr": "p",
+     "kind": "symbol",
+     "fl": [
+      "p"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CInsn_isDataflowOnly",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "insn",
+     "kind": "symbol",
+     "fl": [
+      "insn"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CNamespace_Parent",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "child",
+     "kind": "symbol",
+     "fl": [
+      "child"
+     ]
+    },
+    {
+     "attr": "parent",
+     "kind": "symbol",
+     "fl": [
+      "parent"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CReturnParameter",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "n",
+     "kind": "number",
+     "fl": [
+      "n"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CGlobalParameter",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "n",
+     "kind": "number",
+     "fl": [
+      "n"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CTADLConfig",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "feature",
+     "kind": "symbol",
+     "fl": [
+      "feature"
+     ]
+    },
+    {
+     "attr": "value",
+     "kind": "symbol",
+     "fl": [
+      "value"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CVar_InFunction",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CVar_Name",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "name",
+     "kind": "symbol",
+     "fl": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CVar_Type",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "path",
+     "kind": "symbol",
+     "fl": [
+      "path"
+     ]
+    },
+    {
+     "attr": "type",
+     "kind": "symbol",
+     "fl": [
+      "type"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CType_Subtype",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "subtype",
+     "kind": "symbol",
+     "fl": [
+      "subtype"
+     ]
+    },
+    {
+     "attr": "supertype",
+     "kind": "symbol",
+     "fl": [
+      "supertype"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CVar_SourceInfo",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "key",
+     "kind": "symbol",
+     "fl": [
+      "key"
+     ]
+    },
+    {
+     "attr": "value",
+     "kind": "symbol",
+     "fl": [
+      "value"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CVar_isGlobal",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CisField",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "field",
+     "kind": "symbol",
+     "fl": [
+      "field"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CField_Name",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "field",
+     "kind": "symbol",
+     "fl": [
+      "field"
+     ]
+    },
+    {
+     "attr": "name",
+     "kind": "symbol",
+     "fl": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CisAccessPath",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "ap",
+     "kind": "symbol",
+     "fl": [
+      "ap"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CisAlloc",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "to",
+     "kind": "symbol",
+     "fl": [
+      "to"
+     ]
+    },
+    {
+     "attr": "to_path",
+     "kind": "symbol",
+     "fl": [
+      "to_path"
+     ]
+    },
+    {
+     "attr": "obj",
+     "kind": "symbol",
+     "fl": [
+      "obj"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CisFunction",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "function",
+     "kind": "symbol",
+     "fl": [
+      "function"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CisNamespace",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "name",
+     "kind": "symbol",
+     "fl": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_Location",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "element",
+     "kind": "symbol",
+     "fl": [
+      "element"
+     ]
+    },
+    {
+     "attr": "file_id",
+     "kind": "number",
+     "fl": [
+      "file_id"
+     ]
+    },
+    {
+     "attr": "region_id",
+     "kind": "number",
+     "fl": [
+      "region_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_File",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "uri",
+     "kind": "symbol",
+     "fl": [
+      "uri"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CFile_UriBaseId",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "uriBaseId",
+     "kind": "symbol",
+     "fl": [
+      "uriBaseId"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_LineRegion",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "startLine",
+     "kind": "number",
+     "fl": [
+      "startLine"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CLineRegion_StartColumn",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "startColumn",
+     "kind": "number",
+     "fl": [
+      "startColumn"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CLineRegion_EndLine",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "endLine",
+     "kind": "number",
+     "fl": [
+      "endLine"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CLineRegion_EndColumn",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "endColumn",
+     "kind": "number",
+     "fl": [
+      "endColumn"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_CharRegion",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "charOffset",
+     "kind": "number",
+     "fl": [
+      "charOffset"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CCharRegion_Length",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "charLength",
+     "kind": "number",
+     "fl": [
+      "charLength"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_ByteRegion",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "byteOffset",
+     "kind": "number",
+     "fl": [
+      "byteOffset"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CByteRegion_Length",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "byteLength",
+     "kind": "number",
+     "fl": [
+      "byteLength"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CSourceInfo_Address",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_AbsoluteAddress",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "addr",
+     "kind": "number",
+     "fl": [
+      "addr"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_RelativeAddress",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "addr",
+     "kind": "number",
+     "fl": [
+      "addr"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_OffsetFromParent",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "offset",
+     "kind": "number",
+     "fl": [
+      "offset"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_Length",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "length",
+     "kind": "number",
+     "fl": [
+      "length"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_Name",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "name",
+     "kind": "symbol",
+     "fl": [
+      "name"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_FullyQualifiedName",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "fullyQualifiedName",
+     "kind": "symbol",
+     "fl": [
+      "fullyQualifiedName"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_Kind",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "kind",
+     "kind": "symbol",
+     "fl": [
+      "kind"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CAddress_Parent",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "parent_id",
+     "kind": "number",
+     "fl": [
+      "parent_id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "IndirectCallStmt",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "stmt",
+     "kind": "symbol",
+     "fl": [
+      "stmt"
+     ]
+    },
+    {
+     "attr": "v",
+     "kind": "symbol",
+     "fl": [
+      "v"
+     ]
+    },
+    {
+     "attr": "path",
+     "kind": "symbol",
+     "fl": [
+      "path"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Function",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "arity",
+     "kind": "number",
+     "fl": [
+      "arity"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Global",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "FormalParam",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ActualParam",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "index",
+     "kind": "number",
+     "fl": [
+      "index"
+     ]
+    },
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "path",
+     "kind": "symbol",
+     "fl": [
+      "path"
+     ]
+    },
+    {
+     "attr": "info",
+     "kind": "record",
+     "fl": [
+      "info_id",
+      "info_inmeth"
+     ],
+     "fl_kinds": [
+      "number",
+      "symbol"
+     ],
+     "format": "[{}, {}]"
+    }
+   ]
+  },
+  {
+   "name": "Assign",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "v1",
+     "kind": "symbol",
+     "fl": [
+      "v1"
+     ]
+    },
+    {
+     "attr": "p1",
+     "kind": "symbol",
+     "fl": [
+      "p1"
+     ]
+    },
+    {
+     "attr": "v2",
+     "kind": "symbol",
+     "fl": [
+      "v2"
+     ]
+    },
+    {
+     "attr": "p2",
+     "kind": "symbol",
+     "fl": [
+      "p2"
+     ]
+    },
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "AssignFunction",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "v1",
+     "kind": "symbol",
+     "fl": [
+      "v1"
+     ]
+    },
+    {
+     "attr": "p1",
+     "kind": "symbol",
+     "fl": [
+      "p1"
+     ]
+    },
+    {
+     "attr": "m",
+     "kind": "symbol",
+     "fl": [
+      "m"
+     ]
+    },
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "DirectCall",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "info",
+     "kind": "record",
+     "fl": [
+      "info_id",
+      "info_inmeth"
+     ],
+     "fl_kinds": [
+      "number",
+      "symbol"
+     ],
+     "format": "[{}, {}]"
+    }
+   ]
+  },
+  {
+   "name": "IndirectCall",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "var",
+     "kind": "symbol",
+     "fl": [
+      "var"
+     ]
+    },
+    {
+     "attr": "path",
+     "kind": "symbol",
+     "fl": [
+      "path"
+     ]
+    },
+    {
+     "attr": "info",
+     "kind": "record",
+     "fl": [
+      "info_id",
+      "info_inmeth"
+     ],
+     "fl_kinds": [
+      "number",
+      "symbol"
+     ],
+     "format": "[{}, {}]"
+    }
+   ]
+  },
+  {
+   "name": "TaintSpec",
+   "file": "ctadlir.db",
+   "columns": [
+    {
+     "attr": "source_sink_sanitizer",
+     "kind": "symbol",
+     "fl": [
+      "source_sink_sanitizer"
+     ]
+    },
+    {
+     "attr": "v",
+     "kind": "symbol",
+     "fl": [
+      "v"
+     ]
+    },
+    {
+     "attr": "p",
+     "kind": "symbol",
+     "fl": [
+      "p"
+     ]
+    },
+    {
+     "attr": "label",
+     "kind": "symbol",
+     "fl": [
+      "label"
+     ]
+    },
+    {
+     "attr": "fn",
+     "kind": "symbol",
+     "fl": [
+      "fn_k"
+     ]
+    },
+    {
+     "attr": "id",
+     "kind": "number",
+     "fl": [
+      "id"
+     ]
+    },
+    {
+     "attr": "sanitize_from",
+     "kind": "symbol",
+     "fl": [
+      "sanitize_from"
+     ]
+    },
+    {
+     "attr": "sanitize_from_path",
+     "kind": "symbol",
+     "fl": [
+      "sanitize_from_path"
+     ]
+    }
+   ]
+  }
+ ],
+ "files": {
+  "inputs": [
+   {
+    "name": "CTADLConfig_Input",
+    "file": "CTADLConfig_Input.facts",
+    "columns": [
+     {
+      "attr": "feature",
+      "kind": "symbol",
+      "fl": [
+       "feature"
+      ]
+     },
+     {
+      "attr": "enabled",
+      "kind": "number",
+      "fl": [
+       "enabled"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Edge2",
+    "file": "MG_Edge2.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "child1",
+      "kind": "symbol",
+      "fl": [
+       "child1"
+      ]
+     },
+     {
+      "attr": "child2",
+      "kind": "symbol",
+      "fl": [
+       "child2"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Edge1",
+    "file": "MG_Edge1.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "child1",
+      "kind": "symbol",
+      "fl": [
+       "child1"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_AllOf",
+    "file": "MG_AllOf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_AnyOf",
+    "file": "MG_AnyOf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_Not",
+    "file": "MG_Not.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_OpNode",
+    "file": "MG_OpNode.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "op",
+      "kind": "symbol",
+      "fl": [
+       "op"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchParent",
+    "file": "MG_SigMatchParent.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "parent",
+      "kind": "symbol",
+      "fl": [
+       "parent"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchPattern",
+    "file": "MG_SigMatchPattern.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "pattern",
+      "kind": "symbol",
+      "fl": [
+       "pattern"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchName",
+    "file": "MG_SigMatchName.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "name",
+      "kind": "symbol",
+      "fl": [
+       "name"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_SigMatchUnqualifiedId",
+    "file": "MG_SigMatchUnqualifiedId.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "fid",
+      "kind": "symbol",
+      "fl": [
+       "fid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Parent",
+    "file": "MG_Parent.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Extends",
+    "file": "MG_Extends.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Parameter",
+    "file": "MG_Parameter.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_AnyParameter",
+    "file": "MG_AnyParameter.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "start_idx",
+      "kind": "number",
+      "fl": [
+       "start_idx"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_NumberParameters",
+    "file": "MG_NumberParameters.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_IntCompare",
+    "file": "MG_IntCompare.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "rel",
+      "kind": "symbol",
+      "fl": [
+       "rel"
+      ]
+     },
+     {
+      "attr": "value",
+      "kind": "number",
+      "fl": [
+       "value"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Name",
+    "file": "MG_Name.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "pattern",
+      "kind": "symbol",
+      "fl": [
+       "pattern"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_HasCode",
+    "file": "MG_HasCode.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "value",
+      "kind": "symbol",
+      "fl": [
+       "value"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Propagation",
+    "file": "MG_Propagation.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "propid",
+      "kind": "symbol",
+      "fl": [
+       "propid"
+      ]
+     },
+     {
+      "attr": "direction",
+      "kind": "symbol",
+      "fl": [
+       "direction"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "is_star",
+      "kind": "number",
+      "fl": [
+       "is_star"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_ForwardSelf",
+    "file": "MG_ForwardSelf.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "whereid",
+      "kind": "symbol",
+      "fl": [
+       "whereid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_ForwardCall",
+    "file": "MG_ForwardCall.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "targetid",
+      "kind": "symbol",
+      "fl": [
+       "targetid"
+      ]
+     },
+     {
+      "attr": "forwardid",
+      "kind": "symbol",
+      "fl": [
+       "forwardid"
+      ]
+     },
+     {
+      "attr": "isdirect",
+      "kind": "number",
+      "fl": [
+       "isdirect"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_UsesFieldName",
+    "file": "MG_UsesFieldName.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "name",
+      "kind": "symbol",
+      "fl": [
+       "name"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_UsesFieldUnqualifiedId",
+    "file": "MG_UsesFieldUnqualifiedId.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "symbol",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "MG_Endpoint",
+    "file": "MG_Endpoint.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "source_or_sink",
+      "kind": "symbol",
+      "fl": [
+       "source_or_sink"
+      ]
+     },
+     {
+      "attr": "label",
+      "kind": "symbol",
+      "fl": [
+       "label"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointVertex",
+    "file": "MG_EndpointVertex.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     },
+     {
+      "attr": "param",
+      "kind": "number",
+      "fl": [
+       "param"
+      ]
+     },
+     {
+      "attr": "is_star",
+      "kind": "number",
+      "fl": [
+       "is_star"
+      ]
+     },
+     {
+      "attr": "ap",
+      "kind": "symbol",
+      "fl": [
+       "ap"
+      ]
+     },
+     {
+      "attr": "all_fields",
+      "kind": "symbol",
+      "fl": [
+       "all_fields"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointField",
+    "file": "MG_EndpointField.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "MG_EndpointInsn",
+    "file": "MG_EndpointInsn.facts",
+    "columns": [
+     {
+      "attr": "nodeid",
+      "kind": "symbol",
+      "fl": [
+       "nodeid"
+      ]
+     }
+    ],
+    "read": false
+   },
+   {
+    "name": "Function",
+    "file": "Function.facts",
+    "columns": [
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "arity",
+      "kind": "number",
+      "fl": [
+       "arity"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "Global",
+    "file": "Global.facts",
+    "columns": [
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "FormalParam",
+    "file": "FormalParam.facts",
+    "columns": [
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "ActualParam",
+    "file": "ActualParam.facts",
+    "columns": [
+     {
+      "attr": "index",
+      "kind": "number",
+      "fl": [
+       "index"
+      ]
+     },
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "path",
+      "kind": "symbol",
+      "fl": [
+       "path"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "Assign",
+    "file": "Assign.facts",
+    "columns": [
+     {
+      "attr": "v1",
+      "kind": "symbol",
+      "fl": [
+       "v1"
+      ]
+     },
+     {
+      "attr": "p1",
+      "kind": "symbol",
+      "fl": [
+       "p1"
+      ]
+     },
+     {
+      "attr": "v2",
+      "kind": "symbol",
+      "fl": [
+       "v2"
+      ]
+     },
+     {
+      "attr": "p2",
+      "kind": "symbol",
+      "fl": [
+       "p2"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "AssignFunction",
+    "file": "AssignFunction.facts",
+    "columns": [
+     {
+      "attr": "v1",
+      "kind": "symbol",
+      "fl": [
+       "v1"
+      ]
+     },
+     {
+      "attr": "p1",
+      "kind": "symbol",
+      "fl": [
+       "p1"
+      ]
+     },
+     {
+      "attr": "m",
+      "kind": "symbol",
+      "fl": [
+       "m"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "DirectCall",
+    "file": "DirectCall.facts",
+    "columns": [
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "IndirectCall",
+    "file": "IndirectCall.facts",
+    "columns": [
+     {
+      "attr": "var",
+      "kind": "symbol",
+      "fl": [
+       "var"
+      ]
+     },
+     {
+      "attr": "path",
+      "kind": "symbol",
+      "fl": [
+       "path"
+      ]
+     },
+     {
+      "attr": "info",
+      "kind": "record",
+      "fl": [
+       "info_id",
+       "info_inmeth"
+      ],
+      "fl_kinds": [
+       "number",
+       "symbol"
+      ],
+      "format": "[{}, {}]"
+     }
+    ]
+   },
+   {
+    "name": "TaintSpec",
+    "file": "TaintSpec.facts",
+    "columns": [
+     {
+      "attr": "source_sink_sanitizer",
+      "kind": "symbol",
+      "fl": [
+       "source_sink_sanitizer"
+      ]
+     },
+     {
+      "attr": "v",
+      "kind": "symbol",
+      "fl": [
+       "v"
+      ]
+     },
+     {
+      "attr": "p",
+      "kind": "symbol",
+      "fl": [
+       "p"
+      ]
+     },
+     {
+      "attr": "label",
+      "kind": "symbol",
+      "fl": [
+       "label"
+      ]
+     },
+     {
+      "attr": "fn",
+      "kind": "symbol",
+      "fl": [
+       "fn_k"
+      ]
+     },
+     {
+      "attr": "id",
+      "kind": "number",
+      "fl": [
+       "id"
+      ]
+     },
+     {
+      "attr": "sanitize_from",
+      "kind": "symbol",
+      "fl": [
+       "sanitize_from"
+      ]
+     },
+     {
+      "attr": "sanitize_from_path",
+      "kind": "symbol",
+      "fl": [
+       "sanitize_from_path"
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

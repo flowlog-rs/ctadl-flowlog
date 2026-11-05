@@ -1,0 +1,10 @@
+// Soufflé keeps the locals of sibling aggregates apart, so x is a number in
+// the first and a symbol in the second (O = {(1, 1)}). The translator types
+// a rule's variable names once, so it rejects the rule.
+.decl R(x: number)
+R(1).
+.decl S(x: symbol)
+S("a").
+.decl O(n: number, m: number)
+O(n, m) :- n = count : { R(x) }, m = count : { S(x) }.
+.output O

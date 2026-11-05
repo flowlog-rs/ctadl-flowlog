@@ -1,0 +1,8 @@
+// K(x, 1) inside the aggregate has the wrong arity.
+// expect: line 8: mismatching arity of relation K (expected 1, got 2)
+.decl K(x: number)
+K(0).
+.decl O(n: number)
+.output O
+O(n) :- n = count : { K(_) }.
+O(n) :- n = sum x : { K(x, 1) }, n != n.

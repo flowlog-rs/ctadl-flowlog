@@ -1,0 +1,65 @@
+// Souffle 2.5's aggregate scoping: a body variable grounded outside the
+// aggregate is injected unless the target uses it; all others are local,
+// also when siblings or the clause spell the same name. A body with one
+// atom (no repeated variable, nested aggregate or range) counts the atom's
+// tuples, so wildcards distinguish matches; any other counts the distinct
+// bindings of its named variables.
+.decl R(a: number, b: number)
+R(1, 10). R(1, 20). R(2, 5). R(3, -7). R(3, 7).
+.decl K(a: number)
+K(1). K(2). K(3). K(4).
+.decl RR(a: number, b: number)
+RR(1, 1). RR(2, 2). RR(1, 2).
+
+.decl O(name: symbol, k: number, v: number)
+.output O
+O("tuples", k, n) :- K(k), n = count : { R(k, _) }.
+O("bindings", k, n) :- K(k), n = count : { R(k, _), K(k) }.
+O("bindings named", k, n) :- K(k), n = count : { R(k, b), K(k) }.
+O("target local", k, n) :- K(k), n = sum k : { R(k, _) }.
+O("target local max", k, n) :- K(k), n = max k : { R(k, _) }.
+O("target mixed", k, n) :- K(k), n = sum k + b : { R(k, b) }.
+O("const target", 0, n) :- n = sum 5 : { R(_, _) }.
+O("const target k", k, n) :- K(k), n = sum 5 : { R(k, _) }.
+O("two levels", k, n) :- K(k), n = sum m : { K(j), j <= k, m = count : { R(j, b), b > k } }.
+O("repeated", 0, n) :- n = count : { RR(x, x) }.
+O("wild", 0, n) :- n = count : { RR(x, _) }.
+O("eq", 0, n) :- n = count : { RR(x, y), x = y }.
+O("siblings", n, m) :- n = count : { R(x, _) }, m = count : { K(x) }.
+O("outer eq", x, n) :- n = count : { R(x, _) }, x = 3.
+O("same name", x, n) :- K(x), x < 3, n = sum x : { R(_, x) }.
+O("in cmp", k, 0) :- K(k), count : { R(k, _), K(k) } = 1.
+O("in arith", k, n) :- K(k), n = 2 * count : { R(k, _) } + count : { RR(k, _) }.
+O("disjunction", k, n) :- K(k), (k = 1 ; k = 3), n = count : { R(k, _) }.
+O("disj outer", k, n) :- (K(k) ; R(k, _)), n = count : { R(k, _) }.
+
+// Names: FlowLog keywords and spellings FlowLog lacks, kept apart from the
+// names they map to, and user names equal to the translator's own.
+.decl N(a: number, b: number, c: number, d: number, e: number, f: number)
+.output N
+N(fn, fn_k, x, __x, ?y, True) :- K(fn), fn_k = fn + 1, x = fn * 10, __x = x + 1, ?y = __x + 1, True = ?y + 1.
+.decl NA(name: symbol, k: number, v: number)
+.output NA
+NA("fresh names", k, agg_n) :- K(k), agg_n = sum 5 : { R(k, _) }, unit_u = k, lift_t1 = unit_u + 1, lift_t1 > 0.
+NA("outer b_ag", b_ag, n) :- K(b_ag), n = count : { R(b, _), b < b_ag }.
+NA("agg_w", agg_w, n) :- K(agg_w), n = count : { RR(_, x), x >= agg_w }.
+NA("agg names", k, n) :- K(k), n = sum b_ag : { R(k, b_ag) }.
+
+// Bodies reading no relation.
+.decl C(s: symbol)
+.output C
+C(s) :- s = cat("a", "b").
+C("lt") :- 1 < 2.
+C(cat("x", to_string(n))) :- n = 1 + 2.
+C("cmp only") :- "a" < "b", 2 != 3.
+
+// Several ranges in one clause, in either order.
+.decl P(i: number, j: number)
+.output P
+P(i, j) :- i = range(0, 3), j = range(i, 3).
+P(i, j) :- j = range(10, i), i = range(12, 14).
+P(i, j) :- j = range(i, i + 2), i = range(-2, 0).
+
+// Deprecated qualifiers on .decl.
+.decl Q(x: number) output
+Q(1). Q(2).

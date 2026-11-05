@@ -1,0 +1,4 @@
+// The translator has no float type.
+.decl F(x: float)
+.output F
+F(1.5).

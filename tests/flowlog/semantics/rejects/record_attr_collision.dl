@@ -1,0 +1,5 @@
+// A record attribute p flattens to p_a, the name of another attribute.
+.type P = [a: number]
+.decl R(p: P, p_a: number)
+R([1], 2).
+.output R

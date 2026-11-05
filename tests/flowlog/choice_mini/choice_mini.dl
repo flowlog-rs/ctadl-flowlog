@@ -1,0 +1,41 @@
+.decl E(a: symbol, b: symbol, w: symbol)
+.input E(IO=file, filename="E.csv", delimiter=",")
+
+// global recursive choice with a numeric witness read in the loop
+.decl Reach(x: symbol, path: symbol, d: number)
+choice-domain x
+Reach("s", "s", 0).
+Reach(y, cat(p, ">", y), d + 1) :- Reach(x, p, d), E(x, y, _).
+.output Reach(IO=file, filename="Reach.csv", delimiter=",")
+
+// numeric key, two same-round candidates per key
+.decl NR(n: number, w: symbol)
+choice-domain n
+NR(0, "z").
+NR(n + 1, cat(w, "a")) :- NR(n, w), n < 5.
+NR(n + 1, cat(w, "b")) :- NR(n, w), n < 5.
+.output NR(IO=file, filename="NR.csv", delimiter=",")
+
+// component instantiated twice; the chosen witness decides reachability
+.comp C {
+  .decl Edge(a: symbol, b: symbol, w: symbol)
+  .decl Seed(x: symbol)
+  .decl R(x: symbol, via: symbol)
+  choice-domain x
+  R(x, "init") :- Seed(x).
+  R(y, w) :- R(x, v), Edge(x, y, w), v != "blocked".
+  .decl Out(x: symbol, via: symbol)
+  Out(x, v) :- R(x, v).
+}
+.init fw = C
+.init bw = C
+fw.Edge(a, b, w) :- E(a, b, w).
+bw.Edge(b, a, w) :- E(a, b, w).
+fw.Seed("s").
+bw.Seed("t").
+.decl FwOut(x: symbol, via: symbol)
+FwOut(x, v) :- fw.Out(x, v).
+.decl BwOut(x: symbol, via: symbol)
+BwOut(x, v) :- bw.Out(x, v).
+.output FwOut(IO=file, filename="FwOut.csv", delimiter=",")
+.output BwOut(IO=file, filename="BwOut.csv", delimiter=",")

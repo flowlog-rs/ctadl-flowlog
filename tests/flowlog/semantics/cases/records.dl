@@ -1,0 +1,38 @@
+// Records are flattened to one column per field; equalities between records
+// become equalities of their fields. (Souffle 2.5 asserts "variable not
+// grounded" on a record pattern inside an aggregate body, so none is here.)
+.type Pair = [x: symbol, y: number]
+.type Nest = [p: Pair, z: number]
+.decl Rec(p: Pair)
+Rec(["a", 1]). Rec(["b", 2]).
+.decl RecN(n: Nest)
+RecN([["c", 3], 4]). RecN([["a", 1], 5]).
+
+.decl Out(name: symbol, x: symbol, y: number)
+.output Out
+Out("atom", x, y) :- Rec([x, y]).
+Out("eq lit", x, y) :- Rec(p), p = [x, y].
+Out("eq lit rev", x, y) :- Rec(p), [x, y] = p.
+Out("eq wild", x, 0) :- Rec(p), p = [x, _].
+Out("eq const", x, 0) :- Rec(p), p = ["a", _], p = [x, _].
+Out("nested", x, z) :- RecN(n), n = [[x, _], z].
+Out("nested var", x, y) :- RecN(n), n = [q, _], q = [x, y].
+Out("var eq", x, y) :- Rec(p), RecN([q, _]), p = q, q = [x, y].
+Out("in agg", "", n) :- n = count : { Rec(p) }.
+Out("in agg nested", "", n) :- n = count : { RecN(q) }.
+Out("in agg outer", x, n) :- Rec(p), p = [x, _], n = count : { Built(p) }.
+Out("in agg two", "", n) :- n = count : { Rec(p), Built(p) }.
+Out("in disj", x, y) :- Rec(p), (p = ["a", y] ; p = ["b", y]), x = "ab".
+
+.decl Built(p: Pair)
+Built([x, y + 10]) :- Rec([x, y]).
+Built(p) :- RecN([p, _]).
+Built(p) :- Rec(q), p = q.
+// (Souffle prints a record column as [a, 1]; the translation outputs one
+// column per field, so record relations are compared through Out.)
+Out("built", x, y) :- Built([x, y]).
+.decl Pairs(p: Pair, q: Pair)
+Pairs(p, q) :- Rec(p), Built(q).
+.decl Same(x: symbol, y: number)
+.output Same
+Same(x, y) :- Pairs(p, q), p = q, p = [x, y].

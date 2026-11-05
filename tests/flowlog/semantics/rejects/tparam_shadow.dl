@@ -1,0 +1,13 @@
+// A type parameter named like a type: the translation resolves type names
+// globally, so it would read Node as the record type (Soufflé: O = {"s"}).
+.type Node = [x: number, y: number]
+.comp Box<Node> {
+  .decl item(a: Node)
+  .decl copy(a: Node)
+  copy(a) :- item(a).
+}
+.init b = Box<symbol>
+b.item("s").
+.decl O(a: symbol)
+O(a) :- b.copy(a).
+.output O
