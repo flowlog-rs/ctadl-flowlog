@@ -97,10 +97,10 @@
 .decl CFunction_ModelInfluenceFrom(function: CFunction, to_param: int64, to_ap: CAccessPath, from_param: int64, from_ap: CAccessPath)
 .decl CFunction_ModelInfluenceTo(function: CFunction, to_param: int64, to_ap: CAccessPath, from_param: int64, from_ap: CAccessPath)
 .decl CTADLStats(stat_name: symbol, n: int64)
-.output CTADLStats(IO="sqlite", filename="ctadlir.db")
+.output CTADLStats(IO="sqlite", filename="ctadlir.db", order_by="stat_name, n")
 .decl CTADLConfig(feature: symbol, value: symbol)
 .decl CTADLError(msg: symbol)
-.output CTADLError(IO="sqlite", filename="ctadlir.db")
+.output CTADLError(IO="sqlite", filename="ctadlir.db", order_by="msg")
 .decl CTADLStats_AnalyzedFunction(m: CFunction)
 CTADLStats_AnalyzedFunction(m) :-
     CInsn_InFunction(_, _, m).
@@ -386,7 +386,7 @@ VirtualAssign(choice_field(ck, 0), v1, p1, v2, p2, choice_field(ck, 1), ctx) :-
 .decl AliasedBy_Target(target: CVar)
 .decl AliasedBy(targetv: CVar, targetp: CAccessPath, aliasv: CVar, aliasp: CAccessPath, ctx: symbol)
 .decl IntraObjectAliasedBy(targetv: CVar, f: CAccessPath, g: CAccessPath, ctx: symbol)
-.output IntraObjectAliasedBy(IO="sqlite", filename="ctadlir.db")
+.output IntraObjectAliasedBy(IO="sqlite", filename="ctadlir.db", order_by="targetv, f, g, ctx")
 .extern fn NewCallString() -> string
 .extern fn CallStringLte(s1: string, s2: string) -> int64
 .extern fn CallStringUnder(s1: string, s2: string) -> int64
@@ -543,21 +543,21 @@ LeakingSinkVertexNonRec(label, v, p), LeakingSinkVertex(label, v, p) :-
 }
 .init forward_flow = SliceTaint
 .init backward_flow = SliceTaint
-.output TaintSourceVertex(IO="sqlite", filename="ctadlir.db")
-.output LeakingSinkVertex(IO="sqlite", filename="ctadlir.db")
-.output TaintSanitizeEdge(IO="sqlite", filename="ctadlir.db")
-.output TaintSanitizeVertex(IO="sqlite", filename="ctadlir.db")
-.output forward_flow.ReachableVertex(IO="sqlite", filename="ctadlir.db")
-.output forward_flow.ReachableEdge(IO="sqlite", filename="ctadlir.db")
-.output backward_flow.ReachableVertex(IO="sqlite", filename="ctadlir.db")
-.output backward_flow.ReachableEdge(IO="sqlite", filename="ctadlir.db")
-.output isTaintedArgUnmodeled(IO="sqlite", filename="ctadlir.db")
-.output IntCInsn_InFunction(IO="sqlite", filename="ctadlir.db")
+.output TaintSourceVertex(IO="sqlite", filename="ctadlir.db", order_by="tag, v, p")
+.output LeakingSinkVertex(IO="sqlite", filename="ctadlir.db", order_by="tag, v, p")
+.output TaintSanitizeEdge(IO="sqlite", filename="ctadlir.db", order_by="tag, v1, p1, v2, p2")
+.output TaintSanitizeVertex(IO="sqlite", filename="ctadlir.db", order_by="tag, v, p")
+.output forward_flow.ReachableVertex(IO="sqlite", filename="ctadlir.db", order_by="id, v1, p1, label, call_state, suspicion, ctx")
+.output forward_flow.ReachableEdge(IO="sqlite", filename="ctadlir.db", order_by="vertex_to, vertex_from, insn, kind")
+.output backward_flow.ReachableVertex(IO="sqlite", filename="ctadlir.db", order_by="id, v1, p1, label, call_state, suspicion, ctx")
+.output backward_flow.ReachableEdge(IO="sqlite", filename="ctadlir.db", order_by="vertex_to, vertex_from, insn, kind")
+.output isTaintedArgUnmodeled(IO="sqlite", filename="ctadlir.db", order_by="tag, function, index, ap, direction")
+.output IntCInsn_InFunction(IO="sqlite", filename="ctadlir.db", order_by="insn, index, function")
 .decl LostAssign(insn: CInsn, p13: CAccessPath, dir: symbol)
 .decl LostAssign_choice(insn: CInsn, ck: min<int64>)
 LostAssign(insn, choice_field(ck, 0), choice_field(ck, 1)) :-
     LostAssign_choice(insn, ck).
-.output LostAssign(IO="sqlite", filename="ctadlir.db")
+.output LostAssign(IO="sqlite", filename="ctadlir.db", order_by="insn, p13, dir")
 .decl NegPre22(c0: CInsn, c1: symbol, c2: CVar, c3: SliceLabelType)
 NegPre22(insn, p13, v1, label) :-
     forward_flow.isReachable(v2, p23, label), VirtualAssign(insn, v1, p1, v2, p2, _reason, ""), p2 != "", p3 != "", p23 != "", ComputedAccessPathNonEmptySplit(p23, p2, p3), !contains(".*", p1), p13 = cat(p1, p3).

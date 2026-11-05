@@ -245,11 +245,12 @@ tests, both corpora, the option variants, the semantics suite, the `choice-domai
 front ends give the results reported here ([Validation](#validation)). The benchmarks used `main`
 at `84b3a1c` plus #477 as it was before it was merged (`fed6293`), except those [with the
 interner fix](#with-the-interner-fix). The translator's later simplifications leave CTADL's
-FlowLog programs (`index_tf.fl`, `query_tf.fl`) unchanged, byte for byte, but for the `ord` fix:
-`souffle_ord`'s declaration and its 3 calls in each program. The fixed programs are as fast: on
-syn25 with 32 workers, medians of 3 runs on `b99ed29`, FlowLog's engine took 3.47 s for the index
-(3.43 s before the fix) and 17.0 s for the query (17.9 s). On syn10, the query's fell from 2.37 s
-to 0.77 s (`results/bench/ord-ab.txt`).
+FlowLog programs (`index_tf.fl`, `query_tf.fl`) unchanged, byte for byte, but for two fixes: each
+`.output` sorts its relation with `order_by` ([Pipeline](#pipeline)), and the `ord` fix changes
+`souffle_ord`'s declaration and its 3 calls in each program. With the `ord` fix, the programs are
+as fast: on syn25 with 32 workers, medians of 3 runs on `b99ed29`, FlowLog's engine took 3.47 s
+for the index (3.43 s before the fix) and 17.0 s for the query (17.9 s). On syn10, the query's
+fell from 2.37 s to 0.77 s (`results/bench/ord-ab.txt`).
 
 The runs write large databases (1.07–1.10 GB each on the larger benchmark program), and the compiled
 analyses and the cargo target dir take about 1 GB ([Disk usage](#disk-usage)). Put the workspace,
