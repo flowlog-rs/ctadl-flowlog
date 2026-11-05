@@ -105,7 +105,10 @@ FlowLog does not accept CTADL's program as is. It took four things:
   worker, and 1.5× with 32, or 4.5× with #499 ([Join order](#join-order)).
 - **End to end,** FlowLog's index phase takes about half of Soufflé's wall time, with 1 worker, or
   with 32 and #499. Its query phase takes 1.1–1.2× as long as Soufflé's: the port converts
-  FlowLog's results into CTADL's sqlite layout, which takes about 19 s.
+  FlowLog's results into CTADL's sqlite layout, which takes about 19 s. On FlowLog's latest
+  `main`, `49d9999`, with this branch's faster conversion (11 s) and sorted outputs, it takes
+  0.90× as long with 32 workers (65.2 s against 72.1 s) and 1.07× with 1
+  ([On `49d9999`](#on-flowlog-49d9999)).
 - **Memory:** FlowLog's index needs 2.3–7.5× Soufflé's peak memory.
 - **Compiling** takes 1.2–1.8× as long, and the binaries are 19–28× larger
   ([Performance](#performance)).
@@ -116,7 +119,9 @@ are filed on FlowLog (B7 for `^` only), and its `main` fixes all of them
 to work around B2, B4, B5 and B10–B13; it now relies on FlowLog's fixes instead. B14 can give a
 compilation the binary of another program compiled at the same time; the engine and the tests
 avoid it. B15 is an internal compiler error on a rule whose body has only negated atoms, which the
-translator anchors on a one-row relation. Both are filed, with fix PRs that are not yet merged.
+translator anchors on a one-row relation. FlowLog's `main` has fixed both since, as the repros
+show on `49d9999`: it names a crate after its build directory too, and rejects B15's rule with an
+error instead. The engine and the tests keep their own crate names, and the translator its anchor.
 
 **Status: an end-to-end alternative, opt-in, not yet the default.** With `--engine flowlog`, CTADL
 indexes and queries programs from its three front ends (taint-front, Ghidra's P-code, JADX), with
@@ -129,11 +134,12 @@ Soufflé's results. What keeps it from replacing Soufflé as the default:
   change.
 - **Cost:** FlowLog is faster on large inputs (on nginx, 2.5× in both phases; on the realistic
   executables from 600 MB of facts, 1.74–1.96× in the index phase and 2.45–3.41× in the query
-  phase), but needs 2–9× Soufflé's peak memory (19 GB for nginx's index). Its memory also has a
-  floor that grows with the worker count, whatever the input: with CTADL's default of 32 workers on
-  this machine, its index of Diary, a small app, peaks at 2.5 GB, and Soufflé's at 45 MB
+  phase, and 2.04–2.37× and 2.49–3.29× on `49d9999`), but needs 2–9× Soufflé's peak memory (19 GB
+  for nginx's index). Its memory also has a floor that grows with the worker count, whatever the
+  input: with CTADL's default of 32 workers on this machine, its index of Diary, a small app,
+  peaks at 2.5 GB, and Soufflé's at 45 MB
   ([flowlog-rs/flowlog#521](https://github.com/flowlog-rs/flowlog/issues/521)). The compiled
-  analyses take 110–250 MB each, 19–28× Soufflé's.
+  analyses take 110–250 MB each, 19–28× Soufflé's (123–263 MB and 21–30× on `49d9999`).
 - **Symbol numbering:** P-code's type propagation depends on the engines' symbol ids, which on
   curl and nginx coincide but are not guaranteed to. With ids that differed, FlowLog computed
   what Soufflé computes with them ([Limitations](#limitations)).
@@ -891,6 +897,8 @@ both. The figures below for FlowLog's query on syn25 are from the `flowlog-nopla
   small input, FlowLog's index takes 0.3–1.0 s longer, and its query takes 2.6 s with 32 workers
   against 1.1 s with 1: there the workers cost more than they gain.
 - **End to end**, FlowLog's query phase takes 1.2× Soufflé's wall time with 1 worker and with 32.
+  (On FlowLog's `49d9999`, with the faster conversion and sorted outputs described below, it takes
+  1.07× and 0.90×: [On `49d9999`](#on-flowlog-49d9999).)
   syn25's query phase, step by step (`bench.py` logs each step's time):
 
   | Step (seconds) | Soufflé, 1 | FlowLog, 1 | Soufflé, 32 | FlowLog, 32 |
@@ -1136,7 +1144,10 @@ On syn25:
   82.8 s against 72.4 s. FlowLog computes the query's results in 5.4 s, but writes them to sqlite
   in 11.5 s, the port converts them in 18.6 s, and CTADL's indexing and report take 10.1 s longer
   than on Soufflé's database (row order, [Performance](#performance)). Item 6 of the
-  [Suggestions](#suggestions) addresses these three.
+  [Suggestions](#suggestions) addresses these three. On FlowLog's `49d9999`, which includes #499,
+  with this branch's faster conversion and sorted outputs, the query phase takes 65.2 s against
+  Soufflé's 72.1 s: FlowLog computes in 4.5 s and writes in 10.4 s, the port converts in 11.3 s,
+  and CTADL's indexing and report take 2.6 s longer ([On `49d9999`](#on-flowlog-49d9999)).
 - **Memory:** #499 changes FlowLog's peak memory by less than 9%. With 32 workers, FlowLog's index
   needs 7.5× Soufflé's memory, 12× without the hints, and its query 2.9×.
 - **Results:** FlowLog's databases are the same as in the runs above, with and without the hints,
@@ -1178,7 +1189,8 @@ imported once. Each engine then indexed it and queried it for a SARIF report, wi
 run at a time on the otherwise idle machine, and `bench.py` compared FlowLog's database and report
 with Soufflé's. CTADL's default P-code query (`souffle-logic/pcode/taintquery.dl`) names no
 source, so the P-code runs query `src/ctadl/models/pcode/default-query.json`; the JADX runs use
-CTADL's default query. FlowLog is `main` at `03b534b`. The results are in `results/realistic/`:
+CTADL's default query. FlowLog is `main` at `03b534b`; all of these runs were repeated on its
+latest `main`, `49d9999` ([below](#on-flowlog-49d9999)). The results are in `results/realistic/`:
 the runs in `pcode.txt` and `jadx.txt`, and their differences in `compare.txt`.
 
 Each cell gives the wall time of the `ctadl` command in seconds, the engine's time in parentheses
@@ -1303,6 +1315,11 @@ the conversion takes 41.4 s. Two FlowLog PRs make emission faster:
   17.4 s instead of 27.0 s, and the index binaries of dropbear and openssl in 10.8 s and 56.9 s
   instead of 12.8 s and 64.2 s (`sync.txt`).
 
+Both are merged. On `49d9999`, the index binaries emit for 207 s of 366 s on the 13 executables,
+and 233 s of 453 s on the apps: they now spend 43% and 49% of their run computing. bash's binary
+computes for 22.6 s and emits for 36.2 s. NewPipe's query binary runs in 16.3 s, 0.9 s of them
+emitting ([On `49d9999`](#on-flowlog-49d9999)).
+
 **Memory.** From 600 MB of facts, FlowLog's peak memory is 2.9–4.7× Soufflé's for an
 executable's index and 2.1–3.6× for its query, and 2.9–5.2× and 1.8–4.4× for an app's. On smaller
 inputs the ratio grows, up to 58× for Diary's index (2.5 GB against 45 MB), because FlowLog's
@@ -1340,9 +1357,9 @@ executables' phases take 1,976 s with FlowLog and 3,476 s with Soufflé, and the
 and 2,693 s. A small program's first run is slower with FlowLog: libz's index and query take
 438.6 s, against Soufflé's 330.8 s, compilations included.
 
-**On FlowLog's latest `main`** (`flowlog-59f6909.txt`). After these runs, FlowLog's `main` moved
-to `59f6909`, a planner refactor ([#502](https://github.com/flowlog-rs/flowlog/pull/502)). On it,
-CTADL's FlowLog checks pass, the repros give `b99ed29`'s results ([FlowLog
+**On FlowLog's `main` at `59f6909`** (`flowlog-59f6909.txt`). After these runs, FlowLog's `main`
+moved to `59f6909`, a planner refactor ([#502](https://github.com/flowlog-rs/flowlog/pull/502)).
+On it, CTADL's FlowLog checks pass, the repros give `b99ed29`'s results ([FlowLog
 findings](#flowlog-findings)), and libz, dropbear, wget, Diary and NetGuard give `03b534b`'s
 databases, on every column. On dropbear, wget and NetGuard, FlowLog's times are within 8% of
 `03b534b`'s (libz's and Diary's include compiling the analyses), and two runs of NetGuard's query
@@ -1351,14 +1368,69 @@ list other equally short paths, as wget's also do between two runs of `59f6909`;
 [ctadl-flowlog#3](https://github.com/flowlog-rs/ctadl-flowlog/pull/3) makes them independent of
 vertex ids.
 
+<a id="on-flowlog-49d9999"></a>
+**On FlowLog's latest `main`, `49d9999`** (`flowlog-49d9999/`). FlowLog's `main` has since merged
+#517 and #519 (above), a string table of its own in place of `lasso`
+([#501](https://github.com/flowlog-rs/flowlog/pull/501)), a fixed order for a stratum's relations
+([#510](https://github.com/flowlog-rs/flowlog/pull/510)), and the fixes for B14 and B15
+([#508](https://github.com/flowlog-rs/flowlog/pull/508),
+[#516](https://github.com/flowlog-rs/flowlog/pull/516)). On `49d9999`, with this branch, both
+engines ran the 27 programs again, as above and on the same imports, but for lighttpd's: a new
+one, with the same exporter fix. The synthetic programs, CTADL's FlowLog checks and the repros ran
+too. `against-03b534b.txt` compares the runs with the earlier ones, which used this branch before
+[ctadl-flowlog#5](https://github.com/flowlog-rs/ctadl-flowlog/pull/5)'s append (below). On 13
+executables (all but lighttpd) and the 13 apps, in seconds, wall time and the engine's in
+parentheses, earlier → `49d9999`:
+
+| Phases, in all | Soufflé | FlowLog | × |
+|---|---|---|---|
+| Executables' index | 1,914 (1,640) → 1,923 (1,646) | 1,054 (530) → 905 (366) | 1.82 → 2.12 |
+| Executables' query | 1,112 (544) → 1,163 (570) | 432 (73) → 459 (68) | 2.57 → 2.54 |
+| Apps' index | 1,735 (1,413) → 1,759 (1,433) | 1,346 (727) → 1,090 (453) | 1.29 → 1.61 |
+| Apps' query | 655 (331) → 687 (336) | 488 (170) → 498 (129) | 1.34 → 1.38 |
+
+- **Index:** FlowLog's binaries take 31% less time on the executables and 38% less on the apps,
+  from emission (above), and its index phases 14% and 19% less. FlowLog's index phase is now
+  1.22–2.37× as fast as Soufflé's on the executables, 2.04–2.37× from 600 MB of facts, and
+  0.76–1.90× on the apps, 1.44–1.90× from 600 MB; its binary alone, 1.9–5.3× and 0.7–3.7× as fast
+  as Soufflé's analysis.
+- **Query:** FlowLog's binaries take 6% and 24% less time, NewPipe's 16.3 s instead of 37.1 s, but
+  both engines' query phases take longer than before. Outside the engines, CTADL's steps take 2–3 s
+  longer per query, also on unchanged code: libz's query with Soufflé, in the earlier runs'
+  checkout, took 15.6 s on Oct 30 and takes 17.6–17.9 s now. And #5's append keeps CTADL's indexes
+  on the relations it writes, by design, which makes FlowLog's conversion of a query's results up
+  to 2.1 s slower, 5.0 s and 9.3 s in all. FlowLog's query phase is 1.07–3.29× as fast as
+  Soufflé's on the executables, 2.49–3.29× from 600 MB, and 0.87–1.60× on the apps, 1.25–1.60×
+  from 600 MB; its binary, 2.8–10.0× and 0.8–3.1×. FlowLog is slower only on Diary and Editor:
+  their index phases by 1.5 s and 1.2 s, and their query phases by 2.4 s and 1.7 s.
+- **Results:** FlowLog's databases and reports compare with Soufflé's as in the earlier runs, but
+  wget's report differs from Soufflé's in 2 places instead of 3, and lighttpd's database, from the
+  new import, has 2 relations equal up to witnesses instead of 1. FlowLog's reports have the same
+  results as before; on wget, Amaze, NetGuard, ConnectBot and NewPipe, code flows go through other
+  instructions, along equally short paths. Soufflé's reports change between its two runs too, in
+  statistics on 5 apps, and in a code flow on NewPipe.
+- **Memory** is as before: from 600 MB of facts, FlowLog's peak is 2.9–4.7× Soufflé's for an
+  executable's index and 2.0–3.7× for its query, and 2.9–5.1× and 1.8–4.4× for an app's.
+- **Compiling** (`compile-times.txt`) takes as long as before; the compiler's peak memory is 2–5%
+  higher, and the binaries are 7–10% larger, 123–263 MB.
+- **syn25** (`synthetic.txt`): with 32 workers, FlowLog's index phase takes 6.3 s against Soufflé's
+  15.1 s, and its query phase 65.2 s against 72.1 s, 0.90× as long. FlowLog computes the query's
+  results in 4.5 s and writes them in 10.4 s, the port converts them in 11.3 s, and CTADL's
+  indexing and report take 2.6 s longer than on Soufflé's database. With 1 worker, the phases take
+  23.5 s against 46.8 s, and 97.8 s against 91.0 s, 1.07× as long. With 1 and 32 workers,
+  FlowLog's databases are those of the runs in [Performance](#performance) up to record ids, which
+  are the engine's numbering, but for the query file's path.
+- **Checks** (`checks.txt`): CTADL's FlowLog checks pass, and the repros give `b99ed29`'s results,
+  but for B14 and B15, now fixed ([FlowLog findings](#flowlog-findings)).
+
 **Findings.** Besides FlowLog's B14 and B15 ([FlowLog findings](#flowlog-findings)), the sweep
 found these. Issues are disabled on flowlog-rs/ctadl-flowlog, so each of its PRs describes its
 problem.
 
 | Finding | Issue | Fix |
 |---|---|---|
-| FlowLog: an ordered output is sorted and merged on one thread, scanning every worker's next row for each row | [flowlog#514](https://github.com/flowlog-rs/flowlog/issues/514) | [flowlog#517](https://github.com/flowlog-rs/flowlog/pull/517) |
-| FlowLog: its SQLite output syncs each commit to the disk, where Soufflé's does not | [flowlog#518](https://github.com/flowlog-rs/flowlog/issues/518) | [flowlog#519](https://github.com/flowlog-rs/flowlog/pull/519) |
+| FlowLog: an ordered output is sorted and merged on one thread, scanning every worker's next row for each row | [flowlog#514](https://github.com/flowlog-rs/flowlog/issues/514) | [flowlog#517](https://github.com/flowlog-rs/flowlog/pull/517), merged |
+| FlowLog: its SQLite output syncs each commit to the disk, where Soufflé's does not | [flowlog#518](https://github.com/flowlog-rs/flowlog/issues/518) | [flowlog#519](https://github.com/flowlog-rs/flowlog/pull/519), merged |
 | FlowLog: a memory floor of 60–90 MiB per worker for CTADL's analyses, whatever the input | [flowlog#521](https://github.com/flowlog-rs/flowlog/issues/521) | directions in the issue |
 | CTADL: the P-code exporter gives a thunk with a default name no local entry point, and lighttpd's index fails | | [ctadl-flowlog#2](https://github.com/flowlog-rs/ctadl-flowlog/pull/2), on CTADL's `main` |
 | CTADL: SARIF paths, and their number, depend on vertex ids | | [ctadl-flowlog#3](https://github.com/flowlog-rs/ctadl-flowlog/pull/3), on `main` |
@@ -1396,7 +1468,12 @@ every repro of those bugs gives Soufflé's result there, except `count_all_wild`
 `strlen` and `substr`, and `empty_dataflow`, for which FlowLog writes no file. B15's
 `neg_only_body` and the gap `dup_output` were found on `b99ed29`, and only its results have them.
 On `main` at `59f6909`, both runs give `b99ed29`'s results (`results/realistic/flowlog-59f6909.txt`).
-`repros/same_name.sh` reproduces B14, which takes two compilations at once.
+`main-49d9999.txt` has the results on `main` at `49d9999`, which has the fixes for B14 and B15:
+those of `b99ed29`, but `neg_only_body`, which FlowLog now rejects with an error, `rule body has
+no positive atom or aggregate`; `check.sh -t` gives `b99ed29`'s results there too
+(`results/realistic/flowlog-49d9999/checks.txt`).
+`repros/same_name.sh` reproduces B14, which takes two compilations at once; on `49d9999`, it gives
+`a: O={1}` and `b: O={2}`.
 
 **Bugs**
 
@@ -1424,7 +1501,7 @@ Soufflé 2.5 also tests such variables after the comparisons, and stops on `R(1,
 
 B1–B13 are filed on flowlog-rs/flowlog, with their repros rechecked on `84b3a1c`, and each has a
 fix PR. B14 was found later, on `b03d2fd`, and B15 on `b99ed29`; both are filed, with fix PRs.
-The status is as of `main` at `59f6909`: all of B1–B13 are fixed there.
+The status is as of `main` at `49d9999`: all of B1–B15 are fixed there.
 
 | Bug | Issue | Fix | Status |
 |---|---|---|---|
@@ -1441,8 +1518,8 @@ The status is as of `main` at `59f6909`: all of B1–B13 are fixed there.
 | B11 | [#474](https://github.com/flowlog-rs/flowlog/issues/474) | [#487](https://github.com/flowlog-rs/flowlog/pull/487); [#492](https://github.com/flowlog-rs/flowlog/pull/492) does the same for an `as` whose operand is not a literal ([#490](https://github.com/flowlog-rs/flowlog/issues/490)) | merged |
 | B12 | [#475](https://github.com/flowlog-rs/flowlog/issues/475) | [#484](https://github.com/flowlog-rs/flowlog/pull/484) | merged |
 | B13 | [#476](https://github.com/flowlog-rs/flowlog/issues/476) | [#483](https://github.com/flowlog-rs/flowlog/pull/483) | merged |
-| B14 | [#507](https://github.com/flowlog-rs/flowlog/issues/507) | [#508](https://github.com/flowlog-rs/flowlog/pull/508): the crate's name ends with a hash of its build directory | open |
-| B15 | [#515](https://github.com/flowlog-rs/flowlog/issues/515) | [#516](https://github.com/flowlog-rs/flowlog/pull/516): the parser rejects such a body, with a note on the one-row workaround | open |
+| B14 | [#507](https://github.com/flowlog-rs/flowlog/issues/507) | [#508](https://github.com/flowlog-rs/flowlog/pull/508): the crate's name ends with a hash of its build directory | merged |
+| B15 | [#515](https://github.com/flowlog-rs/flowlog/issues/515) | [#516](https://github.com/flowlog-rs/flowlog/pull/516): the parser rejects such a body, with a note on the one-row workaround | merged |
 
 B7's `strlen` and `substr`, which count characters where Soufflé counts bytes, are not filed, nor
 is the gap `dup_output`.
@@ -1527,13 +1604,12 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
 
 1. **Native `choice-domain`**, or an aggregate that picks one witness per key and never revises it
    inside recursion. It is the only non-syntactic gap, and it would replace the stateful UDFs.
-2. **B14 and B15**, the open bugs: [#508](https://github.com/flowlog-rs/flowlog/pull/508) names
-   the crate after its build directory too, and
-   [#516](https://github.com/flowlog-rs/flowlog/pull/516) rejects a body with no positive atom or
-   aggregate with an error instead of an internal one. Deriving such a rule's head as Soufflé
-   does would need a one-row source, which the translator supplies. The fixes for B1–B13 are
-   merged, and the translator now relies on them instead of working around B2, B4, B5 and
-   B10–B13.
+2. **A body with no positive atom or aggregate** (B15): since
+   [#516](https://github.com/flowlog-rs/flowlog/pull/516), FlowLog rejects it with an error
+   instead of an internal one. Deriving its head as Soufflé does would need a one-row source,
+   which the translator supplies. The fixes for B1–B15 are merged, B14's in
+   [#508](https://github.com/flowlog-rs/flowlog/pull/508), and the translator now relies on them
+   instead of working around B2, B4, B5 and B10–B13.
 3. **String interning that scales with workers**
    ([#498](https://github.com/flowlog-rs/flowlog/issues/498)). With `--str-intern`, the generated
    code interns or resolves strings on every row, at 859 `intern` and 1,024 `resolve` call sites in
@@ -1559,24 +1635,26 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
    translator do both now. With several workers, FlowLog writes rows in an order that varies
    between runs, and CTADL's indexing and report took 7.3 s longer on such a database
    ([Performance](#performance)); the translation now sorts every output with `order_by`
-   ([Pipeline](#pipeline)). Writing is most of FlowLog's time on realistic programs, about 70% of
-   an index's run ([Realistic programs](#realistic-programs)):
-   [flowlog-rs/flowlog#517](https://github.com/flowlog-rs/flowlog/pull/517) sorts and merges
-   ordered outputs in parallel, and [#519](https://github.com/flowlog-rs/flowlog/pull/519) commits
-   SQLite output without waiting for the disk. Writing Soufflé's sqlite layout (a symbol table,
-   shadow tables of ids, and views) as an option would remove most of the port's conversion. On
-   syn25 with 32 workers, FlowLog computes the query's results in 10.8 s, then takes 9.3 s to
-   write them as plain tables, and the port 19.0 s to convert them (10.5 s since,
-   [Performance](#performance)); with #499, 5.4 s, 11.5 s and 18.6 s.
+   ([Pipeline](#pipeline)). Writing was most of FlowLog's time on realistic programs, about 70% of
+   an index's run ([Realistic programs](#realistic-programs)), and is 51–57% on `49d9999`, with
+   [flowlog-rs/flowlog#517](https://github.com/flowlog-rs/flowlog/pull/517), which sorts and
+   merges ordered outputs in parallel, and [#519](https://github.com/flowlog-rs/flowlog/pull/519),
+   which commits SQLite output without waiting for the disk. Writing Soufflé's sqlite layout (a
+   symbol table, shadow tables of ids, and views) as an option would remove most of the port's
+   conversion. On syn25 with 32 workers, FlowLog computes the query's results in 10.8 s, then
+   takes 9.3 s to write them as plain tables, and the port 19.0 s to convert them (10.5 s since,
+   [Performance](#performance)); with #499, 5.4 s, 11.5 s and 18.6 s; on `49d9999`, with this
+   branch's conversion, 4.5 s, 10.4 s and 11.3 s ([On `49d9999`](#on-flowlog-49d9999)).
    [#503](https://github.com/flowlog-rs/flowlog/pull/503), open, writes that layout for a
    `--str-intern` program; the engine has not been tried with it.
 7. **Compile time and binary size.** CTADL's taint-front index and query take 3 min 8 s and 2 min
    3 s to compile, against Soufflé's 2 min 43 s and 1 min 10 s; its P-code and JADX ones take
    4 min 30 s–4 min 53 s and 2 min, against about 3 min 55 s and 1 min 8 s, and an index's
    compilation peaks at 10–11 GB of memory, against 3 GB ([Realistic
-   programs](#realistic-programs)). The binaries are 19–28× larger (168 and 116 MB). Both engines
-   cache the binary, so this cost is paid once per version of the analysis, but it slows down work
-   on the analysis itself.
+   programs](#realistic-programs)). The binaries are 19–28× larger (168 and 116 MB), and 21–30×
+   on `49d9999` (184 and 126 MB), where compiling takes as long. Both engines cache the binary, so
+   this cost is paid once per version of the analysis, but it slows down work on the analysis
+   itself.
 8. **Memory.** FlowLog's memory has a floor that grows with the number of workers, whatever the
    program: CTADL's index of a small Android app takes 0.15 GB with 1 worker, 0.33 GB with 4 and
    2.3 GB with 32, where Soufflé takes 0.05 GB. On empty inputs, the P-code index peaks at about
@@ -1648,7 +1726,7 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
 <a id="disk-usage"></a>
 ## Disk usage
 
-- **Compiled analyses:** each takes about 110–250 MB in CTADL's state directory
+- **Compiled analyses:** each takes about 110–265 MB in CTADL's state directory
   (`~/.local/state/ctadl/analysis/<version>/flowlog/`). Delete the entries you no longer need; any
   change to the translator, policy, UDFs or compiler produces new keys.
 - **Shared target dir:** the cargo target dir (`CARGO_TARGET_DIR`, by default `target/` in the
@@ -1669,7 +1747,7 @@ B2, B5 and B10–B13, and nineteen repros gave Soufflé's result. It rejected `a
 
 | Component | Version |
 |---|---|
-| FlowLog | `main` at `b99ed29` (perf(runtime): cache interner lookups per thread #499), which has the fixes for B1–B13: the validation runs and the repros. The benchmarks and earlier runs: `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477, and on `main` at `b03d2fd` (#488) and `8ce7b5e` (#481). The runs [with the interner fix](#with-the-interner-fix): `main` at `f14db3d` (#479) + PR #499 (`87ed8e8`). The [realistic programs](#realistic-programs): `main` at `03b534b` (fix(codegen): cast a compound substr index in one pair of parentheses #500), rechecked on `main` at `59f6909` (refactor(planner): generate logical dedup/aggregation on head in planning phase #502), with the repros |
+| FlowLog | `main` at `b99ed29` (perf(runtime): cache interner lookups per thread #499), which has the fixes for B1–B13: the validation runs and the repros. The benchmarks and earlier runs: `main` at `84b3a1c` (fix(deps): update rust crate rusqlite to 0.41 #461) + PR #477 (`fed6293`, the B1 fix); also checked on `main` at `bad0ff2` (#493) + #477, and on `main` at `b03d2fd` (#488) and `8ce7b5e` (#481). The runs [with the interner fix](#with-the-interner-fix): `main` at `f14db3d` (#479) + PR #499 (`87ed8e8`). The [realistic programs](#realistic-programs): `main` at `03b534b` (fix(codegen): cast a compound substr index in one pair of parentheses #500), rechecked on `main` at `59f6909` (refactor(planner): generate logical dedup/aggregation on head in planning phase #502), with the repros, and all run again on `main` at `49d9999` (chore(deps): lock file maintenance #531), with the synthetic programs, CTADL's FlowLog checks and the repros |
 | CTADL | 0.14.1, `4f6f8cb` |
 | ctadl-rs | `7c98b73e` |
 | Soufflé | 2.5 |

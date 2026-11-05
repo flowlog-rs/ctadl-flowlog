@@ -1,0 +1,50 @@
+# FlowLog main at 49d9999 (chore(deps): lock file maintenance #531), the latest when run, with this
+# branch at 4e33a4a: bench.py --lang pcode --query src/ctadl/models/pcode/default-query.json
+# --format sarif --jobs 32 BIN on each binary of ../pcode.txt, on its import, smallest first, one
+# at a time, with the analyses compiled beforehand (compile-times.txt). lighttpd's import is a new
+# one with the P-code exporter fix (flowlog-rs/ctadl-flowlog#2), as ../thunk-fix.txt's was. The
+# run's CTADL checkout also had a refactor of the translator's code that generates the same
+# programs, byte for byte. Columns as in ../pcode.txt; compare.txt has the differences, and
+# against-03b534b.txt compares the runs with ../pcode.txt's.
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+libz       souffle  32 |   12.74     8.03    8.03    160M |   17.68     2.97    2.97     95M | (reference)
+libz       flowlog  32 |   10.44     6.12    4.28   3096M |   16.57     1.60    0.92   1752M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+nc         souffle  32 |   17.29    12.50   12.50    190M |   22.35     5.28    5.28    123M | (reference)
+nc         flowlog  32 |   12.87     8.44    6.13   3060M |   16.66     2.11    1.22   1727M | summary: 209 equal, 1 different; sarif: different (3 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+sed        souffle  32 |   22.05    16.81   16.81    229M |   19.93     3.92    3.92    115M | (reference)
+sed        flowlog  32 |   13.66     8.62    5.53   3110M |   16.09     2.18    1.42   1690M | summary: 210 equal, 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+gzip       souffle  32 |   27.37    21.18   21.18    276M |   25.15     6.38    6.38    142M | (reference)
+gzip       flowlog  32 |   16.08    10.17    6.08   3182M |   16.43     2.04    1.17   1825M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+dropbear   souffle  32 |   47.56    39.18   39.18    422M |   33.07    10.19   10.19    205M | (reference)
+dropbear   flowlog  32 |   23.67    15.03    8.89   3413M |   18.99     2.87    1.57   1823M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+sudo       souffle  32 |   58.36    48.97   48.97    559M |   40.59    13.72   13.72    282M | (reference)
+sudo       flowlog  32 |   28.91    19.29   11.49   3474M |   21.20     3.96    2.22   1982M | summary: 210 equal, 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+lighttpd   souffle  32 |   63.91    50.49   50.49    644M |   30.63     9.69    9.69    291M | (reference)
+lighttpd   flowlog  32 |   33.99    21.61   12.43   3830M |   22.32     4.62    2.62   1949M | summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+dnsmasq    souffle  32 |  142.37   120.98  120.98   1456M |   89.01    45.84   45.84    840M | (reference)
+dnsmasq    flowlog  32 |   69.31    46.66   27.06   6810M |   35.68    10.90    6.38   2692M | summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+wget       souffle  32 |  157.13   136.50  136.50   1392M |   93.78    38.87   38.87    647M | (reference)
+wget       flowlog  32 |   69.55    46.34   25.88   5244M |   36.07     8.23    4.52   2371M | summary: 206 equal (1 up to choice-domain witnesses), 4 different; sarif: different (2 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+tar        souffle  32 |  180.62   155.22  155.22   1633M |  112.27    56.90   56.90    820M | (reference)
+tar        flowlog  32 |   80.31    53.97   31.47   6299M |   39.43    10.62    5.93   2631M | summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (5 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+openssl    souffle  32 |  253.86   220.52  220.52   2077M |  147.71    69.54   69.54    989M | (reference)
+openssl    flowlog  32 |  107.20    72.21   41.37   6777M |   47.23    12.57    6.98   2724M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+ssh        souffle  32 |  300.54   260.06  260.06   2750M |  204.17   125.22  125.22   1685M | (reference)
+ssh        flowlog  32 |  142.88   100.54   64.57  11879M |   62.00    22.04   12.63   3674M | summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+sqlite3    souffle  32 |  358.29   306.65  306.65   3682M |  176.60   104.92  104.92   1998M | (reference)
+sqlite3    flowlog  32 |  175.68   122.02   74.62  13847M |   68.42    25.20   14.09   4086M | summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (1 places); same results up to code flows
+program    backend   j |     idx  analyze  engine     rss |   query  analyze  engine     rss | diff vs first run
+bash       souffle  32 |  345.27   299.64  299.64   2938M |  180.63    86.59   86.59   1389M | (reference)
+bash       flowlog  32 |  154.82   105.94   58.86   8400M |   63.92    17.93    9.43   3171M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal

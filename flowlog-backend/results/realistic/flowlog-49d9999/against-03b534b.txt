@@ -1,0 +1,264 @@
+# The runs on FlowLog main at 49d9999 (pcode.txt, jadx.txt, synthetic.txt) against the earlier
+# ones: on 03b534b (../pcode.txt, ../jadx.txt, and ../thunk-fix.txt for lighttpd) and on
+# 84b3a1c + #477 (../../bench). The earlier realistic runs used this branch before
+# flowlog-rs/ctadl-flowlog#5's append, which keeps CTADL's indexes while it writes a FlowLog
+# query's results, by design: the conversion of a query's results takes up to 2.1 s longer
+# (phases.txt against ../phases.txt), 5.0 s and 9.3 s in all on 13 executables and the apps.
+# lighttpd's rows come from two imports with the same exporter fix (the earlier one, run apart
+# from the sweep, is not kept), so its times are not compared; the P-code totals include it.
+
+## Per program: wall (engine) and peak RSS, earlier -> new (49d9999); x: Soufflé's wall over
+## FlowLog's; diff: each run's comparison of FlowLog with Soufflé.
+libz j32
+  index  souffle      11.7 (8.0) 0.2G ->      12.7 (8.0) 0.2G   flowlog      10.8 (5.2) 3.0G ->      10.4 (4.3) 3.0G   x 1.08 -> 1.22
+  query  souffle      15.6 (3.0) 0.1G ->      17.7 (3.0) 0.1G   flowlog      13.7 (1.2) 1.7G ->      16.6 (0.9) 1.7G   x 1.13 -> 1.07
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+nc j32
+  index  souffle     17.0 (12.7) 0.2G ->     17.3 (12.5) 0.2G   flowlog      14.0 (7.5) 3.0G ->      12.9 (6.1) 3.0G   x 1.22 -> 1.34
+  query  souffle      19.6 (5.4) 0.1G ->      22.4 (5.3) 0.1G   flowlog      14.6 (1.2) 1.7G ->      16.7 (1.2) 1.7G   x 1.34 -> 1.34
+  diff earlier: summary: 209 equal, 1 different; sarif: different (3 places); same results up to code flows
+  diff new: summary: 209 equal, 1 different; sarif: different (3 places); same results up to code flows
+sed j32
+  index  souffle     22.2 (16.7) 0.2G ->     22.1 (16.8) 0.2G   flowlog      15.2 (7.1) 3.0G ->      13.7 (5.5) 3.0G   x 1.46 -> 1.61
+  query  souffle      19.4 (3.9) 0.1G ->      19.9 (3.9) 0.1G   flowlog      13.9 (1.1) 1.7G ->      16.1 (1.4) 1.7G   x 1.40 -> 1.24
+  diff earlier: summary: 210 equal, 0 different; sarif: equal
+  diff new: summary: 210 equal, 0 different; sarif: equal
+gzip j32
+  index  souffle     26.8 (21.1) 0.3G ->     27.4 (21.2) 0.3G   flowlog      17.4 (7.9) 3.2G ->      16.1 (6.1) 3.1G   x 1.54 -> 1.70
+  query  souffle      23.3 (6.4) 0.1G ->      25.1 (6.4) 0.1G   flowlog      15.7 (1.3) 1.7G ->      16.4 (1.2) 1.8G   x 1.49 -> 1.53
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+dropbear j32
+  index  souffle     46.6 (39.0) 0.4G ->     47.6 (39.2) 0.4G   flowlog     26.9 (13.1) 3.3G ->      23.7 (8.9) 3.3G   x 1.73 -> 2.01
+  query  souffle     31.4 (10.5) 0.2G ->     33.1 (10.2) 0.2G   flowlog      17.0 (1.7) 1.8G ->      19.0 (1.6) 1.8G   x 1.84 -> 1.74
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+sudo j32
+  index  souffle     58.0 (49.1) 0.5G ->     58.4 (49.0) 0.5G   flowlog     33.1 (16.2) 3.4G ->     28.9 (11.5) 3.4G   x 1.75 -> 2.02
+  query  souffle     42.6 (15.1) 0.3G ->     40.6 (13.7) 0.3G   flowlog      19.6 (2.3) 1.9G ->      21.2 (2.2) 1.9G   x 2.17 -> 1.91
+  diff earlier: summary: 210 equal, 0 different; sarif: equal
+  diff new: summary: 210 equal, 0 different; sarif: equal
+lighttpd j32
+  index  souffle     70.8 (53.8) 0.6G ->     63.9 (50.5) 0.6G   flowlog     55.6 (30.8) 3.6G ->     34.0 (12.4) 3.7G   x 1.27 -> 1.88
+  query  souffle     77.0 (14.0) 0.3G ->      30.6 (9.7) 0.3G   flowlog      21.8 (2.6) 1.9G ->      22.3 (2.6) 1.9G   x 3.53 -> 1.37
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+dnsmasq j32
+  index  souffle   141.6 (120.4) 1.4G ->   142.4 (121.0) 1.4G   flowlog     81.5 (40.0) 6.7G ->     69.3 (27.1) 6.7G   x 1.74 -> 2.05
+  query  souffle     86.2 (43.0) 0.8G ->     89.0 (45.8) 0.8G   flowlog      34.5 (7.2) 2.7G ->      35.7 (6.4) 2.6G   x 2.50 -> 2.49
+  diff earlier: summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+wget j32
+  index  souffle   155.4 (134.7) 1.4G ->   157.1 (136.5) 1.4G   flowlog     80.0 (40.2) 5.2G ->     69.5 (25.9) 5.1G   x 1.94 -> 2.26
+  query  souffle     87.3 (37.0) 0.6G ->     93.8 (38.9) 0.6G   flowlog      35.7 (4.8) 2.3G ->      36.1 (4.5) 2.3G   x 2.45 -> 2.60
+  diff earlier: summary: 206 equal (1 up to choice-domain witnesses), 4 different; sarif: different (3 places); same results up to code flows
+  diff new: summary: 206 equal (1 up to choice-domain witnesses), 4 different; sarif: different (2 places); same results up to code flows
+tar j32
+  index  souffle   183.6 (156.0) 1.6G ->   180.6 (155.2) 1.6G   flowlog     95.7 (47.5) 6.2G ->     80.3 (31.5) 6.2G   x 1.92 -> 2.25
+  query  souffle    104.9 (50.9) 0.8G ->    112.3 (56.9) 0.8G   flowlog      38.4 (6.2) 2.6G ->      39.4 (5.9) 2.6G   x 2.73 -> 2.85
+  diff earlier: summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (5 places); same results up to code flows
+  diff new: summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (5 places); same results up to code flows
+openssl j32
+  index  souffle   250.8 (219.0) 2.0G ->   253.9 (220.5) 2.0G   flowlog    127.9 (62.6) 6.7G ->    107.2 (41.4) 6.6G   x 1.96 -> 2.37
+  query  souffle    144.9 (70.8) 1.0G ->    147.7 (69.5) 1.0G   flowlog      42.5 (7.5) 2.7G ->      47.2 (7.0) 2.7G   x 3.41 -> 3.13
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+ssh j32
+  index  souffle   300.6 (258.0) 2.7G ->   300.5 (260.1) 2.7G   flowlog   160.6 (86.1) 11.5G ->   142.9 (64.6) 11.6G   x 1.87 -> 2.10
+  query  souffle   196.1 (113.4) 1.6G ->   204.2 (125.2) 1.6G   flowlog     57.8 (13.1) 3.8G ->     62.0 (12.6) 3.6G   x 3.39 -> 3.29
+  diff earlier: summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (2 up to choice-domain witnesses), 0 different; sarif: equal
+sqlite3 j32
+  index  souffle   354.8 (304.1) 3.6G ->   358.3 (306.6) 3.6G   flowlog  200.8 (100.7) 13.6G ->   175.7 (74.6) 13.5G   x 1.77 -> 2.04
+  query  souffle   170.3 (101.2) 1.9G ->   176.6 (104.9) 2.0G   flowlog     66.7 (15.1) 4.1G ->     68.4 (14.1) 4.0G   x 2.55 -> 2.58
+  diff earlier: summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (1 places); same results up to code flows
+  diff new: summary: 209 equal (1 up to choice-domain witnesses), 1 different; sarif: different (1 places); same results up to code flows
+bash j32
+  index  souffle   344.8 (301.0) 2.9G ->   345.3 (299.6) 2.9G   flowlog    189.6 (95.4) 8.3G ->    154.8 (58.9) 8.2G   x 1.82 -> 2.23
+  query  souffle    170.4 (82.9) 1.4G ->    180.6 (86.6) 1.4G   flowlog     62.2 (10.5) 3.0G ->      63.9 (9.4) 3.1G   x 2.74 -> 2.83
+  diff earlier: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+  diff new: summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+total index flowlog new    : wall    939.4 engine    378.7 (14 programs)
+total index flowlog earlier: wall   1109.2 engine    560.6 (14 programs)
+total index souffle new    : wall   1987.4 engine   1696.7 (14 programs)
+total index souffle earlier: wall   1984.8 engine   1693.7 (14 programs)
+total query flowlog new    : wall    481.0 engine     71.1 (14 programs)
+total query flowlog earlier: wall    454.1 engine     75.6 (14 programs)
+total query souffle new    : wall   1193.6 engine    580.0 (14 programs)
+total query souffle earlier: wall   1188.7 engine    557.6 (14 programs)
+org.billthefarmer.diary_1105 j32
+  index  souffle       4.5 (2.2) 0.0G ->       4.8 (2.2) 0.0G   flowlog       6.6 (3.6) 2.5G ->       6.3 (3.0) 2.4G   x 0.69 -> 0.76
+  query  souffle      14.9 (0.7) 0.1G ->      16.7 (0.7) 0.0G   flowlog      15.2 (0.9) 1.6G ->      19.2 (0.7) 1.6G   x 0.98 -> 0.87
+  diff earlier: summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+  diff new: summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+org.billthefarmer.editor_198 j32
+  index  souffle       4.8 (2.4) 0.0G ->       5.0 (2.4) 0.0G   flowlog       6.0 (3.3) 2.5G ->       6.2 (2.9) 2.5G   x 0.79 -> 0.81
+  query  souffle      15.0 (0.7) 0.1G ->      16.7 (0.8) 0.0G   flowlog      14.3 (0.8) 1.6G ->      18.4 (1.0) 1.6G   x 1.05 -> 0.91
+  diff earlier: summary: 156 equal, 10 different; sarif: different (1 places); same results up to code flows
+  diff new: summary: 156 equal, 10 different; sarif: different (1 places); same results up to code flows
+eu.faircode.netguard_2026080101 j32
+  index  souffle     25.8 (19.4) 0.3G ->     26.4 (19.8) 0.3G   flowlog     22.6 (11.5) 2.9G ->      20.5 (8.4) 2.9G   x 1.14 -> 1.29
+  query  souffle      20.3 (4.1) 0.2G ->      22.1 (4.3) 0.2G   flowlog      19.4 (2.7) 1.9G ->      20.9 (2.7) 1.8G   x 1.05 -> 1.06
+  diff earlier: summary: 156 equal (1 up to choice-domain witnesses), 10 different; sarif: different (22 places); same results up to code flows
+  diff new: summary: 156 equal (1 up to choice-domain witnesses), 10 different; sarif: different (22 places); same results up to code flows
+de.markusfisch.android.binaryeye_180 j32
+  index  souffle     51.8 (41.6) 0.8G ->     53.4 (41.8) 0.8G   flowlog     41.1 (21.4) 4.4G ->     35.4 (15.5) 4.4G   x 1.26 -> 1.51
+  query  souffle      27.5 (9.6) 0.4G ->      29.8 (9.8) 0.4G   flowlog      23.3 (4.7) 2.0G ->      25.4 (4.7) 2.0G   x 1.18 -> 1.17
+  diff earlier: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+  diff new: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+ch.blinkenlights.android.vanilla_13200 j32
+  index  souffle     39.0 (28.9) 0.5G ->     39.4 (29.3) 0.5G   flowlog     35.4 (18.9) 3.9G ->     31.1 (11.5) 3.9G   x 1.10 -> 1.26
+  query  souffle      23.5 (6.2) 0.3G ->      25.4 (6.4) 0.3G   flowlog      21.5 (3.8) 2.0G ->      23.5 (3.5) 1.9G   x 1.09 -> 1.08
+  diff earlier: summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (17 places); same results up to code flows
+  diff new: summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (17 places); same results up to code flows
+net.sourceforge.opencamera_96 j32
+  index  souffle     77.5 (62.4) 1.0G ->     82.8 (64.8) 1.0G   flowlog     72.2 (39.3) 4.3G ->     53.8 (22.6) 4.3G   x 1.07 -> 1.54
+  query  souffle     34.3 (13.8) 0.5G ->     39.4 (13.8) 0.5G   flowlog      27.4 (7.1) 2.2G ->      31.4 (6.7) 2.2G   x 1.25 -> 1.25
+  diff earlier: summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (20 places); same results up to code flows
+  diff new: summary: 159 equal (1 up to choice-domain witnesses), 7 different; sarif: different (20 places); same results up to code flows
+org.secuso.privacyfriendlynotes_105 j32
+  index  souffle   141.3 (116.2) 1.6G ->   146.6 (119.4) 1.6G   flowlog    112.6 (61.8) 6.8G ->    101.5 (38.4) 6.9G   x 1.25 -> 1.44
+  query  souffle     55.8 (26.5) 0.9G ->     57.8 (25.6) 0.9G   flowlog     37.1 (12.7) 2.6G ->     41.0 (11.3) 2.6G   x 1.50 -> 1.41
+  diff earlier: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+  diff new: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (20 places); same results up to code flows
+com.amaze.filemanager_126 j32
+  index  souffle   169.1 (140.2) 2.2G ->   169.4 (140.8) 2.2G   flowlog    123.3 (67.2) 8.4G ->    103.2 (41.3) 8.4G   x 1.37 -> 1.64
+  query  souffle     57.5 (32.5) 1.1G ->     59.0 (32.6) 1.1G   flowlog     37.8 (12.7) 2.9G ->     40.2 (11.8) 2.9G   x 1.52 -> 1.47
+  diff earlier: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+  diff new: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+de.danoeh.antennapod_3120395 j32
+  index  souffle   166.0 (133.6) 1.9G ->   168.6 (138.8) 1.9G   flowlog   144.9 (78.4) 10.1G ->    106.5 (44.0) 9.9G   x 1.15 -> 1.58
+  query  souffle     54.8 (29.6) 1.0G ->     56.6 (30.7) 1.0G   flowlog     39.1 (13.5) 2.8G ->     40.2 (12.6) 2.8G   x 1.40 -> 1.41
+  diff earlier: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (23 places); same results up to code flows
+  diff new: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (23 places); same results up to code flows
+org.connectbot_11101000 j32
+  index  souffle   162.9 (135.9) 1.9G ->   160.3 (130.7) 1.9G   flowlog    136.8 (74.5) 7.0G ->     97.4 (37.1) 7.0G   x 1.19 -> 1.65
+  query  souffle     57.0 (28.5) 1.0G ->     61.0 (29.5) 1.0G   flowlog     40.0 (11.9) 2.7G ->     40.7 (10.3) 2.7G   x 1.43 -> 1.50
+  diff earlier: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (24 places); same results up to code flows
+  diff new: summary: 154 equal (1 up to choice-domain witnesses), 12 different; sarif: different (24 places); same results up to code flows
+org.schabi.newpipe_1015 j32
+  index  souffle   242.9 (196.3) 2.8G ->   236.4 (196.9) 2.8G   flowlog    182.3 (94.6) 8.8G ->    140.6 (57.4) 8.7G   x 1.33 -> 1.68
+  query  souffle     76.7 (46.4) 1.5G ->     79.3 (47.6) 1.5G   flowlog     68.6 (37.1) 3.3G ->     54.7 (16.3) 3.1G   x 1.12 -> 1.45
+  diff earlier: summary: 152 equal, 14 different; sarif: different (24 places)
+  diff new: summary: 152 equal, 14 different; sarif: different (24 places)
+com.fsck.k9_39046 j32
+  index  souffle   281.9 (236.6) 3.2G ->   314.4 (256.1) 3.2G   flowlog    191.2 (97.9) 9.7G ->    165.1 (69.0) 9.6G   x 1.47 -> 1.90
+  query  souffle     89.8 (55.5) 1.7G ->     97.5 (58.3) 1.7G   flowlog     64.5 (28.2) 3.4G ->     63.9 (19.0) 3.4G   x 1.39 -> 1.53
+  diff earlier: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+  diff new: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places); same results up to code flows
+org.wikipedia_50614 j32
+  index  souffle   367.7 (297.4) 4.0G ->   352.0 (290.0) 4.0G   flowlog  271.4 (155.0) 11.7G ->  222.6 (101.7) 11.5G   x 1.35 -> 1.58
+  query  souffle    127.7 (77.0) 2.1G ->    125.8 (75.9) 2.1G   flowlog     80.4 (34.0) 3.8G ->     78.8 (28.1) 3.7G   x 1.59 -> 1.60
+  diff earlier: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places)
+  diff new: summary: 153 equal (1 up to choice-domain witnesses), 13 different; sarif: different (24 places)
+total index flowlog new    : wall   1090.2 engine    452.9 (13 programs)
+total index flowlog earlier: wall   1346.4 engine    727.5 (13 programs)
+total index souffle new    : wall   1759.4 engine   1433.1 (13 programs)
+total index souffle earlier: wall   1735.2 engine   1413.1 (13 programs)
+total query flowlog new    : wall    498.4 engine    128.7 (13 programs)
+total query flowlog earlier: wall    488.5 engine    170.1 (13 programs)
+total query souffle new    : wall    687.2 engine    336.1 (13 programs)
+total query souffle earlier: wall    654.7 engine    331.1 (13 programs)
+## The reports, earlier -> new, per engine (compare_sarif.py; on JADX, the raw and the canonical
+## reports differ in the same places). Every pair differs in CTADL_Query, the path of the query
+## file, which names the CTADL checkout: "identical" means nothing else differs. Where FlowLog's
+## differ, a code flow goes through other instructions: the paths are equally short, and CTADL
+## orders them by vertex ids (flowlog-rs/ctadl-flowlog#3). Soufflé's statistics change on 5 apps
+## between its two runs, and on NewPipe a code flow too. lighttpd's earlier reports are not kept.
+pcode bash                                     souffle same results: identical
+pcode bash                                     flowlog same results: identical
+pcode dnsmasq                                  souffle same results: identical
+pcode dnsmasq                                  flowlog same results: identical
+pcode dropbear                                 souffle same results: identical
+pcode dropbear                                 flowlog same results: identical
+pcode gzip                                     souffle same results: identical
+pcode gzip                                     flowlog same results: identical
+pcode libz                                     souffle same results: identical
+pcode libz                                     flowlog same results: identical
+pcode nc                                       souffle same results: identical
+pcode nc                                       flowlog same results: identical
+pcode openssl                                  souffle same results: identical
+pcode openssl                                  flowlog same results: identical
+pcode sed                                      souffle same results: identical
+pcode sed                                      flowlog same results: identical
+pcode sqlite3                                  souffle same results: identical
+pcode sqlite3                                  flowlog same results: identical
+pcode ssh                                      souffle same results: identical
+pcode ssh                                      flowlog same results: identical
+pcode sudo                                     souffle same results: identical
+pcode sudo                                     flowlog same results: identical
+pcode tar                                      souffle same results: identical
+pcode tar                                      flowlog same results: identical
+pcode wget                                     souffle same results: identical
+pcode wget                                     flowlog same results: logicalLocations: 14 items only in A, 13 only in B; results: 18 items only in A, 18 only in B
+jadx  ch.blinkenlights.android.vanilla_13200   souffle same results: identical
+jadx  ch.blinkenlights.android.vanilla_13200   flowlog same results: identical
+jadx  com.amaze.filemanager_126                souffle same results: stats.ctx: 7820 != 7819
+jadx  com.amaze.filemanager_126                flowlog same results: logicalLocations: 9 items only in A, 10 only in B; results: 17 items only in A, 17 only in B
+jadx  com.fsck.k9_39046                        souffle same results: identical
+jadx  com.fsck.k9_39046                        flowlog same results: identical
+jadx  de.danoeh.antennapod_3120395             souffle same results: stats.ContextObj: 46575 != 46584; stats.ParthianFlowEdge: 86823 != 86827; stats.ParthianVertex: 176773 != 176778; stats.ctx: 6929 != 6928; stats.obj-reachable-vertex: 34039 != 34048
+jadx  de.danoeh.antennapod_3120395             flowlog same results: identical
+jadx  de.markusfisch.android.binaryeye_180     souffle same results: identical
+jadx  de.markusfisch.android.binaryeye_180     flowlog same results: identical
+jadx  eu.faircode.netguard_2026080101          souffle same results: identical
+jadx  eu.faircode.netguard_2026080101          flowlog same results: logicalLocations: 6 items only in A, 7 only in B; results: 1 items only in A, 1 only in B
+jadx  net.sourceforge.opencamera_96            souffle same results: identical
+jadx  net.sourceforge.opencamera_96            flowlog same results: identical
+jadx  org.billthefarmer.diary_1105             souffle same results: identical
+jadx  org.billthefarmer.diary_1105             flowlog same results: identical
+jadx  org.billthefarmer.editor_198             souffle same results: identical
+jadx  org.billthefarmer.editor_198             flowlog same results: identical
+jadx  org.connectbot_11101000                  souffle same results: stats.ctx: 5720 != 5719
+jadx  org.connectbot_11101000                  flowlog same results: logicalLocations: 8 items only in A, 7 only in B; results: 1 items only in A, 1 only in B
+jadx  org.schabi.newpipe_1015                  souffle same results: logicalLocations: 6 items only in A, 6 only in B; results: 1 items only in A, 1 only in B; stats.LocallyReachable-ctx: 89149 != 89145; stats.LocallyReachableSources: 250267 != 250263; stats.ctx: 10306 != 10304; stats.import-vertex: 2134498 != 2134488; stats.import-virtual-assign: 1386775 != 1386771; stats.summary-flow-ctx: 26114 != 26110; stats.vertex: 2134498 != 2134488; stats.virtual-alloc-ctx: 82283 != 82271; stats.virtual-assign-ctx: 49679 != 49675
+jadx  org.schabi.newpipe_1015                  flowlog same results: logicalLocations: 6 items only in A, 7 only in B; results: 1 items only in A, 1 only in B
+jadx  org.secuso.privacyfriendlynotes_105      souffle same results: identical
+jadx  org.secuso.privacyfriendlynotes_105      flowlog same results: identical
+jadx  org.wikipedia_50614                      souffle same results: stats.ctx: 14634 != 14635
+jadx  org.wikipedia_50614                      flowlog same results: identical
+
+## syn25's databases: FlowLog 84b3a1c + #477 (../../bench/syn25) against 49d9999 (synthetic.txt),
+## with 32 workers, compare_db.py -q --keys VirtualAssign=0,1,2,3,4,5,6 --schema index_schema.json
+## --schema query_schema.json: every column, witnesses included, but record ids. <earlier ctadl>
+## and <new ctadl> stand for the two CTADL checkouts.
+DIFF     CTADLConfig: souffle 17, flowlog 17, souffle-only 1, flowlog-only 1
+           - ('CTADL_Query', '<earlier ctadl>/src/ctadl/souffle-logic/taint-front/taintquery.dl')
+           + ('CTADL_Query', '<new ctadl>/src/ctadl/souffle-logic/taint-front/taintquery.dl')
+summary: 119 equal, 1 different
+## The same with 1 worker:
+DIFF     CTADLConfig: souffle 17, flowlog 17, souffle-only 1, flowlog-only 1
+           - ('CTADL_Query', '<earlier ctadl>/src/ctadl/souffle-logic/taint-front/taintquery.dl')
+           + ('CTADL_Query', '<new ctadl>/src/ctadl/souffle-logic/taint-front/taintquery.dl')
+summary: 119 equal, 1 different
+## Record ids are the engine's numbering: with 32 workers and without --schema, the 3 relations
+## with a record column differ in them (--only on those, --samples 2). With --schema, they are
+## equal, with 1 and 32 workers.
+DIFF     ActualParam: souffle 279, flowlog 279, souffle-only 233, flowlog-only 233
+           - ('-1', 't0', '', '10')
+           - ('-1', 't0', '', '23')
+           + ('-1', 't0', '', '1')
+           + ('-1', 't0', '', '2')
+DIFF     DirectCall: souffle 57, flowlog 57, souffle-only 54, flowlog-only 54
+           - ('f0', '1')
+           - ('f0', '28')
+           + ('f0', '13')
+           + ('f0', '48')
+DIFF     IndirectCall: souffle 36, flowlog 36, souffle-only 33, flowlog-only 33
+           - ('t0', '.func', '29')
+           - ('t0', '.func', '31')
+           + ('t0', '.func', '17')
+           + ('t0', '.func', '32')
+summary: 0 equal, 3 different
+
+## CTADL's own time: libz with Soufflé only, in the earlier runs' environment (CTADL checkout and
+## state directory) and in this one, alternating, two runs each. CTADL's code for Soufflé is the
+## same in both, and was in the earlier runs. ../pcode.txt's libz query took 15.56 s on Oct 30, in
+## the earlier environment, which now takes 17.6-17.9 s. In this one, Soufflé's compiled query has
+## the same cache key, but its generated C++ writes the outputs in another order, and its analysis
+## takes 3.17 s instead of 2.92 s.
+earlier-1 libz       souffle  32 |   12.41     8.03    8.03    160M |   17.59     2.92    2.92     95M | (reference)
+new-1     libz       souffle  32 |   12.76     7.93    7.93    157M |   18.39     3.17    3.17     95M | (reference)
+earlier-2 libz       souffle  32 |   12.36     7.93    7.93    159M |   17.91     2.92    2.92     96M | (reference)
+new-2     libz       souffle  32 |   12.52     7.93    7.93    159M |   19.02     3.17    3.17     95M | (reference)

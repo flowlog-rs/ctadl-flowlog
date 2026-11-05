@@ -1,0 +1,27 @@
+# Compiling CTADL's analyses with FlowLog main at 49d9999 and with Soufflé 2.5, as in
+# ../compile-times.txt, in one pass from empty analysis caches and an empty cargo target dir (that
+# file's pass1): bench.py ran libz's (P-code), Diary's (JADX) and syn10's (taint-front) index and
+# query phases with 32 workers, with each engine's compiler wrapped to time each call alone.
+# FlowLog's first compilation, the P-code index, also builds its runtime and dependencies.
+# s: wall seconds of the compiler call; peak: peak RSS of its largest process, MiB; binary: the
+# cached analysis, MB (10^6 bytes). tf: taint-front.
+souffle  pass1  pcode-index    234.1 s  peak   2883 MiB  binary   10.6 MB
+souffle  pass1  pcode-query     68.3 s  peak   1471 MiB  binary    4.1 MB
+flowlog  pass1  pcode-index    325.4 s  peak  10822 MiB  binary  263.1 MB
+flowlog  pass1  pcode-query    118.3 s  peak   5567 MiB  binary  122.9 MB
+souffle  pass1  jadx-index     234.3 s  peak   3291 MiB  binary   11.5 MB
+souffle  pass1  jadx-query      67.7 s  peak   1471 MiB  binary    4.1 MB
+flowlog  pass1  jadx-index     268.5 s  peak  11245 MiB  binary  242.9 MB
+flowlog  pass1  jadx-query     117.8 s  peak   5584 MiB  binary  122.9 MB
+souffle  pass1  tf-index       162.7 s  peak   2452 MiB  binary    8.6 MB
+souffle  pass1  tf-query        70.5 s  peak   1492 MiB  binary    4.2 MB
+flowlog  pass1  tf-index       193.3 s  peak   8876 MiB  binary  183.9 MB
+flowlog  pass1  tf-query       120.7 s  peak   5658 MiB  binary  126.0 MB
+
+# bench.py's rows: idx and query include compiling, and rss is the compiler's.
+pass1  libz       souffle  32 |  247.30     7.93    7.93   2883M |   85.91     2.97    2.97   1471M | (reference)
+pass1  libz       flowlog  32 |  336.14     6.00    4.18  10822M |  133.78     1.60    0.92   5567M | summary: 210 equal (1 up to choice-domain witnesses), 0 different; sarif: equal
+pass1  org.billthefarmer.diary_1105 souffle  32 |  238.85     2.17    2.17   3291M |   83.78     0.67    0.67   1471M | (reference)
+pass1  org.billthefarmer.diary_1105 flowlog  32 |  275.25     3.36    2.82  11245M |  136.34     1.05    0.72   5584M | summary: 160 equal, 6 different; sarif: different (4 places); same results up to code flows
+pass1  syn10      souffle  32 |  165.20     0.56    0.56   2452M |   74.08     0.77    0.77   1492M | (reference)
+pass1  syn10      flowlog  32 |  197.58     1.38    1.32   8876M |  125.19     0.95    0.72   5658M | summary: 116 equal (1 up to choice-domain witnesses), 4 different

@@ -1,0 +1,17 @@
+# CTADL's FlowLog checks and the repros on FlowLog main at 49d9999, with this branch, as in
+# ../flowlog-59f6909.txt: the semantics, choice_mini and adapter suites, run_taintfront.py on
+# CTADL's taint-front tests with both engines, CTADL's check-taintfront with the FlowLog engine,
+# and repros/. Each gives 59f6909's output, but for the temporary paths in the adapter's messages
+# and the repros of B14 and B15, which main has fixed since (#508, #516).
+tests/flowlog/semantics/run.sh, WORKERS="1 4 32": all passed (20 cases at each worker count; 41 rejects, 7 invalid, 11 aborts, 3 warns)
+tests/flowlog/choice_mini/run.sh, WORKERS="1 4 32":
+  Reach: -w1 ok -w4 ok -w32 ok (Souffle: same-round tie broken differently)
+  NR: -w1 ok -w4 ok -w32 ok (= Souffle)
+  FwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+  BwOut: -w1 ok -w4 ok -w32 ok (= Souffle)
+tests/flowlog/adapter/run.sh: 24 of 24 ok
+run_taintfront.py --backend both: 12 of 12 programs: checks ok with both engines; summary: 120 equal, 0 different; sarif: equal
+CTADL_ENGINE=flowlog bash tests/bin/check-taintfront: exit 0 (12 programs)
+repros/check.sh: results/repros/main-49d9999.txt, the lines of main-b99ed29.txt but neg_only_body: compile FAILED: error: rule body has no positive atom or aggregate (B15)
+repros/check.sh -t: the lines of results/repros/translated-b99ed29.txt
+repros/same_name.sh: a: O={1} b: O={2} (B14 fixed)
