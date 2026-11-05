@@ -1,0 +1,7 @@
+// FlowLog writes one output of a relation, and the copies that write the
+// others write files
+// expect: two outputs of the relation are not to a file
+.decl R(x: number)
+R(1).
+.output R(IO=sqlite, filename="a.db")
+.output R(IO=sqlite, filename="b.db")

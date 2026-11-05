@@ -1,0 +1,7 @@
+// expect: .printsize of undefined relation Z
+.decl K(x: number)
+K(0).
+.decl O(n: number)
+.output O
+O(x) :- K(x).
+.printsize Z

@@ -1,0 +1,8 @@
+// Numeric conversions are not translated.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+.decl U(x: unsigned)
+.output U
+U(to_unsigned(x)) :- P(x).

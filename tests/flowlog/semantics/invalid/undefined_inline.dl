@@ -1,0 +1,9 @@
+// The clause of the unused inline relation P names the undefined Z.
+// expect: line 6: undefined relation Z
+.decl K(x: number)
+K(0).
+.decl P(x: number) inline
+P(x) :- Z(x).
+.decl O(n: number)
+.output O
+O(x) :- K(x).

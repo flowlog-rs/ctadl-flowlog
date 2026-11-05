@@ -1,0 +1,17 @@
+// B reads A's choice-domain relation R: its claims would follow B's
+// instance, not A's.
+// expect: names a relation of an enclosing instance
+.comp A {
+  .decl R(x: number, y: number) choice-domain x
+  R(1, 2).
+  R(1, 3).
+  .comp B {
+    .decl S(y: number)
+    S(y) :- R(_, y).
+  }
+  .init b = B
+}
+.init a = A
+.decl O(y: number)
+.output O
+O(y) :- a.b.S(y).

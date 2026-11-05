@@ -1,0 +1,8 @@
+// The head's division is checked on the rows R(x, x, b) binds, but Souffle
+// evaluates the body's copy before testing the repeated x, and stops on
+// R(1, 2, 0) as well.
+.decl R(x: number, y: number, b: number)
+R(6, 6, 2). R(1, 2, 0).
+.decl O(q: number)
+.output O
+O(x / b) :- R(x, x, b), x / b > 1. // unchecked

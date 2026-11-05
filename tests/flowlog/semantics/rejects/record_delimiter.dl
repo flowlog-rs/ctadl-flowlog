@@ -1,0 +1,10 @@
+// The engine reads and writes the record columns of a fact file with the tab
+// delimiter only. (With a delimiter that has a comma, Souffle splits a line
+// around the records.)
+// expect: record columns in a file need the tab delimiter
+.type P = [a: number, b: symbol]
+.decl R(p: P)
+.input R(delimiter=",")
+.decl O(x: number)
+.output O
+O(a) :- R([a, _]).

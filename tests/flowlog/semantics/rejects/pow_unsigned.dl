@@ -1,0 +1,6 @@
+// ^ on unsigned is not translated (literals in an unsigned context too).
+.decl U(u: unsigned)
+U(3).
+.decl B(x: unsigned)
+.output B
+B(2 ^ 3) :- U(_).

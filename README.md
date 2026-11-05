@@ -2,6 +2,17 @@
 
 # CTADL
 
+Repeatable runs of the normal CTADL commands are documented in
+[`benchmark/README.md`](benchmark/README.md). The scripts record raw logs, input checksums,
+tool versions and per-run measurements. `ctadl index` and `ctadl query` also accept
+`--timings FILE` to record phase timings and captured subprocess output during ordinary use.
+
+> **FlowLog engine (this fork).** Run normal `ctadl index` and `ctadl query` commands
+> with `--engine flowlog` (or `CTADL_ENGINE=flowlog`). CTADL translates the same Soufflé
+> analysis sources, compiles and caches them, and adapts their inputs and outputs.
+> See [the engine guide](docs/flowlog.md) for setup, supported behavior and correctness
+> checks, and [benchmark scripts](benchmark/README.md) for repeatable measurements.
+
 [CTADL](https://github.com/sandialabs/ctadl) is a static taint analysis tool.
 
 CTADL (pronounced "citadel") takes as input a program, known as a system under test (SUT), and allows you to perform taint analysis across procedures.

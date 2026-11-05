@@ -1,0 +1,8 @@
+// An inline relation inside an aggregate; Souffle rejects this too.
+.decl R(a: number)
+R(1). R(2).
+.decl I(a: number) inline
+I(a) :- R(a).
+.decl O(n: number)
+.output O
+O(n) :- n = count : { I(_) }.

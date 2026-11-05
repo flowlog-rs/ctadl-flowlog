@@ -1,0 +1,6 @@
+// Souffle: "error: wrong string provided by to_number" and SIGFPE.
+.decl S(s: symbol)
+.decl O(n: number)
+.output O
+O(to_number(s)) :- S(s).
+S("12"). S("abc").

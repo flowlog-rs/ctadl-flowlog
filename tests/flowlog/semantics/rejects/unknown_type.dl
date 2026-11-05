@@ -1,0 +1,4 @@
+// int32 is a FlowLog type, not a Souffle one.
+.decl O(x: int32)
+.output O
+O(1).

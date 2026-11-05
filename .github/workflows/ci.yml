@@ -14,6 +14,22 @@ env:
   NIX_CONFIG: experimental-features = nix-command flakes
 
 jobs:
+  unit:
+    name: Python regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e . jsonschema rich psutil
+      - name: Native execution and correctness checks
+        run: >-
+          python -m unittest tests.test_timings tests.test_flowlog_runtime_cache
+          tests.test_choice_model tests.test_facts_writer tests.test_sarif_path_order
+      - name: Benchmark record and comparison checks
+        run: python -m unittest discover -s benchmark -p 'test_*.py'
+
   test:
     name: Test
     runs-on: ubuntu-latest

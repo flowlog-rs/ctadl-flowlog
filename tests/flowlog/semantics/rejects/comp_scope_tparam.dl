@@ -1,0 +1,15 @@
+// B's R is A's R, whose column has A's type parameter T.
+// expect: names a relation of an enclosing instance
+.comp B {
+  .decl S(x: number)
+  S(x) :- R(x).
+}
+.comp A<T> {
+  .decl R(x: T)
+  .init b = B
+}
+.init a = A<number>
+a.R(4).
+.decl O(x: number)
+.output O
+O(x) :- a.b.S(x).

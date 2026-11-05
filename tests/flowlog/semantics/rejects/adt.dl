@@ -1,0 +1,7 @@
+// Algebraic data types are not supported.
+.type T = A {x: number} | B {}
+.decl R(t: T)
+R($A(1)).
+.decl O(x: number)
+.output O
+O(x) :- R($A(x)).

@@ -1,0 +1,6 @@
+// The binary min and max functors are not translated.
+.decl P(x: number)
+P(1). P(2).
+.decl O(x: number)
+.output O
+O(min(x, 2)) :- P(x).

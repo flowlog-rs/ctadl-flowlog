@@ -1,0 +1,13 @@
+// c.S: component C declares no S.
+// expect: line 13: undefined relation c.S
+.decl K(x: number)
+K(0).
+.comp C {
+  .decl R(x: number)
+  R(x) :- K(x).
+}
+.init c = C
+.decl O(n: number)
+.output O
+O(x) :- K(x).
+O(x) :- c.S(x), x != x.

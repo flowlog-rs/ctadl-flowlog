@@ -1,0 +1,8 @@
+// Souffle rejects the undefined Z although the clause can never fire.
+// expect: line 8: undefined relation Z
+.decl K(x: number)
+K(0).
+.decl O(n: number)
+.output O
+O(1) :- K(_).
+O(2) :- K(_), Z(1), 1 = 2.

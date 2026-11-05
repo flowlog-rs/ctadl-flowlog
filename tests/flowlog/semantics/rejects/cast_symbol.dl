@@ -1,0 +1,7 @@
+// as() between different base types is a reinterpretation in Souffle (a
+// symbol table index); FlowLog has no equivalent.
+.decl R(a: number)
+R(1).
+.decl O(s: symbol)
+.output O
+O(as(x, symbol)) :- R(x).

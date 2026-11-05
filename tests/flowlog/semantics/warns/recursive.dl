@@ -1,0 +1,7 @@
+// A division in the head of a recursive clause: Souffle stops once x
+// reaches 5.
+.decl Rec(x: number)
+.output Rec
+Rec(0).
+Rec(x + 1) :- Rec(x), x < 10.
+Rec(100 / (x - 5)) :- Rec(x), x < 10. // unchecked

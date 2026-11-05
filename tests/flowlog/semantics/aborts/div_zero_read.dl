@@ -1,0 +1,9 @@
+// A division in a relation that is not an output, but whose column an
+// output reads: Souffle computes it.
+.decl N(x: number)
+N(5). N(0).
+.decl I(x: number, q: number)
+I(x, 100 / x) :- N(x).
+.decl O(q: number)
+.output O
+O(q) :- I(_, q).

@@ -1,0 +1,63 @@
+// Relation names in components resolve as Souffle's instantiation does: the
+// innermost enclosing instance whose component declares a name owns it
+// (B's R and x.V below are A's), else the program does.
+.type P = [a: number, b: number]
+
+.decl R(x: number)
+R(100).
+.decl V(v: number)
+V(200).
+
+.comp D {
+  .decl V(v: number)
+  V(7).
+}
+
+.comp A {
+  // shadows the global R in A's instances, with a record column
+  .decl R(p: P)
+  .decl G(g: number)
+  .init x = D
+  .comp B {
+    .decl S(a: number)
+    S(a) :- R([a, _]).
+    .decl T(n: number)
+    T(n) :- n = count : { R(_) }.
+    .decl W(v: number)
+    W(v) :- x.V(v).
+    W(v) :- V(v), v > 150.
+    .decl Neg(a: number)
+    Neg(a) :- G(a), !R([a, 2]).
+  }
+  .init b = B
+  .decl Q(a: number)
+  Q(a) :- b.S(a).
+}
+
+.init a1 = A
+a1.R([1, 2]).
+a1.R([3, 4]).
+a1.G(1).
+a1.G(3).
+.init a2 = A
+a2.R([5, 2]).
+a2.G(5).
+a2.G(6).
+
+.decl O1(i: number, a: number)
+.output O1
+O1(1, a) :- a1.b.S(a).
+O1(2, a) :- a2.b.S(a).
+.decl O2(i: number, n: number)
+.output O2
+O2(1, n) :- a1.b.T(n).
+O2(2, n) :- a2.b.T(n).
+.decl O3(i: number, v: number)
+.output O3
+O3(1, v) :- a1.b.W(v).
+O3(2, v) :- a2.b.W(v).
+.decl O4(i: number, a: number)
+.output O4
+O4(1, a) :- a1.b.Neg(a).
+O4(2, a) :- a2.b.Neg(a).
+O4(3, a) :- a1.Q(a).

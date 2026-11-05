@@ -1,3 +1,17 @@
+# Unreleased
+
+- Added FlowLog as an alternative engine for the analyses: `ctadl index` and
+  `ctadl query` take `--engine flowlog` (or `CTADL_ENGINE=flowlog`). The
+  FlowLog engine (`ctadl.flowlog`) translates the Souffle analyses to FlowLog,
+  compiles them with `flowlog-compiler` and caches them like the Souffle
+  binaries. The index database has the same layout with either engine.
+- Added optional `--timings` logs to normal analysis commands and reproducible
+  benchmark scripts under `benchmark/`, including pinned workload inputs.
+- Stabilized SARIF path traversal, retained local entry points for P-code
+  functions, and reduced SQLite overhead in model writes and index reads.
+- Included local FlowLog runtime sources in analysis cache invalidation and
+  fixed qualified output coverage in choice-model verification.
+
 # 0.14.1
 
 - Exit before plugin run if artifact is not found.

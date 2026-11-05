@@ -1,0 +1,8 @@
+a,s>a,1
+b,s>b,1
+c,s>b>c,2
+d,s>b>d,2
+e,s>a>e,2
+f,s>a>e>f,3
+s,s,0
+t,s>b>d>t,3

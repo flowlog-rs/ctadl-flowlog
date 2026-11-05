@@ -1,0 +1,47 @@
+// choice-domain over records (policy in choice.policy.json). The candidates
+// of a key come from different facts or clauses, whose order decides both
+// Soufflé's choice and the translation's priorities. Soufflé prints records
+// as [x, y], so they are compared through the flattening O* relations.
+.type P = [x: number, y: symbol]
+
+// a record key: equal records compete, [1, "p"] keeps its first fact
+.decl R(k: P, v: symbol) choice-domain k
+R([1, "p"], "a").
+R([1, "p"], "b").
+R([1, "q"], "c").
+R([2, "p"], "d").
+.decl OR(x: number, y: symbol, v: symbol)
+OR(x, y, v) :- R([x, y], v).
+.output OR
+
+// a record dependent column
+.decl S(k: number, v: P) choice-domain k
+S(1, [5, "z"]).
+S(1, [6, "w"]).
+S(2, [7, "u"]).
+.decl OS(k: number, x: number, y: symbol)
+OS(k, x, y) :- S(k, [x, y]).
+.output OS
+
+// a key of a plain column and a record
+.decl T(a: number, p: P, v: number) choice-domain (a, p)
+T(1, [1, "p"], 10).
+T(1, [1, "p"], 11).
+T(1, [2, "p"], 12).
+T(2, [1, "p"], 13).
+.decl OT(a: number, x: number, y: symbol, v: number)
+OT(a, x, y, v) :- T(a, [x, y], v).
+.output OT
+
+// record keys built by rules: the first clause's candidate wins
+.decl Src1(x: number, y: symbol, v: number)
+Src1(1, "p", 10).
+.decl Src2(x: number, y: symbol, v: number)
+Src2(1, "p", 20).
+Src2(2, "q", 30).
+.decl D(k: P, v: number) choice-domain k
+D([x, y], v) :- Src1(x, y, v).
+D([x, y], v) :- Src2(x, y, v).
+.decl OD(x: number, y: symbol, v: number)
+OD(x, y, v) :- D([x, y], v).
+.output OD
