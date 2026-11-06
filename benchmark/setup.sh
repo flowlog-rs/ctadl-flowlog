@@ -19,15 +19,19 @@ git -C "$FLOWLOG_SRC" merge --ff-only origin/main
 CARGO_TARGET_DIR="$FLOWLOG_SRC/target" cargo build --manifest-path "$FLOWLOG_SRC/Cargo.toml" \
     --release --locked -p flowlog-compiler -j "${CARGO_BUILD_JOBS:-8}"
 python3 -m venv .venv
-.venv/bin/python -m pip install -r benchmark/requirements.txt -e . -e plugins/taint-front -e plugins/ghidra
+.venv/bin/python -m pip install -r benchmark/requirements.txt -e . -e plugins/taint-front -e plugins/ghidra -e plugins/networkx-export
 (cd taint-front && dune build)
 ln -sfn "$CTADL_ROOT/taint-front/_build/default/taint.exe" "$CTADL_ROOT/.local/bin/taintfront"
+# Verify the actual compiler/runtime contract before recording a usable build.
+python3 tests/flowlog/native_sqlite/run.py
 python3 - <<'PY'
 import hashlib, json, os, subprocess
 from pathlib import Path
+from ctadl.flowlog import SQLITE_IO_MODE
 root = Path(os.environ['FLOWLOG_SRC'])
 compiler = Path(os.environ['FLOWLOG_COMPILER'])
 record = {'commit': subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'], text=True).strip(),
+          'sqlite_io': SQLITE_IO_MODE,
           'compiler_sha256': hashlib.sha256(compiler.read_bytes()).hexdigest(),
           'rustc': subprocess.check_output(['rustc','--version'], text=True).strip(),
           'cargo_lock_sha256': hashlib.sha256((root/'Cargo.lock').read_bytes()).hexdigest()}

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Compare the relations of two CTADL SQLite DBs (Souffle vs FlowLog).
 
-Either DB may use Souffle's layout (each relation `R` is a view over `_R`
-joined with `__SymbolTable`; detected by the presence of `__SymbolTable`) or
-FlowLog's native layout (plain tables). Rows are compared as sets of
-stringified tuples, by column position.
+Both engines use the shared dictionary layout: each relation `R` is a view
+over `_R` joined with `__SymbolTable`. Rows are compared as sets of stringified
+tuples, by column position. Internal dictionary and schema tables are not
+relations.
 
 Relations whose Souffle declaration has a `choice-domain` (CHOICE_KEYS) are
 compared on full rows, but if they differ only in the dependent columns --
@@ -105,17 +105,16 @@ def normalize_ids(db: sqlite3.Connection, rels: dict, name: str, rs: list) -> li
 
 
 def relations(db: sqlite3.Connection) -> dict[str, str]:
-    souffle = db.execute("SELECT 1 FROM sqlite_master WHERE name='__SymbolTable'").fetchone() is not None
-    kind = "view" if souffle else "table"
-    names = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type=?", (kind,))]
+    if db.execute("SELECT 1 FROM sqlite_master WHERE name='__SymbolTable'").fetchone() is None:
+        raise ValueError("Expected a native shared-dictionary CTADL database")
+    names = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='view'")]
     tables = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     return {n: n for n in names
-            if not n.startswith("sqlite_") and (not n.startswith("_") or souffle and f"_{n}" in tables)}
+            if not n.startswith("sqlite_") and (not n.startswith("_") or f"_{n}" in tables)}
 
 
 def rows(db: sqlite3.Connection, name: str) -> list[tuple]:
-    souffle = db.execute("SELECT 1 FROM sqlite_master WHERE name='__SymbolTable'").fetchone() is not None
-    cur = db.execute(RAW_SQL[name] if souffle and name in RAW_SQL else f'SELECT * FROM "{name}"')
+    cur = db.execute(RAW_SQL[name] if name in RAW_SQL else f'SELECT * FROM "{name}"')
     out = [tuple("" if v is None else str(v).partition("\0")[0] for v in r) for r in cur]
     return [r for r in out if not r or (name, r[0]) not in IGNORED_ROWS]
 

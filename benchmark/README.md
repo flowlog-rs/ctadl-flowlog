@@ -1,14 +1,20 @@
 # CTADL benchmark scripts
 
 分析仍由正常的 CTADL CLI 完成。此目录只准备输入、重复调用 CLI、检查结果并保存日志；
-没有另一套分析引擎，也不生成图表。历史实验保存在旧 PR 分支中；此目录保留可复用的输入生成器、比较器和正确性检查脚本。
+没有另一套分析引擎，也不生成图表。输入生成器、比较器和正确性检查脚本都在此目录。
+
+FlowLog 使用原生共享 SQLite 字典布局（需要已合并的 FlowLog #503）。普通 CLI、测试与
+benchmark 使用同一条路径，不复制 SQLite 关系到中间数据库。`manifest.json` 的
+`flowlog.sqlite_io` 和每条测量的 `sqlite_io` 标记为 `native-shared-dictionary-v1`；
+缺少对应 CLI 阶段标记的样本会被拒绝。
+`finalize_outputs` 记录字段名、索引、空输出和 record 展示元数据的处理，不是整库转换。
 
 ## 环境与普通使用
 
 在 CTADL 仓库根目录执行。Linux 上需要 Python 3.10+、Rust、Soufflé 2.5（含 SQLite）、
 C++ 编译器、OCaml/dune/menhir、curl、GNU time 和 Git。
 可在不提交的 `benchmark/local.env` 中配置工具 PATH、CARGO_HOME、RUSTUP_HOME、
-RUSTUP_TOOLCHAIN、CARGO_BUILD_JOBS 和 FLOWLOG_SRC；脚本不依赖旧 `/tmp/ctadl-perf`。
+RUSTUP_TOOLCHAIN、CARGO_BUILD_JOBS 和 FLOWLOG_SRC。
 
 ```bash
 bash benchmark/setup.sh
@@ -16,7 +22,9 @@ source benchmark/env.sh
 ```
 
 `setup.sh` 更新相邻 `../flowlog` 的干净 `main` checkout，使用 `--locked` 构建编译器，
-安装本仓库到 `.venv`，构建 taint-front。编译器版本及 SHA-256 写入 `compiler.json`，
+安装本仓库及本地前端、networkx 导出插件到 `.venv`，构建 taint-front，
+并执行真实编译器的原生 SQLite 读写检查。
+检查通过后，编译器版本、SHA-256 和 SQLite I/O 模式写入 `compiler.json`，
 环境准备日志写入 `runs/setup-*/`。再次执行 setup 才更新 FlowLog；测量脚本不更新代码。
 编译器和 `FLOWLOG_RUNTIME_PATH` 指向同一份 FlowLog。
 CTADL 的分析缓存包含本地 runtime 的源码和依赖指纹；runtime 更新也会重新编译分析。
@@ -45,6 +53,10 @@ bash benchmark/run.sh
 
 # 指定输入、线程数和次数
 bash benchmark/run.sh --workloads syn10 --workers 1,32 --reps 3
+
+# 多 NUMA node 的机器：先用 numactl --hardware 确认 CPU/node 编号。
+# 此机器的 node 1 物理核为 32–63；CPU 和内存都固定到同一 node。
+numactl --physcpubind=32-63 --membind=1 bash benchmark/run.sh --workloads libz,diary --workers 1,4,8
 ```
 
 `workloads.json` 是输入清单，包含 1 个 smoke、2 个合成程序、14 个 Ubuntu 二进制、
@@ -76,6 +88,8 @@ python3 benchmark/run.py --suite realistic
 然后比较数据库（以及真实程序的 SARIF）。再使用新的 facts 副本进行正式测量。
 各次运行串行；偶数次交换引擎顺序。预热记录标记为 `mode=warmup`，正式记录为 `mode=measure`。
 正式阶段若发现编译事件，样本标为 `invalid_metrics`，不能作为性能数据。
+`manifest.json` 记录 CPU affinity 和 NUMA 内存策略；NUMA 绑定由外层 `numactl`
+施加并由编译器、前端和两个引擎继承。不同轮次应保持相同绑定。
 
 比较使用已有的 compare_db/compare_pcode/compare_jadx/compare_sarif 工具，保留其原始输出。
 不同的合法 choice-domain witness 可能造成差异；只报告键相同的 `WITNESS` 也进入复核，
@@ -88,6 +102,8 @@ smoke 有差异即停止；其他输入继续测量，整轮标为 `needs_review
 检查选择的可推导性及所有输出（包括组件输出）。索引检查需要正常 CLI 的 `--all-outputs`，
 并先确认增加输出没有改变原始索引结果。检查结论只适用于对应的输入、程序和版本，
 不能把某次发现的差异类型加入全局忽略名单。
+`run_taintfront.py` 同样将 witness 或其他比较差异标为 `needs_review`、返回 4，
+并保留对应数据库；`--prune` 只删除比较相同且测试通过的数据库。
 
 默认在记录完成后删除成功运行的工作数据库、facts 副本和报告，保留日志及生成的 Datalog。
 `--keep-work` 保留这些工作目录；失败现场及比较有差异的预热数据库始终保留。真实输入和编译缓存可复用。
@@ -123,8 +139,8 @@ workloads/<id>/
 
 | 字段 | 含义 |
 |---|---|
-| `wall_seconds` | 整条 CTADL 命令的时间，包括驱动、模型生成、转换和报告；预热还可能含编译 |
-| `analyze_seconds` | 分析调用；FlowLog 包括输入转换、引擎、输出转换 |
+| `wall_seconds` | 整条 CTADL 命令的时间，包括驱动、模型生成、分析和报告；预热还可能含编译 |
+| `analyze_seconds` | 分析调用；FlowLog 包括输入准备、原生引擎、输出元数据处理 |
 | `engine_seconds` | 分析二进制运行，包含引擎自身的 I/O 和 SQLite 输出；不是纯 fixpoint 时间 |
 | `process_peak_rss_mib` | GNU time 记录的 CTADL 进程及其子进程最大 RSS，单位 MiB；不是进程 RSS 总和，也不声称是单独的引擎 RSS |
 | `mode` / `repetition` | `warmup` 的 repetition 为 0；`measure` 从 1 开始 |

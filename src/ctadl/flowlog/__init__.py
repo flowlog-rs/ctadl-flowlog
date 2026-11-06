@@ -6,11 +6,11 @@ import, models, preprocessing, the index database and the query results --
 is the same as with Souffle. The preprocessed Souffle program is translated
 to FlowLog (souffle2flowlog.py) and compiled with flowlog-compiler. Like the
 Souffle binaries, the compiled analyses are cached in CTADL's state
-directory, keyed by the program, the translation and the compiler. A run
-converts the analysis' inputs to the layouts FlowLog reads, and its outputs
-back to Souffle's (facts.py for files, sqlite_layout.py for sqlite), so the
-index database and the output files are the same whichever engine wrote
-them. Input and output files must have relative names, as CTADL's do.
+directory, keyed by the program, the translation and the compiler. SQLite
+inputs and outputs link to CTADL's actual database: FlowLog reads and writes
+its dictionary ids directly. native_sqlite restores public attribute names,
+record views and indexes; facts.py adapts text files. Input and output files
+must have relative names, as CTADL's do. Requires FlowLog dictionary I/O (#503).
 
 The translation is generic; CTADL's part of it is in souffle-logic/:
 functors.rs, the Rust port of functors.cpp, and flowlog-policy.json, which
@@ -43,7 +43,9 @@ from pathlib import Path
 import ctadl
 from ctadl import analysiscachedir, error, status, timings
 
-from . import facts, souffle2flowlog, sqlite_layout
+from . import facts, native_sqlite, souffle2flowlog
+
+SQLITE_IO_MODE = native_sqlite.IO_MODE
 
 PACKAGE = resources.files(ctadl)
 TRANSLATOR = PACKAGE / "flowlog" / "souffle2flowlog.py"
@@ -91,6 +93,7 @@ class FlowLogAnalysis:
         flc = compiler()
         runtime = os.environ.get("FLOWLOG_RUNTIME_PATH")
         key = hashlib.sha256()
+        key.update(SQLITE_IO_MODE.encode() + b"\0")
         for p in (src, POLICY, FUNCTORS, TRANSLATOR, TRANSLATOR_UDFS):
             key.update(p.read_bytes() + b"\0")
         st = flc.stat()
@@ -111,7 +114,7 @@ class FlowLogAnalysis:
         self.files = self.schema.get("files", {})
         for rel in self.inputs() + self.outputs():
             name = rel["file"]
-            # the run reads and writes FlowLog's layout in a scratch directory
+            # Scratch directories contain links to the actual SQLite databases.
             if Path(name).is_absolute() or name.startswith(("file:", ":memory:")):
                 error(
                     f"the FlowLog engine needs relative input and output file names: '{name}' ({rel['name']})"
@@ -191,14 +194,10 @@ class FlowLogAnalysis:
                         p.unlink()
 
     def read_inputs(self, fact_dir, tmp: Path) -> tuple[Path, Path]:
-        """Writes the analysis' inputs, from the Souffle fact directory
-        FACT_DIR (default: the working directory, as for Souffle) and the
-        sqlite databases its program reads, to a fresh directory in TMP, in
-        FlowLog's layout. An input missing from them is left out: like
-        Souffle, FlowLog fails if it reads it. Returns the input and output
-        directories for the FlowLog run."""
+        """Adapt text facts and link SQLite inputs/outputs without copying rows."""
         indir, outdir = tmp / "in", tmp / "out"
         src = Path(fact_dir or ".")
+        self.sqlite_outputs = []
         for d, rels in ((indir, self.inputs()), (outdir, self.outputs())):
             d.mkdir()
             for rel in rels:
@@ -211,26 +210,30 @@ class FlowLogAnalysis:
                 if not db.exists():
                     error(f"input database does not exist: '{db}'")
                     sys.exit(1)
-                sqlite_layout.to_flowlog(str(db), str(indir / fname), {"inputs": rels})
+                native_sqlite.check_inputs(db, rels)
+                (indir / fname).symlink_to(db.resolve())
+            for fname, rels in by_file(self.schema.get("outputs", [])).items():
+                db = Path(fname).resolve()
+                self.sqlite_outputs.append(native_sqlite.Output(db, rels))
+                (outdir / fname).symlink_to(db)
         except ValueError as e:
             error(f"cannot read the analysis inputs: {e}")
             sys.exit(1)
         return indir, outdir
 
     def write_outputs(self, outdir: Path) -> None:
-        """Writes the outputs of the run, in OUTDIR, where Souffle writes them
-        (CTADL runs it in the output directory), in Souffle's layout: the
-        sqlite outputs are added to their databases, the output files placed
-        (facts.place_outputs)."""
+        """Finish metadata on the shared database and place text outputs."""
         try:
-            for fname, rels in by_file(self.schema.get("outputs", [])).items():
-                sqlite_layout.to_souffle(
-                    str(outdir / fname), fname, {"outputs": rels}, append=True
-                )
+            for output in self.sqlite_outputs:
+                output.finish()
             facts.place_outputs(self.files.get("outputs", []), outdir)
         except ValueError as e:
             error(f"cannot write the analysis outputs: {e}")
             sys.exit(1)
+
+    def cleanup(self):
+        for output in getattr(self, "sqlite_outputs", []):
+            output.cleanup()
 
 
 def by_file(rels: list) -> dict:

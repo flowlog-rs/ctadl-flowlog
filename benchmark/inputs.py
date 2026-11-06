@@ -104,6 +104,9 @@ def prepare_input(row: dict, env: dict, logs: Path, offline: bool) -> Path:
                 for p in extracted.rglob(row["member"])
                 if p.is_file() and not p.is_symlink()
             ]
+            # Packages may also contain configuration files with this basename.
+            # Select the exact pinned bytes rather than guessing a binary path.
+            candidates = [p for p in candidates if digest(p) == expected]
             if len(candidates) != 1:
                 raise RuntimeError(
                     f"Expected one {row['member']} in {archive}; got {candidates}"

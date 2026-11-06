@@ -1,4 +1,5 @@
 import json
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,9 +7,46 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import run as benchmark_run
+import compare_db
+from run_taintfront import comparison_equal
 
 
 class TestComparison(unittest.TestCase):
+    def test_taintfront_does_not_accept_choice_witnesses_or_report_differences(self):
+        self.assertTrue(
+            comparison_equal("summary: 120 equal, 0 different; sarif: equal")
+        )
+        self.assertFalse(
+            comparison_equal(
+                "summary: 120 equal (1 up to choice-domain witnesses), 0 different; sarif: equal"
+            )
+        )
+        self.assertFalse(
+            comparison_equal("summary: 120 equal, 0 different; sarif: DIFFERENT")
+        )
+        self.assertFalse(comparison_equal("comparison failed"))
+
+    def test_shared_dictionary_views_exclude_internal_metadata(self):
+        db = sqlite3.connect(":memory:")
+        try:
+            db.execute("CREATE TABLE R(value)")
+            with self.assertRaisesRegex(ValueError, "shared-dictionary"):
+                compare_db.relations(db)
+            db.executescript("""
+                DROP TABLE R;
+                CREATE TABLE __SymbolTable(id INTEGER PRIMARY KEY, symbol TEXT);
+                INSERT INTO __SymbolTable VALUES(1, 'value');
+                CREATE TABLE _R("0" INTEGER);
+                INSERT INTO _R VALUES(1);
+                CREATE VIEW R AS SELECT symbol FROM _R JOIN __SymbolTable ON "0"=id;
+                CREATE TABLE __FlowLogRecord(id INTEGER, fields TEXT);
+                CREATE TABLE __FlowLogNativeSchema(relation TEXT, columns_json TEXT);
+            """)
+            self.assertEqual(compare_db.relations(db), {"R": "R"})
+            self.assertEqual(compare_db.rows(db, "R"), [("value",)])
+        finally:
+            db.close()
+
     def test_success_exit_with_only_choice_witness_differences_requires_review(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

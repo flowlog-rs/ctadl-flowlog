@@ -1,0 +1,6 @@
+.type Pair = [n: number, s: symbol]
+.decl Rec(name: symbol, info: Pair)
+.input Rec(IO=sqlite, filename="shared.db")
+.decl Decoded(name: symbol, n: number, text: symbol)
+.output Decoded(IO=sqlite, filename="shared.db")
+Decoded(name, n, s) :- Rec(name, [n, s]).

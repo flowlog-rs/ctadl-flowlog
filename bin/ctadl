@@ -449,15 +449,30 @@ class FlowLogCompiledAnalysis(Command):
         self.analysis = analysis
 
     def analyze(self, fact_dir, out_dir, args) -> subprocess.CompletedProcess:
+        from ctadl.flowlog import SQLITE_IO_MODE
+
         with tempfile.TemporaryDirectory(prefix="flowlog-", dir=args.tmpdir) as tmp:
-            with timings.span("prepare_inputs", engine="flowlog"):
-                indir, outdir = self.analysis.read_inputs(fact_dir, Path(tmp))
-            self.add_args(["-F", str(indir), "-D", str(outdir), "-w", str(args.jobs)])
-            with timings.span("engine", engine="flowlog"):
-                res = self.run(capture_output=(ctadl.verbosity <= 0 or args.quiet))
-            with timings.span("write_outputs", engine="flowlog"):
-                self.analysis.write_outputs(outdir)
-            return res
+            try:
+                with timings.span(
+                    "prepare_inputs",
+                    engine="flowlog",
+                    sqlite_io=SQLITE_IO_MODE,
+                ):
+                    indir, outdir = self.analysis.read_inputs(fact_dir, Path(tmp))
+                self.add_args(
+                    ["-F", str(indir), "-D", str(outdir), "-w", str(args.jobs)]
+                )
+                with timings.span("engine", engine="flowlog", sqlite_io=SQLITE_IO_MODE):
+                    res = self.run(capture_output=(ctadl.verbosity <= 0 or args.quiet))
+                with timings.span(
+                    "finalize_outputs",
+                    engine="flowlog",
+                    sqlite_io=SQLITE_IO_MODE,
+                ):
+                    self.analysis.write_outputs(outdir)
+                return res
+            finally:
+                self.analysis.cleanup()
 
 
 def write_analyzer_config(args: Namespace, facts: model.Facts):

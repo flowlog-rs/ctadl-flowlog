@@ -115,6 +115,15 @@ def comparable(out: Path, name: str, phase: str) -> bool:
     return all(m.exists() and m.read_text().strip() == phase for m in marks)
 
 
+def comparison_equal(text: str) -> bool:
+    return (
+        ", 0 different" in text
+        and "up to choice-domain" not in text
+        and "WITNESS" not in text
+        and ("sarif" not in text or text.endswith("sarif: equal"))
+    )
+
+
 def compare(out: Path, name: str, schemas: list, phase: str) -> str:
     s, f = out / name / "souffle" / "ctadlir.db", out / name / "flowlog" / "ctadlir.db"
     cmd = [sys.executable, HERE / "compare_db.py", s, f, "-q", "--keys", "VirtualAssign=0,1,2,3,4,5,6"]
@@ -155,7 +164,7 @@ def main() -> int:
     if args.tests:
         tests = [t for t in tests if t.stem in args.tests]
     backends = ["souffle", "flowlog"] if args.backend == "both" else [args.backend]
-    failed = 0
+    failed = reviews = 0
     for t in tests:
         line = [f"{t.stem:22}"]
         passed = True
@@ -177,12 +186,15 @@ def main() -> int:
         if comparable(args.out, t.stem, args.phase):
             diff = compare(args.out, t.stem, args.schema, args.phase)
             line.append("diff: " + diff)
-            same = ", 0 different" in diff and ("sarif" not in diff or diff.endswith("sarif: equal"))
+            same = comparison_equal(diff)
+            if not same:
+                reviews += 1
+                line.append("needs_review (database retained)")
             if args.prune and passed and same:
                 for b in backends:
                     (args.out / t.stem / b / "ctadlir.db").unlink(missing_ok=True)
         print(" | ".join(line), flush=True)
-    return 1 if failed else 0
+    return 1 if failed else 4 if reviews else 0
 
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+.type Pair = [n: number, s: symbol]
+.decl R(type: symbol, n: number)
+.input R(IO=sqlite, filename="shared.db")
+.output R(IO=sqlite, filename="shared.db")
+R("added", n + 1) :- R("kept", n).
+
+.decl Rec(name: symbol, info: Pair)
+.output Rec(IO=sqlite, filename="shared.db")
+Rec(s, [n, s]) :- R(s, n).
+
+.decl Empty(x: symbol)
+.output Empty(IO=sqlite, filename="shared.db")
+.decl Missing(x: symbol)
+.output Missing(IO=sqlite, filename="shared.db")
+.decl Unit()
+.output Unit(IO=sqlite, filename="shared.db")
+Unit() :- R("kept", _).

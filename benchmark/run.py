@@ -19,6 +19,7 @@ from pathlib import Path
 
 from inputs import prepare_input, select
 from records import command, digest, event, phase_metrics, require_ok, utc, write_json
+from ctadl.flowlog import SQLITE_IO_MODE
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "benchmark"
@@ -100,6 +101,10 @@ def check_environment(rows):
             "Run bash benchmark/setup.sh to record the compiler build revision"
         )
     build = json.loads(build_file.read_text())
+    if build.get("sqlite_io") != SQLITE_IO_MODE:
+        raise RuntimeError(
+            "Native SQLite compiler/runtime check is missing; rerun benchmark/setup.sh"
+        )
     if build["commit"] != git("rev-parse", "HEAD") or build[
         "compiler_sha256"
     ] != digest(compiler):
@@ -143,7 +148,11 @@ def snapshot(run, rows, args, flowlog, compiler, build):
             "branch": capture(["git", "branch", "--show-current"]),
             "status": capture(["git", "status", "--porcelain"]),
         },
-        "flowlog": {**build, "source_sha256": source_hash(flowlog)},
+        "flowlog": {
+            **build,
+            "source_sha256": source_hash(flowlog),
+            "sqlite_io": SQLITE_IO_MODE,
+        },
         "options": vars(args),
         "workloads": rows,
         "environment": {
@@ -167,6 +176,9 @@ def snapshot(run, rows, args, flowlog, compiler, build):
             "platform": platform.platform(),
             "hostname": platform.node(),
             "cpu_affinity": sorted(os.sched_getaffinity(0)),
+            "numa_policy": (
+                capture(["numactl", "--show"]) if shutil.which("numactl") else None
+            ),
             "memory": Path("/proc/meminfo").read_text(),
             "cpu": capture(["lscpu"]),
             "disk_free_bytes": shutil.disk_usage(run).free,
@@ -244,6 +256,7 @@ def phases(
             "workload": row["id"],
             "language": row["lang"],
             "backend": backend,
+            "sqlite_io": SQLITE_IO_MODE if backend == "flowlog" else "souffle",
             "workers": workers,
             "repetition": rep,
             "mode": mode,
@@ -260,7 +273,14 @@ def phases(
         if program.exists():
             shutil.copyfile(program, directory / program.name)
         try:
-            result.update(phase_metrics(directory, record, measured=mode == "measure"))
+            result.update(
+                phase_metrics(
+                    directory,
+                    record,
+                    measured=mode == "measure",
+                    expected_sqlite_io=SQLITE_IO_MODE if backend == "flowlog" else None,
+                )
+            )
         except (ValueError, KeyError, TypeError, OSError) as exc:
             result.update(status="invalid_metrics", error=str(exc))
         write_json(directory / "measurement.json", result)
@@ -388,6 +408,7 @@ def export_csv(run: Path) -> None:
         "wall_seconds",
         "analyze_seconds",
         "engine_seconds",
+        "sqlite_io",
         "process_peak_rss_mib",
         "logs",
     ]

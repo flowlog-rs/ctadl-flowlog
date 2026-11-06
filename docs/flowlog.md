@@ -32,9 +32,18 @@ invalidates cached analyses. Keep compiler and runtime on the same revision.
 
 CTADL preprocesses its Soufflé analysis and translates it with
 [`ctadl.flowlog`](../src/ctadl/flowlog). The Rust functors and translation policy
-live next to the Soufflé analysis sources. Input and output adapters preserve
-CTADL's SQLite layout, so either engine can query an index produced by the other.
-Writing query outputs preserves existing tables and indexes.
+live next to the Soufflé analysis sources. SQLite uses FlowLog's native dictionary
+I/O (requires FlowLog #503, merged as `9935dc7`). Input and output paths link to
+the actual CTADL database; there is no intermediate SQLite database, relation
+copy or string re-interning pass. Both engines share `__SymbolTable` ids.
+
+FlowLog replaces output tables. CTADL restores the public column names and SQL
+indexes afterward, and empties outputs that the compiler pruned. Record-valued
+outputs retain native flattened storage; their public views expose record ids
+through `__FlowLogRecord`. Reading such records requires native storage metadata;
+Soufflé's process-local record ids cannot be decoded across processes. Text fact
+and result files still use the text adapter. Engine failures remain failures and
+are never silently retried through the old SQLite converter.
 
 Use `--timings FILE` on a normal command to record phase timings and captured
 subprocess output. It is optional and works for both engines:
@@ -45,8 +54,9 @@ ctadl --directory .local/example index --engine flowlog \
 ```
 
 The path is relative to the caller's working directory. The JSONL records
-distinguish compilation, input adaptation, engine execution, output adaptation
-and report work. Captured subprocess streams are stored beside the JSONL file.
+distinguish compilation, input preparation, engine execution, output metadata
+finalization (`finalize_outputs`) and report work. FlowLog phase records carry
+`sqlite_io=native-shared-dictionary-v1`. Captured subprocess streams are stored beside the JSONL file.
 [Benchmark scripts](../benchmark/README.md) add command metadata, resource usage,
 input checksums and source snapshots while calling the same CLI.
 
@@ -76,6 +86,7 @@ python3 -m unittest tests.test_timings tests.test_flowlog_runtime_cache \
   tests.test_choice_model tests.test_facts_writer tests.test_sarif_path_order
 python3 -m unittest discover -s benchmark -p 'test_*.py'
 bash tests/flowlog/adapter/run.sh
+python3 tests/flowlog/native_sqlite/run.py
 bash tests/flowlog/semantics/run.sh
 bash tests/flowlog/choice_mini/run.sh
 python3 benchmark/run_taintfront.py --backend both --prune \
@@ -84,6 +95,3 @@ bash benchmark/run.sh --suite smoke
 ```
 
 The semantics and taint-front suites include compilation and can take time.
-Historical experiments are retained in the
-[original PR branch](https://github.com/flowlog-rs/ctadl-flowlog/tree/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend).
-Their performance numbers describe their recorded revisions, not a newer run.

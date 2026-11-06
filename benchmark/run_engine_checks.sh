@@ -23,6 +23,10 @@
 HERE=$(cd "$(dirname "$0")" && pwd)
 CTADL=$(dirname "$HERE")
 cd "$CTADL" || exit 1
+python3 -c 'import networkx, ctadl_networkx_export_plugin' || {
+  echo "Missing export test dependencies; run bash benchmark/setup.sh" >&2
+  exit 2
+}
 T=$CTADL/tests/taint-front
 O=$HERE/runs/engine-$(date -u +%Y%m%dT%H%M%S)-$$
 J=${JOBS:-4}
@@ -36,10 +40,10 @@ prepare() { # DIR TEST INDEX_ENGINE
     ctadl --directory "$1" index --engine "$3" -f -j "$J" "${opts[@]}"
 }
 compare_db() { # DB1 DB2
-  python3 "$HERE/compare_db.py" "$1" "$2" -q --keys VirtualAssign=0,1,2,3,4,5,6 "${S[@]}" 2>&1 | tail -1
+  python3 "$HERE/compare_db.py" "$1" "$2" -q --keys VirtualAssign=0,1,2,3,4,5,6 "${S[@]}" 2>&1 | tee "$(dirname "$2")/database-compare.log" | tail -1
 }
 compare_sarif() { # SARIF1 SARIF2
-  python3 "$HERE/compare_sarif.py" "$1" "$2" 2>&1 | tail -1
+  python3 "$HERE/compare_sarif.py" "$1" "$2" 2>&1 | tee "$(dirname "$2")/sarif-compare.log" | tail -1
 }
 checks() { # DIR TEST: CTADL's checks of the test, as check-taintfront makes them
   local sarif=$1/$2.sarif
@@ -193,7 +197,7 @@ END
 }
 
 report | tee "$O/summary.txt"
-! grep -q -e FAILED -e DIFFER -e MISSING -e UNEXPECTED "$O/summary.txt" &&
+! grep -q -e FAILED -e DIFFER -e MISSING -e UNEXPECTED -e 'up to choice-domain' "$O/summary.txt" &&
   [ "$(grep -c ', 0 different; sarif: equal' "$O/summary.txt")" = 11 ] &&
   grep -q '^check-taintfront2, outputs: .*; gml: equal (' "$O/summary.txt" &&
   grep -q '^--dl fragment, FlowLog compilations: 1$' "$O/summary.txt"

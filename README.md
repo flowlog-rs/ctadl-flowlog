@@ -9,7 +9,8 @@ tool versions and per-run measurements. `ctadl index` and `ctadl query` also acc
 
 > **FlowLog engine (this fork).** Run normal `ctadl index` and `ctadl query` commands
 > with `--engine flowlog` (or `CTADL_ENGINE=flowlog`). CTADL translates the same Soufflé
-> analysis sources, compiles and caches them, and adapts their inputs and outputs.
+> analysis sources, compiles and caches them, and shares CTADL's SQLite database
+> through FlowLog's native dictionary I/O (FlowLog #503 or later).
 > See [the engine guide](docs/flowlog.md) for setup, supported behavior and correctness
 > checks, and [benchmark scripts](benchmark/README.md) for repeatable measurements.
 

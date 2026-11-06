@@ -125,7 +125,13 @@ def require_ok(record: dict, directory: Path) -> None:
         raise RuntimeError(f"{record['status']}: see {directory}/stderr.log")
 
 
-def phase_metrics(directory: Path, record: dict, *, measured: bool = False) -> dict:
+def phase_metrics(
+    directory: Path,
+    record: dict,
+    *,
+    measured: bool = False,
+    expected_sqlite_io: str | None = None,
+) -> dict:
     """Missing or malformed measurements are errors, never zero durations."""
     result = {
         "wall_seconds": record["wall_seconds"],
@@ -140,6 +146,20 @@ def phase_metrics(directory: Path, record: dict, *, measured: bool = False) -> d
         for line in (directory / "timings.jsonl").read_text().splitlines()
     ]
     phases = [r for r in phases if r["kind"] == "phase"]
+    if expected_sqlite_io:
+        tagged = [
+            r
+            for r in phases
+            if r["phase"] in ("prepare_inputs", "engine", "finalize_outputs")
+        ]
+        if {r["phase"] for r in tagged} != {
+            "prepare_inputs",
+            "engine",
+            "finalize_outputs",
+        } or any(r.get("sqlite_io") != expected_sqlite_io for r in tagged):
+            raise ValueError(
+                "Missing native SQLite I/O provenance; do not mix legacy adapter measurements"
+            )
     if measured and any(r["phase"] == "compile" for r in phases):
         raise ValueError(
             "Compilation occurred during measurement; this sample is invalid"

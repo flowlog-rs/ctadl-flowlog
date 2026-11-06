@@ -1,63 +1,12 @@
 #!/bin/bash
-# ctadl.flowlog's sqlite_layout.py on record columns, with a DB that Soufflé
-# itself writes.
-# Soufflé stores a record column as a record id that only the writing
-# process can decode, so:
-#   - an sqlite input that no rule reads is marked "read": false by the
-#     translator and created empty, even if its record ids are undecodable;
-#   - an input that a rule reads fails with an explanation;
-#   - record columns the port writes (to-souffle) still round-trip, and a
-#     nil (or dangling) record id fails;
-#   - an append keeps the ids of the symbols and records the DB has, and
-#     numbers new ones after the largest, in the order of FlowLog's rows;
-#   - an empty record relation needs no record table, both ways;
-#   - without FlowLog's DB, to-souffle creates every output empty;
-#   - an input missing from the DB is not created (FlowLog, like Soufflé,
-#     fails if it reads it);
-#   - an append replaces the rows of the relations it writes, keeping their
-#     tables, views and indexes, as Soufflé does, and fails, leaving the DB
-#     as it was, where one has another number of columns;
-#   - an append (to-souffle --append, as to CTADL's index) interrupted by
-#     Ctrl-C, or killed, leaves the DB as it was.
-# And facts.py, on a program with component instances (Soufflé names their
-# relations, and files, `i.A`, `o.in.A`): the inputs get their files in
-# FlowLog's layout (record columns flattened, as Soufflé reads them; an
-# input no rule reads empty; a missing file left out), and the output files
-# of a run are placed where Soufflé writes them, also for the outputs
-# FlowLog prunes, with record columns and nullary facts as Soufflé writes
-# them.
-# Needs `souffle` on PATH.   tests/flowlog/adapter/run.sh
+# Native shared SQLite contract, plus the existing text facts adapter checks.
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 PORT=$(cd "$HERE/../../../src/ctadl/flowlog" && pwd)
+cd "$HERE/../../.."
+python3 -m unittest tests.test_flowlog_runtime_cache
 W=$(mktemp -d)
 trap 'rm -rf "$W"' EXIT
-
-decls='.type R = [id: number, m: symbol]
-.decl Call(n: number, info: R)
-.decl Name(s: symbol)'
-cat > "$W/index.dl" <<EOF
-$decls
-Call(1, [7, "f"]). Call(2, [8, "g"]).
-Name("a"). Name("b").
-.output Call(IO=sqlite, filename="db.sqlite")
-.output Name(IO=sqlite, filename="db.sqlite")
-EOF
-for q in unread read; do
-  body='Out(s) :- Name(s).'
-  [ $q = read ] && body='Out(to_string(n)) :- Call(n, _).'
-  cat > "$W/$q.dl" <<EOF
-$decls
-.input Call(IO=sqlite, filename="db.sqlite")
-.input Name(IO=sqlite, filename="db.sqlite")
-.decl Out(s: symbol)
-$body
-.output Out
-EOF
-  python3 "$PORT/souffle2flowlog.py" "$W/$q.dl" -o "$W/$q.fl" --schema "$W/$q.json" > /dev/null
-done
-python3 "$PORT/souffle2flowlog.py" "$W/index.dl" -o "$W/index.fl" --schema "$W/index.json" > /dev/null
-souffle -D "$W" "$W/index.dl"
 
 cat > "$W/comp.dl" <<'EOF'
 .type R = [a: number, b: symbol]
@@ -127,175 +76,14 @@ python3 "$PORT/souffle2flowlog.py" "$W/comp.dl" -o "$W/comp.fl" --schema "$W/com
 souffle --wno=no-rules-nor-facts -F "$W/facts" -D "$W/sout" "$W/comp.dl"
 
 python3 - "$PORT" "$W" <<'EOF'
-import json, sqlite3, sys
+import json, sys
 sys.path.insert(0, sys.argv[1])
-import sqlite_layout as A
 W = sys.argv[2]
 fails = 0
-
 def check(what, ok):
     global fails
     print(f"  {'ok  ' if ok else 'FAIL'} {what}")
     fails += not ok
-
-def rows(db, rel):
-    return sorted(sqlite3.connect(db).execute(f'SELECT * FROM "{rel}"'))
-
-unread, read = (A.load_schema([f"{W}/{q}.json"]) for q in ("unread", "read"))
-flag = {q: {e["name"]: e.get("read", True) for e in s["inputs"]} for q, s in (("unread", unread), ("read", read))}
-check("the translator marks Call unread when no rule reads it", flag["unread"] == {"Call": False, "Name": True})
-check("and read when a rule does", flag["read"] == {"Call": True, "Name": False})
-
-counts = A.to_flowlog(f"{W}/db.sqlite", f"{W}/fl1.db", unread)
-check("Souffle's DB: the unread Call is created empty", counts["Call"] == 0 and rows(f"{W}/fl1.db", "Call") == [])
-check("and Name is converted", rows(f"{W}/fl1.db", "Name") == [("a",), ("b",)])
-try:
-    A.to_flowlog(f"{W}/db.sqlite", f"{W}/fl2.db", read)
-    check("Souffle's DB: reading Call's records fails", False)
-except ValueError as e:
-    check(f"Souffle's DB: reading Call's records fails: {e}", "does not store record contents" in str(e))
-
-# records written by the port (FlowLog layout -> Souffle layout -> back)
-out = A.load_schema([f"{W}/index.json"])
-fl = sqlite3.connect(f"{W}/fl_out.db")
-cols = [c for col in next(e for e in out["outputs"] if e["name"] == "Call")["columns"] for c in col["fl"]]
-fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
-fl.executemany("INSERT INTO Call VALUES (?, ?, ?)", [(1, 7, "f"), (2, 8, "g")])
-fl.execute("CREATE TABLE Name (s)")
-fl.commit()
-A.to_souffle(f"{W}/fl_out.db", f"{W}/port.sqlite", out, False)
-A.to_flowlog(f"{W}/port.sqlite", f"{W}/fl3.db", read)
-check("the port's DB: Call's records round-trip", rows(f"{W}/fl3.db", "Call") == [(1, 7, "f"), (2, 8, "g")])
-db = sqlite3.connect(f"{W}/port.sqlite")
-db.execute('UPDATE "_Call" SET "1" = 0 WHERE "0" = 2')
-db.commit()
-try:
-    A.to_flowlog(f"{W}/port.sqlite", f"{W}/fl4.db", read)
-    check("a nil record id fails", False)
-except ValueError as e:
-    check(f"a nil record id fails: {e}", "record id 0 is nil or unknown" in str(e))
-for i, (calls, names) in enumerate((([(1, 7, "f")], ["a"]), ([(3, 9, "h"), (2, 8, "g"), (1, 7, "f")], ["b", "a"]))):
-    fl = sqlite3.connect(f"{W}/fl_app{i}.db")
-    fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
-    fl.executemany("INSERT INTO Call VALUES (?, ?, ?)", calls)
-    fl.execute("CREATE TABLE Name (s)")
-    fl.executemany("INSERT INTO Name VALUES (?)", [(n,) for n in names])
-    fl.commit()
-    A.to_souffle(f"{W}/fl_app{i}.db", f"{W}/app.sqlite", out, True)
-db = sqlite3.connect(f"{W}/app.sqlite")
-check("an append keeps the ids of the DB's symbols and records, and numbers new ones after the largest",
-      list(db.execute("SELECT * FROM __SymbolTable ORDER BY id")) == [(1, "a"), (2, "b")]
-      and list(db.execute("SELECT * FROM __FlowLogRecord ORDER BY id")) == [(1, '[7,"f"]'), (2, '[9,"h"]'), (3, '[8,"g"]')]
-      and rows(f"{W}/app.sqlite", "Name") == [("a",), ("b",)])
-A.to_flowlog(f"{W}/app.sqlite", f"{W}/fl_app.db", read)
-check("and its records read back", rows(f"{W}/fl_app.db", "Call") == [(1, 7, "f"), (2, 8, "g"), (3, 9, "h")])
-counts = A.to_souffle(f"{W}/missing.db", f"{W}/empty.sqlite", out, False)
-check("without FlowLog's DB, every output is created empty",
-      counts == {"Call": 0, "Name": 0} and rows(f"{W}/empty.sqlite", "Call") == [])
-fl = sqlite3.connect(f"{W}/fl_norec.db")
-fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
-fl.execute("CREATE TABLE Name (s)")
-fl.execute("INSERT INTO Name VALUES ('a')")
-fl.commit()
-counts = A.to_souffle(f"{W}/fl_norec.db", f"{W}/norec.sqlite", out, False)
-check("an empty record relation is converted (with no record table)", counts == {"Call": 0, "Name": 1})
-counts = A.to_flowlog(f"{W}/norec.sqlite", f"{W}/fl5.db", read)
-check("and read back empty", counts["Call"] == 0 and rows(f"{W}/fl5.db", "Call") == [])
-sqlite3.connect(f"{W}/none.sqlite").execute("CREATE TABLE T (x)")
-counts = A.to_flowlog(f"{W}/none.sqlite", f"{W}/fl6.db", read)
-tables = {r[0] for r in sqlite3.connect(f"{W}/fl6.db").execute("SELECT name FROM sqlite_master")}
-check("an input missing from the DB is not created (the unread Name still is)",
-      counts == {"Call": -1, "Name": 0} and tables == {"Name"})
-
-# Soufflé writes db.sqlite again, the port appends to kept.sqlite, each with
-# an index
-import shutil, subprocess
-
-def objects(db):
-    c = sqlite3.connect(db)
-    return set(c.execute("SELECT type, name FROM sqlite_master")), set(c.execute("SELECT idx FROM sqlite_stat1"))
-
-A.to_souffle(f"{W}/fl_out.db", f"{W}/kept.sqlite", out, False)
-had = {}
-for db in (f"{W}/db.sqlite", f"{W}/kept.sqlite"):
-    c = sqlite3.connect(db)
-    c.execute('CREATE INDEX idx_Call ON "_Call" ("0")')
-    c.execute("ANALYZE")
-    c.commit()
-    had[db] = objects(db)
-subprocess.run(["souffle", "-D", W, f"{W}/index.dl"], check=True)
-A.to_souffle(f"{W}/fl_norec.db", f"{W}/kept.sqlite", out, True)
-check("an append replaces the rows of the relations it writes, keeping their tables, views and indexes "
-      "(and the indexes' statistics), as Soufflé's writer does",
-      all(objects(db) == b for db, b in had.items())
-      and ("index", "idx_Call") in had[f"{W}/kept.sqlite"][0] and ("idx_Call",) in had[f"{W}/kept.sqlite"][1]
-      and len(rows(f"{W}/db.sqlite", "Call")) == 2
-      and rows(f"{W}/kept.sqlite", "Call") == [] and rows(f"{W}/kept.sqlite", "Name") == [("a",)])
-shutil.copy(f"{W}/kept.sqlite", f"{W}/wide.sqlite")
-c = sqlite3.connect(f"{W}/wide.sqlite")
-c.executescript('DROP TABLE "_Name"; CREATE TABLE "_Name" ("0" INTEGER, "1" INTEGER); INSERT INTO "_Name" VALUES (1, 2);')
-c.close()
-dump = list(sqlite3.connect(f"{W}/wide.sqlite").iterdump())
-try:
-    A.to_souffle(f"{W}/fl_out.db", f"{W}/wide.sqlite", out, True)
-    check("an append to a relation with another number of columns fails", False)
-except ValueError as e:
-    # Soufflé fails too, but with the relation emptied
-    check(f"an append to a relation with another number of columns fails, leaving the DB as it was: {e}",
-          "Name: 2 columns" in str(e) and list(sqlite3.connect(f"{W}/wide.sqlite").iterdump()) == dump)
-
-# an append interrupted after writing (part of) the DB: Ctrl-C rolls it back
-# when the connection closes, and after a kill the next connection rolls it
-# back from the journal (Soufflé's in-memory one would be lost)
-import os, signal
-fl = sqlite3.connect(f"{W}/fl_big.db")
-fl.execute(f'CREATE TABLE Call ({", ".join(cols)})')
-fl.execute("CREATE TABLE Name (s)")
-fl.executemany("INSERT INTO Name VALUES (?)", ((f"symbol {i}",) for i in range(20000)))
-fl.commit()
-fl.close()
-A.to_souffle(f"{W}/fl_out.db", f"{W}/idx.sqlite", out, False)
-before = list(sqlite3.connect(f"{W}/idx.sqlite").iterdump())
-
-def append_and(stop):
-    """Appends fl_big.db's outputs to idx.sqlite, and calls STOP after Name's rows."""
-    copy, cache = A.copy_to_souffle, A.CACHE_KIB
-    def copy_and_stop(conn, name, *args):
-        n = copy(conn, name, *args)
-        if name == "Name":
-            stop()
-        return n
-    A.copy_to_souffle = copy_and_stop
-    A.CACHE_KIB = 1  # so that SQLite writes the DB before the commit
-    try:
-        A.to_souffle(f"{W}/fl_big.db", f"{W}/idx.sqlite", out, True)
-    finally:
-        A.copy_to_souffle, A.CACHE_KIB = copy, cache
-
-def intact(db):
-    try:
-        c = sqlite3.connect(db, timeout=0)
-        return c.execute("PRAGMA integrity_check").fetchone() == ("ok",) and list(c.iterdump()) == before
-    except sqlite3.Error as e:  # e.g. still locked
-        print(f"  {db}: {e}")
-        return False
-
-def interrupt():
-    raise KeyboardInterrupt
-try:
-    append_and(interrupt)
-    check("an append is interrupted", False)
-except KeyboardInterrupt:
-    check("an append interrupted by Ctrl-C leaves the DB as it was", intact(f"{W}/idx.sqlite"))
-sys.stdout.flush()
-pid = os.fork()
-if pid == 0:
-    append_and(lambda: os.kill(os.getpid(), signal.SIGKILL))
-    os._exit(0)
-status = os.waitpid(pid, 0)[1]
-check("as does one killed, from the journal it leaves",
-      os.WIFSIGNALED(status) and os.path.exists(f"{W}/idx.sqlite-journal") and intact(f"{W}/idx.sqlite"))
-
 # facts.py on comp.dl
 import os, shutil
 from pathlib import Path

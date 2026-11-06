@@ -9,6 +9,29 @@ from records import command, phase_metrics
 
 
 class TestRecords(unittest.TestCase):
+    def test_legacy_adapter_timing_is_rejected_by_native_campaign(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "timings.jsonl").write_text(
+                "\n".join(
+                    json.dumps(
+                        {"kind": "phase", "phase": phase, "status": "ok", "seconds": 1}
+                    )
+                    for phase in [
+                        "prepare_inputs",
+                        "engine",
+                        "write_outputs",
+                        "analysis",
+                    ]
+                )
+            )
+            with self.assertRaisesRegex(ValueError, "native SQLite"):
+                phase_metrics(
+                    directory,
+                    {"status": "ok", "wall_seconds": 4},
+                    expected_sqlite_io="native-shared-dictionary-v1",
+                )
+
     def test_nonzero_exit_and_raw_streams_survive(self):
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp) / "failure"
