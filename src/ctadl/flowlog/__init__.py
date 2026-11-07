@@ -20,8 +20,9 @@ drops the choice-domains whose dependent columns are functions of the key
 Environment:
   FLOWLOG_COMPILER      flowlog-compiler (default: on PATH)
   FLOWLOG_RUNTIME_PATH  flowlog-runtime source that flowlog-compiler builds
-                        against (read by flowlog-compiler; default: the
-                        crates.io release it was built with)
+                        against (default: the runtime of the FlowLog checkout
+                        that built flowlog-compiler, else the crates.io
+                        release that flowlog-compiler names)
   CARGO_TARGET_DIR      cargo target directory, shared by the compilations
                         (default: in CTADL's analysis cache)
 """
@@ -69,6 +70,30 @@ def compiler() -> Path:
     return Path(path).resolve()
 
 
+def runtime_source(flc: Path) -> Path | None:
+    """The flowlog-runtime source that the analyses build against, or None for
+    flowlog-compiler's default (the crates.io release of its runtime version).
+
+    FLOWLOG_RUNTIME_PATH if set; otherwise, for a compiler built in a FlowLog
+    checkout (<checkout>/target/<profile>/flowlog-compiler), that checkout's
+    runtime, which matches the code the compiler generates: the crates.io
+    release can lag behind it."""
+    if path := os.environ.get("FLOWLOG_RUNTIME_PATH"):
+        runtime = Path(path).resolve()
+        if not (runtime / "Cargo.toml").is_file():
+            error(
+                f"FLOWLOG_RUNTIME_PATH is not a flowlog-runtime source directory: '{path}'",
+                remediations="Set FLOWLOG_RUNTIME_PATH to the flowlog-runtime directory of flowlog-compiler's FlowLog checkout, or unset it",
+            )
+            sys.exit(1)
+        return runtime
+    target = flc.parent.parent
+    runtime = target.parent / "flowlog-runtime"
+    if target.name == "target" and (runtime / "Cargo.toml").is_file():
+        return runtime
+    return None
+
+
 def runtime_fingerprint(runtime: Path) -> str:
     """Invalidate compiled analyses when the local runtime or its dependencies change."""
     key = hashlib.sha256()
@@ -91,16 +116,16 @@ class FlowLogAnalysis:
 
     def __init__(self, src: Path):
         flc = compiler()
-        runtime = os.environ.get("FLOWLOG_RUNTIME_PATH")
+        self.runtime = runtime_source(flc)
         key = hashlib.sha256()
         key.update(SQLITE_IO_MODE.encode() + b"\0")
         for p in (src, POLICY, FUNCTORS, TRANSLATOR, TRANSLATOR_UDFS):
             key.update(p.read_bytes() + b"\0")
         st = flc.stat()
-        runtime = str(Path(runtime).resolve()) if runtime else ""
+        runtime = str(self.runtime or "")
         key.update(f"{flc}:{st.st_size}:{st.st_mtime_ns}:{runtime}".encode())
-        if runtime:
-            key.update(runtime_fingerprint(Path(runtime)).encode())
+        if self.runtime:
+            key.update(runtime_fingerprint(self.runtime).encode())
         self.dir = CACHE / key.hexdigest()[:32]
         self.bin = self.dir / "analysis"
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -171,12 +196,23 @@ class FlowLogAnalysis:
             "-T",
             target,
         ]
+        # flowlog-compiler reads FLOWLOG_RUNTIME_PATH
+        env = {k: v for k, v in os.environ.items() if k != "FLOWLOG_RUNTIME_PATH"}
+        if self.runtime:
+            env["FLOWLOG_RUNTIME_PATH"] = str(self.runtime)
         status(f"compiling FlowLog analysis to '{self.bin}' (takes a few minutes)...")
         with open(log, "w") as out:
-            res = subprocess.run(cmd, stdout=out, stderr=subprocess.STDOUT)
+            res = subprocess.run(cmd, stdout=out, stderr=subprocess.STDOUT, env=env)
         if res.returncode != 0 or not tmp.exists():
             tail = log.read_text(errors="replace").splitlines()[-30:]
-            error(f"FlowLog compilation failed (log: '{log}'):\n" + "\n".join(tail))
+            error(
+                f"FlowLog compilation failed (log: '{log}'):\n" + "\n".join(tail),
+                remediations=(
+                    f"Build flowlog-compiler ('{flc}') and its runtime ('{self.runtime}') from the same FlowLog revision"
+                    if self.runtime
+                    else "flowlog-compiler built against the crates.io release of flowlog-runtime: for a compiler built from FlowLog's main branch, set FLOWLOG_RUNTIME_PATH to the flowlog-runtime directory of its checkout"
+                ),
+            )
             sys.exit(1)
         os.replace(tmp, self.bin)
         # The binary is cached here: of its build, the target dir need only
