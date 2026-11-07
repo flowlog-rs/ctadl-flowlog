@@ -23,8 +23,9 @@ python3 -m venv .venv
 (cd taint-front && dune build)
 ln -sfn "$CTADL_ROOT/taint-front/_build/default/taint.exe" "$CTADL_ROOT/.local/bin/taintfront"
 # Verify the actual compiler/runtime contract before recording a usable build.
-python3 tests/flowlog/native_sqlite/run.py
-python3 - <<'PY'
+# .venv/bin/python, not python3: bash still resolves python3 to the one that created .venv.
+.venv/bin/python tests/flowlog/native_sqlite/run.py
+.venv/bin/python - <<'PY'
 import hashlib, json, os, subprocess
 from pathlib import Path
 from ctadl.flowlog import SQLITE_IO_MODE

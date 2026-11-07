@@ -42,6 +42,8 @@ stdout/stderr；不传此参数时不生成这些文件。文件路径相对于�
 
 ## 运行
 
+完整对比（全部 29 个输入、两种引擎、16 workers，含报告）可用 `sweep.sh` 一次完成并可续跑，见 [SWEEP.md](SWEEP.md)。
+
 环境准备好后，一条命令启动；`run.sh` 只加载 `env.sh` 并调用 `run.py`：
 
 ```bash
