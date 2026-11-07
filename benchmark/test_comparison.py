@@ -1,13 +1,17 @@
+import io
 import json
 import sqlite3
+import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
 import run as benchmark_run
 import compare_db
+import run_taintfront
 from run_taintfront import comparison_equal
 
 
@@ -25,6 +29,30 @@ class TestComparison(unittest.TestCase):
             comparison_equal("summary: 120 equal, 0 different; sarif: DIFFERENT")
         )
         self.assertFalse(comparison_equal("comparison failed"))
+
+    def test_taintfront_variants_are_not_held_to_default_option_expectations(self):
+        commands = []
+
+        def run(cmd, log, cwd=None, env=None):
+            commands.append([str(c) for c in cmd])
+            return int(str(cmd[1]).endswith("sarif_has_code_flows.py")), 0.0
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "t.tnt").touch()
+            (root / "t.codeflows").touch()
+            argv = ["run_taintfront.py", "--backend", "flowlog", "--testdir", tmp]
+            argv += ["--out", str(root / "out")]
+            with patch.object(run_taintfront, "run", run), redirect_stdout(io.StringIO()):
+                with patch.object(sys, "argv", argv):
+                    self.assertEqual(run_taintfront.main(), 1)
+                with patch.object(sys, "argv", argv + ["--variants", "star,qall"]):
+                    self.assertEqual(run_taintfront.main(), 0)
+            for variant in ("star", "qall"):
+                self.assertTrue((root / "out" / variant / "t/flowlog/phase").exists())
+        tails = [c[-2:] for c in commands]
+        self.assertIn(["--star", "--match-star-fields"], tails)
+        self.assertIn(["--compute-slices=all", "--format=sarif+all"], tails)
 
     def test_shared_dictionary_views_exclude_internal_metadata(self):
         db = sqlite3.connect(":memory:")

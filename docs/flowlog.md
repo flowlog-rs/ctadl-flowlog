@@ -97,3 +97,10 @@ bash benchmark/run.sh --suite smoke
 ```
 
 The semantics and taint-front suites include compilation and can take time.
+
+`run_taintfront.py --variants all` repeats the engine comparison under presets
+of non-default CTADL options, such as `--object-tracking`, `--cha` or
+`--all-outputs` (`--variants star,qall` selects some), each in a directory of
+its own. CTADL's expectations assume its default options, so a variant is
+judged by the comparison alone. `--testdir taint-front` runs CTADL's
+taint-front corpus the same way.
