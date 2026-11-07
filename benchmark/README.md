@@ -82,6 +82,8 @@ python3 benchmark/run.py --suite realistic
 [原始输入清单](https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/results/realistic/inputs.txt)；固定版本若不再可下载，准备会失败，
 不会静默换用更新版本。`--offline` 要求真实输入已缓存；首次 Rust 分析编译仍可能访问 crates.io。
 
+两种引擎在 16 workers 下运行 `--suite all`（29 个输入）的结果见 [`results/`](results/README.md)。
+
 ## 每轮如何执行
 
 每个输入导入一次。每种线程数下，两种引擎各在独立的 facts 副本上执行 index/query 预热，
