@@ -97,6 +97,8 @@ bash benchmark/run.sh --suite smoke
 ```
 
 The semantics and taint-front suites include compilation and can take time.
+The `native_sqlite`, `semantics` and `choice_mini` suites run each program with
+1 and 4 workers; set `WORKERS`, for example `WORKERS="1 16"`, to use others.
 
 `run_taintfront.py --variants all` repeats the engine comparison under presets
 of non-default CTADL options, such as `--object-tracking`, `--cha` or
