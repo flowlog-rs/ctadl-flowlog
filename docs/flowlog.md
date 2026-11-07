@@ -17,8 +17,10 @@ ctadl --directory .local/example index --engine flowlog -j 32
 ctadl --directory .local/example query --engine flowlog -j 32
 ```
 
-For an existing installation, set `FLOWLOG_COMPILER` to `flowlog-compiler` and
-`FLOWLOG_RUNTIME_PATH` to the matching checkout's `flowlog-runtime` directory.
+For an existing installation, set `FLOWLOG_COMPILER` to the `flowlog-compiler`
+of a built FlowLog checkout; the analyses build against that checkout's
+`flowlog-runtime`. For a compiler installed elsewhere, set
+`FLOWLOG_RUNTIME_PATH` to the `flowlog-runtime` directory of its checkout.
 `CARGO_TARGET_DIR` can share Rust dependencies between analysis compilations.
 `CTADL_ENGINE=flowlog` selects FlowLog without adding `--engine` to every command.
 

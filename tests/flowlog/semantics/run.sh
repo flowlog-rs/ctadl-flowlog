@@ -20,8 +20,8 @@
 # Needs a 64-bit-domain `souffle` on PATH (CTADL requires one).
 # FlowLog is found as by `ctadl --engine flowlog` (see ctadl.flowlog):
 # $FLOWLOG_COMPILER or flowlog-compiler on PATH, and $FLOWLOG_RUNTIME_PATH
-# if set; Rust builds go to $CARGO_TARGET_DIR (default:
-# ctadl-test-output/flowlog-target).
+# or else the runtime of the compiler's FlowLog checkout; Rust builds go to
+# $CARGO_TARGET_DIR (default: ctadl-test-output/flowlog-target).
 #   [WORKERS="1 4 32"] tests/flowlog/semantics/run.sh [name...]
 # (default: every case, with 1 and 4 workers)
 set -u
@@ -29,6 +29,10 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$HERE/../../.." && pwd) # the CTADL checkout
 PORT=$ROOT/src/ctadl/flowlog
 FLC=${FLOWLOG_COMPILER:-flowlog-compiler}
+if [ -z "${FLOWLOG_RUNTIME_PATH:-}" ] && flc=$(readlink -f "$(command -v "$FLC")") &&
+  t=${flc%/*/*} && [ "${t##*/}" = target ] && [ -f "${t%/*}/flowlog-runtime/Cargo.toml" ]; then
+  export FLOWLOG_RUNTIME_PATH=${t%/*}/flowlog-runtime
+fi
 TARGET=${CARGO_TARGET_DIR:-$ROOT/ctadl-test-output/flowlog-target}
 # flowlog-compiler names the crate after the executable, and cargo can take
 # a build of another crate of that name in $TARGET for this one's: each run

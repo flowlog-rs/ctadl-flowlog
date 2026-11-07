@@ -104,13 +104,15 @@ compiler:
    git clone https://github.com/flowlog-rs/flowlog
    (cd flowlog && cargo build --release)
    export FLOWLOG_COMPILER=$PWD/flowlog/target/release/flowlog-compiler
-   export FLOWLOG_RUNTIME_PATH=$PWD/flowlog/flowlog-runtime
 
-``FLOWLOG_COMPILER`` defaults to ``flowlog-compiler`` on ``PATH``, and
-``FLOWLOG_RUNTIME_PATH`` makes the analyses use the runtime of the same
-checkout. ``CARGO_TARGET_DIR`` sets the cargo target directory that all
-compilations share. CTADL's analyses need FlowLog's ``main`` branch:
-FlowLog's releases, up to 0.8.0, lack a compiler fix that they need. The
+``FLOWLOG_COMPILER`` defaults to ``flowlog-compiler`` on ``PATH``. The
+analyses build against the ``flowlog-runtime`` of the checkout that built
+the compiler. A compiler installed elsewhere uses the crates.io release of
+the runtime unless ``FLOWLOG_RUNTIME_PATH`` names its checkout's
+``flowlog-runtime`` directory. ``CARGO_TARGET_DIR`` sets the cargo target
+directory that all compilations share. CTADL's analyses need FlowLog's
+``main`` branch: FlowLog's releases, up to 0.8.0, lack a compiler fix that
+they need. The
 FlowLog engine does not need Souffle, but CTADL still needs a C
 preprocessor for its analyses (mcpp, gcc or clang).
 
