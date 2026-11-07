@@ -36,9 +36,9 @@ fi
 TARGET=${CARGO_TARGET_DIR:-$ROOT/ctadl-test-output/flowlog-target}
 # flowlog-compiler names the crate after the executable, and cargo can take
 # a build of another crate of that name in $TARGET for this one's: each run
-# compiles under a name of its own (FlowLog finding B14), and removes that
+# compiles under a name of its own (flowlog-rs/flowlog#507), and removes that
 # crate's build products from $TARGET when it exits (named after $BIN, which
-# FlowLog's fix, flowlog-rs/flowlog#507, suffixes with a hash)
+# FlowLog's fix, flowlog-rs/flowlog#508, suffixes with a hash)
 BIN=bin_$$
 WORKERS=${WORKERS:-1 4}
 W=$(mktemp -d)

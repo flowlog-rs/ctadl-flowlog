@@ -65,9 +65,12 @@ input checksums and source snapshots while calling the same CLI.
 ## Correctness and limits
 
 Choice-domain relations can select different witnesses in the two engines.
-Inside recursion, a different choice can also change contexts, summaries and
-downstream relations. Equal choice keys alone do not establish correctness.
-The benchmark keeps such differences for review.
+When one clause derives several candidates for a key in the same iteration,
+Soufflé keeps the one it happens to insert first, and the translation breaks
+the tie by the length and hash of the dependent fields. Inside recursion, a
+different choice can also change contexts, summaries and downstream relations.
+Equal choice keys alone do not establish correctness. The benchmark keeps such
+differences for review.
 
 `benchmark/check_choice_model.py` checks whether Soufflé can derive FlowLog's
 results when constrained to its choices. It checks qualified component outputs
@@ -80,6 +83,11 @@ P-code and JADX also use `ord`, whose numbering can differ between engines.
 `compare_pcode.py`, `compare_jadx.py` and `ord_oracle.sh` support investigating
 those differences. Unsupported translation constructs produce an error;
 FlowLog does not support Soufflé's interpreter mode or `--souffle-arg` options.
+
+Soufflé stops on a failing partial call (`to_number`, `/` or `%`). The
+translation stops too where it can prove that Soufflé evaluates the call;
+elsewhere a failing call returns 0, and the translator lists such calls in a
+warning.
 
 ## Validation
 

@@ -1,7 +1,7 @@
 // Aggregates: count, sum, min and max, uncorrelated and correlated, over
 // empty bodies (count and sum give 0, min and max no value), with expression
 // targets, inside comparisons and arithmetic, and in the shapes of FlowLog
-// bugs B2 and B4.
+// bugs B2 (flowlog-rs/flowlog#465) and B4 (flowlog-rs/flowlog#467).
 .decl R(a: number, b: number)
 R(1, 10). R(1, 20). R(2, 5). R(3, -7). R(3, 7).
 .decl K(a: number)

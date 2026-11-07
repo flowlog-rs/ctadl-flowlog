@@ -14,7 +14,7 @@ S("12"). S("abc").
 Dead(x) :- N(x), y = 100 / x.
 
 // Guarded calls: the filters run before the head's projection (FlowLog
-// evaluates the call first, see FlowLog issue B8).
+// used to evaluate the call first, flowlog-rs/flowlog#471).
 .decl Guard(x: number, q: number, r: number)
 .output Guard
 Guard(x, 100 / x, 100 % x) :- N(x), x != 0.
@@ -41,8 +41,8 @@ E(100 / x) :- N(x).
 .output Exists
 Exists(1) :- E(_).
 
-// A negation removing every row: FlowLog's antijoin evaluates the
-// projection on the rows it removes (FlowLog issue B9).
+// A negation removing every row: FlowLog's antijoin used to evaluate the
+// projection on the rows it removes (flowlog-rs/flowlog#472).
 .decl R(x: number)
 R(x) :- N(x).
 .decl NegAll(q: number)

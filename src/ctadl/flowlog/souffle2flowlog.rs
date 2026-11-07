@@ -34,8 +34,8 @@ use std::sync::{LazyLock, Mutex};
 // without digits or out of range, and on `/` or `%` by zero or of INT64_MIN
 // by -1 (SIGFPE). The ports return 0 there instead. FlowLog's planner orders
 // a rule's joins, filters and computations its own way, so a call can see
-// bindings Souffle never evaluates it on (flowlog-rs/flowlog B8 and B9 were
-// two such cases), and FlowLog also runs the clauses Souffle's optimiser
+// bindings Souffle never evaluates it on (flowlog-rs/flowlog#471 and #472
+// were two such cases), and FlowLog also runs the clauses Souffle's optimiser
 // deletes. Aborting in the call would stop runs Souffle completes. Each
 // partial function has an `_error` companion, "" for arguments it is defined
 // on and Souffle's complaint otherwise. The translator checks the calls
