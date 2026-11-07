@@ -5,7 +5,9 @@ into a FlowLog program.
 The translator covers the Souffle features used by CTADL.  Anything it does not
 understand is reported as an error, so that unsupported features stay visible.
 
-Rewrites performed (see README.md for the rationale of each one):
+Rewrites performed (the rationale of each one, with a minimal program, is in
+the original port's notes,
+https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/README.md#translation):
   * nested `.comp` declarations are hoisted to top level (FlowLog cannot resolve
     a nested component from a nested `.init`);
   * a relation name in a component's clauses denotes what Souffle resolves it

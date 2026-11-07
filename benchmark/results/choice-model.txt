@@ -1,0 +1,9 @@
+# Is FlowLog's index a choice model of CTADL's index analysis? For each app, FlowLog indexed the
+# benchmark's facts again with --all-outputs (16 workers, --str-intern), whose index outputs equal
+# the benchmark's FlowLog index (all but CTADLStats' 6 rows that the query adds). check_choice_model.py
+# then ran Soufflé on the index analysis with each choice-domain relation restricted to FlowLog's
+# witnesses (--ord-map from compare_jadx.py ords), and compared what it derived with FlowLog's database.
+diary (org.billthefarmer.diary_1105) | forced: VirtualAssign 9416, AliasedBy 0, IntraObjectAliasedBy 0, ctadl_jadx_phase1.ParthianVertex 4272, ctadl_jadx_phase1.ContextObj 1509 | summary: 164 equal, 0 different | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+editor (org.billthefarmer.editor_198) | forced: VirtualAssign 15287, AliasedBy 0, IntraObjectAliasedBy 0, ctadl_jadx_phase1.ParthianVertex 3593, ctadl_jadx_phase1.ContextObj 993 | summary: 164 equal, 0 different | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+netguard (eu.faircode.netguard_2026080101) | forced: VirtualAssign 109793, AliasedBy 0, IntraObjectAliasedBy 0, ctadl_jadx_phase1.ParthianVertex 32647, ctadl_jadx_phase1.ContextObj 8889 | summary: 164 equal, 0 different | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database
+binaryeye (de.markusfisch.android.binaryeye_180) | forced: VirtualAssign 377554, AliasedBy 0, IntraObjectAliasedBy 0, ctadl_jadx_phase1.ParthianVertex 67091, ctadl_jadx_phase1.ContextObj 35433 | summary: 164 equal, 0 different | choice model: yes, Souffle forced to FlowLog's choices derives the FlowLog database

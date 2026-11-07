@@ -2077,8 +2077,9 @@ CTADL pays attention to the following environment variables:
   analyses. CXX, CXXFLAGS, and LDFLAGS are used to compile analyses.
 * CTADL_ENGINE: Default for --engine (souffle or flowlog).
 * FLOWLOG_COMPILER, FLOWLOG_RUNTIME_PATH, and CARGO_TARGET_DIR: Used by the
-  FlowLog engine to compile analyses (flowlog-compiler, the flowlog-runtime
-  source it builds against, and the cargo target directory).
+  FlowLog engine to compile analyses (flowlog-compiler; the flowlog-runtime
+  source it builds against, by default that of the compiler's FlowLog
+  checkout; and the cargo target directory).
 """
 
 

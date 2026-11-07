@@ -3,12 +3,12 @@
 
 Souffle keeps, for each `choice-domain` key, the first candidate its
 evaluation order derives. When a key gets two candidates from the same clause
-in the same iteration, the port breaks the tie differently (README,
-Limitations), and the two databases then differ in the choice relations and
-in everything derived from them. Both are correct if each is a choice model of
-the program. This tool checks that for a FlowLog database: it makes Souffle
-take FlowLog's choices and checks that Souffle then derives exactly the
-FlowLog database.
+in the same iteration, the port breaks the tie differently (docs/flowlog.md,
+Correctness and limits), and the two databases then differ in the choice
+relations and in everything derived from them. Both are correct if each is a
+choice model of the program. This tool checks that for a FlowLog database: it
+makes Souffle take FlowLog's choices and checks that Souffle then derives
+exactly the FlowLog database.
 
 The program is rewritten so that, for every choice relation R (other than the
 `--functional` ones, whose dependent columns are functions of the key), R's

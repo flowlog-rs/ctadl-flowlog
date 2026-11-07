@@ -12,7 +12,8 @@ already present) it also diffs the resulting databases relation by relation
 
     run_taintfront.py [--backend souffle|flowlog|both] [--phase index|query]
                       [--testdir DIR] [--out DIR] [-j N] [--index-args ARGS]
-                      [--query-args ARGS] [--prune] [TEST...]
+                      [--query-args ARGS] [--variants NAME,...|all] [--prune]
+                      [TEST...]
 
 --testdir runs another corpus of .tnt programs (e.g. ctadl/taint-front or
 ctadl-rs/ctadl-ascent/tests/tnt); programs without a .json/.codeflows/
@@ -20,6 +21,11 @@ ctadl-rs/ctadl-ascent/tests/tnt); programs without a .json/.codeflows/
 check-taintfront, a test's .options file holds extra `ctadl index` arguments;
 --index-args/--query-args add arguments to every test's `ctadl index`/`query`
 (e.g. --index-args=--object-tracking, --query-args="--compute-slices all").
+
+--variants runs the tests under presets of non-default CTADL options
+(VARIANTS) instead, each into OUT/NAME. CTADL's expectations assume its
+default options, so a variant is judged by the comparison of the backends
+alone.
 """
 from __future__ import annotations
 
@@ -35,6 +41,22 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CTADL = HERE.parent  # the CTADL checkout this port is part of
 TESTDIR = CTADL / "tests" / "taint-front"
+# Non-default CTADL options as (index args, query args). All but `allout`
+# (CTADL's ALL_OUTPUTS) change only configuration facts, not the programs, so
+# they reuse the compiled analyses while enabling rules the defaults never fire.
+VARIANTS = {
+    "objtrack": ("--object-tracking", ""),
+    "kctx2": ("--hybrid-inlining-context-bound=2", ""),
+    "nohi": ("--no-hybrid-inlining", ""),
+    "dynap3": ("--dynamic-access-paths-max-length=3", ""),
+    "nointer": ("--no-interprocedural-data-flow", ""),
+    "unbounded": ("--no-hybrid-inlining-inlining-bound", ""),
+    "parthians": ("--hybrid-inlining-add-parthians-to-vertex", ""),
+    "star": ("--star --match-star-fields", ""),
+    "cha": ("--cha", ""),
+    "qall": ("", "--compute-slices=all --format=sarif+all"),
+    "allout": ("--all-outputs", ""),
+}
 
 
 def run(cmd: list, log, cwd=None, env=None) -> tuple[int, float]:
@@ -46,7 +68,7 @@ def run(cmd: list, log, cwd=None, env=None) -> tuple[int, float]:
 
 
 def run_backend(backend: str, test: Path, out: Path, phase: str, jobs: int,
-                index_args: list, query_args: list) -> dict:
+                index_args: list, query_args: list, expectations: bool = True) -> dict:
     name = test.stem
     d = out / name / backend
     d.mkdir(parents=True, exist_ok=True)
@@ -73,20 +95,25 @@ def run_backend(backend: str, test: Path, out: Path, phase: str, jobs: int,
         if rc:
             res["error"] = "query"
             return res
-        checks = []
-        if test.with_suffix(".json").exists():
-            rc, _ = run([sys.executable, CTADL / "tests" / "test_ctadlir.py", test.with_suffix(".json")], log, cwd=d)
-            checks.append(("ctadlir", rc == 0))
-            checks.append(("strict", strict_check(test.with_suffix(".json"), d / "ctadlir.db", log)))
-        if test.with_suffix(".codeflows").exists():
-            rc, _ = run([sys.executable, CTADL / "tests" / "bin" / "sarif_has_code_flows.py", sarif], log, cwd=d)
-            checks.append(("codeflows", rc == 0))
-        if test.with_suffix(".nocodeflows").exists():
-            rc, _ = run([sys.executable, CTADL / "tests" / "bin" / "sarif_has_code_flows.py", sarif], log, cwd=d)
-            checks.append(("nocodeflows", rc != 0))
-        res["checks"] = checks
+        if expectations:
+            res["checks"] = check_expectations(test, d, sarif, log)
     (d / "phase").write_text(phase)
     return res
+
+
+def check_expectations(test: Path, d: Path, sarif: Path, log) -> list:
+    checks = []
+    if test.with_suffix(".json").exists():
+        rc, _ = run([sys.executable, CTADL / "tests" / "test_ctadlir.py", test.with_suffix(".json")], log, cwd=d)
+        checks.append(("ctadlir", rc == 0))
+        checks.append(("strict", strict_check(test.with_suffix(".json"), d / "ctadlir.db", log)))
+    if test.with_suffix(".codeflows").exists():
+        rc, _ = run([sys.executable, CTADL / "tests" / "bin" / "sarif_has_code_flows.py", sarif], log, cwd=d)
+        checks.append(("codeflows", rc == 0))
+    if test.with_suffix(".nocodeflows").exists():
+        rc, _ = run([sys.executable, CTADL / "tests" / "bin" / "sarif_has_code_flows.py", sarif], log, cwd=d)
+        checks.append(("nocodeflows", rc != 0))
+    return checks
 
 
 def strict_check(spec: Path, db: Path, log) -> bool:
@@ -153,47 +180,59 @@ def main() -> int:
     ap.add_argument("--schema", action="append", default=[], help="schema manifests for compare_db.py")
     ap.add_argument("--index-args", default="", help="extra `ctadl index` arguments for every test")
     ap.add_argument("--query-args", default="", help="extra `ctadl query` arguments for every test")
+    ap.add_argument("--variants", default="", metavar="NAMES",
+                    help="comma-separated presets of non-default CTADL options to run instead, each into "
+                         "OUT/NAME, or `all`: " + ", ".join(VARIANTS))
     ap.add_argument("--prune", action="store_true",
                     help="delete the ctadlir.db files (~15 MB each) of tests that pass on both backends "
                          "with identical results; logs, SARIF and compare.txt are kept")
     args = ap.parse_args()
     # ctadl resolves -o relative to --directory
     args.out, args.testdir = args.out.resolve(), args.testdir.resolve()
+    variants = list(VARIANTS) if args.variants == "all" else [v for v in args.variants.split(",") if v]
+    if unknown := [v for v in variants if v not in VARIANTS]:
+        ap.error(f"unknown variant {unknown[0]!r} (choose from all, {', '.join(VARIANTS)})")
 
     tests = sorted(args.testdir.glob("*.tnt"))
     if args.tests:
         tests = [t for t in tests if t.stem in args.tests]
     backends = ["souffle", "flowlog"] if args.backend == "both" else [args.backend]
+    # (label prefix, output directory, preset index args, preset query args)
+    runs = [(f"{v}/", args.out / v, *VARIANTS[v]) for v in variants] or [("", args.out, "", "")]
+    width = 22 + max(len(prefix) for prefix, *_ in runs)
     failed = reviews = 0
-    for t in tests:
-        line = [f"{t.stem:22}"]
-        passed = True
-        for b in backends:
-            r = run_backend(b, t, args.out, args.phase, args.jobs,
-                            shlex.split(args.index_args), shlex.split(args.query_args))
-            status = r.get("error", "ok")
-            if "error" in r:
-                failed += 1
-                passed = False
-                status = f"{r['error']} FAILED"
-            elif r["checks"]:
-                bad = [c for c, ok in r["checks"] if not ok]
-                status = "checks FAILED: " + ",".join(bad) if bad else "checks ok (" + ",".join(c for c, _ in r["checks"]) + ")"
-                failed += bool(bad)
-                passed &= not bad
-            times = " ".join(f"{k[:-2]}={r[k]:.1f}s" for k in ("index_s", "query_s") if k in r)
-            line.append(f"{b}: {status} [{times}]")
-        if comparable(args.out, t.stem, args.phase):
-            diff = compare(args.out, t.stem, args.schema, args.phase)
-            line.append("diff: " + diff)
-            same = comparison_equal(diff)
-            if not same:
-                reviews += 1
-                line.append("needs_review (database retained)")
-            if args.prune and passed and same:
-                for b in backends:
-                    (args.out / t.stem / b / "ctadlir.db").unlink(missing_ok=True)
-        print(" | ".join(line), flush=True)
+    for prefix, out, preset_index, preset_query in runs:
+        index_args = shlex.split(f"{preset_index} {args.index_args}")
+        query_args = shlex.split(f"{preset_query} {args.query_args}")
+        for t in tests:
+            line = [f"{prefix + t.stem:{width}}"]
+            passed = True
+            for b in backends:
+                r = run_backend(b, t, out, args.phase, args.jobs, index_args, query_args,
+                                expectations=not variants)
+                status = r.get("error", "ok")
+                if "error" in r:
+                    failed += 1
+                    passed = False
+                    status = f"{r['error']} FAILED"
+                elif r["checks"]:
+                    bad = [c for c, ok in r["checks"] if not ok]
+                    status = "checks FAILED: " + ",".join(bad) if bad else "checks ok (" + ",".join(c for c, _ in r["checks"]) + ")"
+                    failed += bool(bad)
+                    passed &= not bad
+                times = " ".join(f"{k[:-2]}={r[k]:.1f}s" for k in ("index_s", "query_s") if k in r)
+                line.append(f"{b}: {status} [{times}]")
+            if comparable(out, t.stem, args.phase):
+                diff = compare(out, t.stem, args.schema, args.phase)
+                line.append("diff: " + diff)
+                same = comparison_equal(diff)
+                if not same:
+                    reviews += 1
+                    line.append("needs_review (database retained)")
+                if args.prune and passed and same:
+                    for b in backends:
+                        (out / t.stem / b / "ctadlir.db").unlink(missing_ok=True)
+            print(" | ".join(line), flush=True)
     return 1 if failed else 4 if reviews else 0
 
 

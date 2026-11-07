@@ -3,7 +3,8 @@
 
 Run after sourcing benchmark/env.sh. This compiles two small analyses and
 checks shared input/output, reruns, symbol IDs, indexes, pruned outputs, nullary
-relations and record storage across two separate engine processes.
+relations and record storage across two separate engine processes, with 1 and 4
+workers (or $WORKERS, as in the other FlowLog suites: WORKERS="1 16").
 """
 
 import json
@@ -39,7 +40,7 @@ def main():
     reader = FlowLogAnalysis(here / "read.dl")
     previous = Path.cwd()
     try:
-        for workers in (1, 4):
+        for workers in map(int, os.environ.get("WORKERS", "1 4").split()):
             with tempfile.TemporaryDirectory() as tmp:
                 directory = Path(tmp).resolve()
                 os.chdir(directory)

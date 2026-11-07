@@ -17,8 +17,10 @@ ctadl --directory .local/example index --engine flowlog -j 32
 ctadl --directory .local/example query --engine flowlog -j 32
 ```
 
-For an existing installation, set `FLOWLOG_COMPILER` to `flowlog-compiler` and
-`FLOWLOG_RUNTIME_PATH` to the matching checkout's `flowlog-runtime` directory.
+For an existing installation, set `FLOWLOG_COMPILER` to the `flowlog-compiler`
+of a built FlowLog checkout; the analyses build against that checkout's
+`flowlog-runtime`. For a compiler installed elsewhere, set
+`FLOWLOG_RUNTIME_PATH` to the `flowlog-runtime` directory of its checkout.
 `CARGO_TARGET_DIR` can share Rust dependencies between analysis compilations.
 `CTADL_ENGINE=flowlog` selects FlowLog without adding `--engine` to every command.
 
@@ -63,9 +65,12 @@ input checksums and source snapshots while calling the same CLI.
 ## Correctness and limits
 
 Choice-domain relations can select different witnesses in the two engines.
-Inside recursion, a different choice can also change contexts, summaries and
-downstream relations. Equal choice keys alone do not establish correctness.
-The benchmark keeps such differences for review.
+When one clause derives several candidates for a key in the same iteration,
+Soufflé keeps the one it happens to insert first, and the translation breaks
+the tie by the length and hash of the dependent fields. Inside recursion, a
+different choice can also change contexts, summaries and downstream relations.
+Equal choice keys alone do not establish correctness. The benchmark keeps such
+differences for review.
 
 `benchmark/check_choice_model.py` checks whether Soufflé can derive FlowLog's
 results when constrained to its choices. It checks qualified component outputs
@@ -78,6 +83,11 @@ P-code and JADX also use `ord`, whose numbering can differ between engines.
 `compare_pcode.py`, `compare_jadx.py` and `ord_oracle.sh` support investigating
 those differences. Unsupported translation constructs produce an error;
 FlowLog does not support Soufflé's interpreter mode or `--souffle-arg` options.
+
+Soufflé stops on a failing partial call (`to_number`, `/` or `%`). The
+translation stops too where it can prove that Soufflé evaluates the call;
+elsewhere a failing call returns 0, and the translator lists such calls in a
+warning.
 
 ## Validation
 
@@ -95,3 +105,12 @@ bash benchmark/run.sh --suite smoke
 ```
 
 The semantics and taint-front suites include compilation and can take time.
+The `native_sqlite`, `semantics` and `choice_mini` suites run each program with
+1 and 4 workers; set `WORKERS`, for example `WORKERS="1 16"`, to use others.
+
+`run_taintfront.py --variants all` repeats the engine comparison under presets
+of non-default CTADL options, such as `--object-tracking`, `--cha` or
+`--all-outputs` (`--variants star,qall` selects some), each in a directory of
+its own. CTADL's expectations assume its default options, so a variant is
+judged by the comparison alone. `--testdir taint-front` runs CTADL's
+taint-front corpus the same way.

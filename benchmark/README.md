@@ -82,6 +82,8 @@ python3 benchmark/run.py --suite realistic
 [原始输入清单](https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/results/realistic/inputs.txt)；固定版本若不再可下载，准备会失败，
 不会静默换用更新版本。`--offline` 要求真实输入已缓存；首次 Rust 分析编译仍可能访问 crates.io。
 
+两种引擎在 16 workers 下运行 `--suite all`（29 个输入）的结果见 [`results/`](results/README.md)。
+
 ## 每轮如何执行
 
 每个输入导入一次。每种线程数下，两种引擎各在独立的 facts 副本上执行 index/query 预热，
@@ -104,6 +106,8 @@ smoke 有差异即停止；其他输入继续测量，整轮标为 `needs_review
 不能把某次发现的差异类型加入全局忽略名单。
 `run_taintfront.py` 同样将 witness 或其他比较差异标为 `needs_review`、返回 4，
 并保留对应数据库；`--prune` 只删除比较相同且测试通过的数据库。
+`--variants all`（或逗号分隔的预设名）在非默认 CTADL 选项下重复这一比较，结果写入
+`OUT/<预设名>/`；CTADL 的测试预期按默认选项编写，因此这些运行只按两种引擎的比较判定。
 
 默认在记录完成后删除成功运行的工作数据库、facts 副本和报告，保留日志及生成的 Datalog。
 `--keep-work` 保留这些工作目录；失败现场及比较有差异的预热数据库始终保留。真实输入和编译缓存可复用。

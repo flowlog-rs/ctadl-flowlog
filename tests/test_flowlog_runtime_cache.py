@@ -1,11 +1,14 @@
 """FlowLog runtime I/O and compilation-cache regression checks."""
 
+import io
 import json
 import os
+import shutil
 import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from ctadl.flowlog import FlowLogAnalysis, runtime_fingerprint
 from ctadl.flowlog.native_sqlite import Output, check_inputs
@@ -192,6 +195,70 @@ class TestRuntimeCache(unittest.TestCase):
             self.assertNotEqual(before, changed)
             (workspace / "Cargo.lock").write_text("new dependency resolution")
             self.assertNotEqual(changed, runtime_fingerprint(runtime))
+
+
+class TestRuntimeSource(unittest.TestCase):
+    """Analyses build against the runtime of flowlog-compiler's checkout."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name).resolve()
+        self.runtime = self.root / "flowlog/flowlog-runtime"
+        self.runtime.mkdir(parents=True)
+        (self.runtime / "Cargo.toml").write_text("")
+        # A stand-in compiler: its "executable" records the runtime it got.
+        self.compiler = self.root / "flowlog/target/release/flowlog-compiler"
+        self.compiler.parent.mkdir(parents=True)
+        self.compiler.write_text(
+            "#!/bin/sh\n"
+            'while [ $# -gt 0 ]; do [ "$1" = -o ] && out=$2; shift; done\n'
+            'printf %s "${FLOWLOG_RUNTIME_PATH-default}" > "$out"\n'
+        )
+        self.compiler.chmod(0o755)
+        self.src = self.root / "a.dl"
+        self.src.write_text(
+            ".decl A(x: number)\n.input A\n.decl B(x: number)\n.output B\nB(x) :- A(x).\n"
+        )
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("FLOWLOG_COMPILER", "FLOWLOG_RUNTIME_PATH")
+        }
+        env["CARGO_TARGET_DIR"] = str(self.root / "target")
+        for patch in (
+            mock.patch.dict(os.environ, env, clear=True),
+            mock.patch("ctadl.flowlog.CACHE", self.root / "cache"),
+            mock.patch("sys.stderr", io.StringIO()),
+        ):
+            patch.start()
+            self.addCleanup(patch.stop)
+
+    def built_against(self, compiler):
+        os.environ["FLOWLOG_COMPILER"] = str(compiler)
+        return FlowLogAnalysis(self.src).bin.read_text()
+
+    def test_checkout_compiler_uses_the_checkout_runtime(self):
+        link = self.root / "bin/flowlog-compiler"
+        link.parent.mkdir()
+        link.symlink_to(self.compiler)
+        self.assertEqual(self.built_against(link), str(self.runtime))
+
+    def test_runtime_path_overrides_the_checkout(self):
+        other = self.root / "other"
+        other.mkdir()
+        (other / "Cargo.toml").write_text("")
+        os.environ["FLOWLOG_RUNTIME_PATH"] = str(other)
+        self.assertEqual(self.built_against(self.compiler), str(other))
+        os.environ["FLOWLOG_RUNTIME_PATH"] = str(self.root / "missing")
+        with self.assertRaises(SystemExit):
+            self.built_against(self.compiler)
+
+    def test_installed_compiler_keeps_its_default_runtime(self):
+        installed = self.root / "bin/flowlog-compiler"
+        installed.parent.mkdir()
+        shutil.copy(self.compiler, installed)
+        self.assertEqual(self.built_against(installed), "default")
 
 
 if __name__ == "__main__":

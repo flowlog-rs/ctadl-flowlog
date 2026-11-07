@@ -1,0 +1,2 @@
+# CTADL's root .gitignore ignores *.csv; the results keep their measurements.
+!*.csv
