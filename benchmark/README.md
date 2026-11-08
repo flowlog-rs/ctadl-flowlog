@@ -1,35 +1,44 @@
 # CTADL benchmark scripts
 
-分析仍由正常的 CTADL CLI 完成。此目录只准备输入、重复调用 CLI、检查结果并保存日志；
-没有另一套分析引擎，也不生成图表。输入生成器、比较器和正确性检查脚本都在此目录。
+Analysis runs through the standard CTADL CLI. This directory prepares inputs,
+invokes the CLI repeatedly, checks results, and saves logs. It does not provide a
+separate analysis engine or generate charts. Input generators, comparison tools,
+and correctness checks all live here.
 
-FlowLog 使用原生共享 SQLite 字典布局（需要已合并的 FlowLog #503）。普通 CLI、测试与
-benchmark 使用同一条路径，不复制 SQLite 关系到中间数据库。`manifest.json` 的
-`flowlog.sqlite_io` 和每条测量的 `sqlite_io` 标记为 `native-shared-dictionary-v1`；
-缺少对应 CLI 阶段标记的样本会被拒绝。
-`finalize_outputs` 记录字段名、索引、空输出和 record 展示元数据的处理，不是整库转换。
+FlowLog uses the native shared SQLite dictionary layout, which requires the
+merged FlowLog #503. The standard CLI, tests, and benchmarks use the same path,
+without copying SQLite relations into intermediate databases. The
+`flowlog.sqlite_io` field in `manifest.json` and each measurement's `sqlite_io`
+field are set to `native-shared-dictionary-v1`. Samples without the corresponding
+CLI stage markers are rejected. `finalize_outputs` records the handling of field
+names, indexes, empty outputs, and record display metadata; it is not a conversion
+of the entire database.
 
-## 环境与普通使用
+## Environment and standalone usage
 
-在 CTADL 仓库根目录执行。Linux 上需要 Python 3.10+、Rust、Soufflé 2.5（含 SQLite）、
-C++ 编译器、OCaml/dune/menhir、curl、GNU time 和 Git。
-可在不提交的 `benchmark/local.env` 中配置工具 PATH、CARGO_HOME、RUSTUP_HOME、
-RUSTUP_TOOLCHAIN、CARGO_BUILD_JOBS 和 FLOWLOG_SRC。
+Run these commands from the CTADL repository root. On Linux, the prerequisites
+are Python 3.10+, Rust, Soufflé 2.5 with SQLite support, a C++ compiler,
+OCaml/dune/menhir, curl, GNU time, and Git. Configure tool paths and environment
+variables in an uncommitted `benchmark/local.env`: PATH, CARGO_HOME, RUSTUP_HOME,
+RUSTUP_TOOLCHAIN, CARGO_BUILD_JOBS, and FLOWLOG_SRC.
 
 ```bash
 bash benchmark/setup.sh
 source benchmark/env.sh
 ```
 
-`setup.sh` 更新相邻 `../flowlog` 的干净 `main` checkout，使用 `--locked` 构建编译器，
-安装本仓库及本地前端、networkx 导出插件到 `.venv`，构建 taint-front，
-并执行真实编译器的原生 SQLite 读写检查。
-检查通过后，编译器版本、SHA-256 和 SQLite I/O 模式写入 `compiler.json`，
-环境准备日志写入 `runs/setup-*/`。再次执行 setup 才更新 FlowLog；测量脚本不更新代码。
-编译器和 `FLOWLOG_RUNTIME_PATH` 指向同一份 FlowLog。
-CTADL 的分析缓存包含本地 runtime 的源码和依赖指纹；runtime 更新也会重新编译分析。
+`setup.sh` updates the clean `main` checkout in the adjacent `../flowlog`
+directory and builds the compiler with `--locked`. It installs this repository,
+the local frontend plugins, and the networkx export plugin into `.venv`, builds
+taint-front, and checks native SQLite reads and writes using the actual compiler.
+After those checks pass, the compiler version, SHA-256, and SQLite I/O mode are
+written to `compiler.json`; setup logs go to `runs/setup-*/`. FlowLog is updated
+only when setup runs again; measurement scripts do not update code. The compiler
+and `FLOWLOG_RUNTIME_PATH` refer to the same FlowLog checkout. CTADL's analysis
+cache includes fingerprints of the local runtime's source and dependencies, so
+runtime updates also trigger analysis recompilation.
 
-然后可以独立使用 CTADL：
+You can then use CTADL independently:
 
 ```bash
 ctadl import taint-front tests/taint-front/ex3.tnt -o .local/example
@@ -37,38 +46,44 @@ ctadl --directory .local/example index --engine flowlog -j 32 --timings .local/l
 ctadl --directory .local/example query --engine flowlog -j 32 --timings .local/logs/query.jsonl
 ```
 
-`--timings FILE` 是 CTADL 的可选日志功能，两种引擎都支持。它记录阶段时间及捕获的子进程
-stdout/stderr；不传此参数时不生成这些文件。文件路径相对于调用 CTADL 时的目录。
+`--timings FILE` enables optional CTADL logging for either engine. It records stage
+timings and captures subprocess stdout/stderr. These files are not generated when
+the option is omitted. Paths are relative to the directory from which CTADL is
+invoked.
 
-## 运行
+## Running benchmarks
 
-环境准备好后，一条命令启动；`run.sh` 只加载 `env.sh` 并调用 `run.py`：
+Once the environment is ready, start a run with one command. `run.sh` only loads
+`env.sh` and invokes `run.py`:
 
 ```bash
-# 最小正确性与测量验证，默认每种引擎预热一次、正式测量一次
+# Minimal correctness and measurement check: one warmup and one measured run per engine by default
 bash benchmark/run.sh --suite smoke
 
-# 默认 syn10 + syn25；32 workers、每种引擎三次正式测量
+# Default: syn10 + syn25, 32 workers, three measured runs per engine
 bash benchmark/run.sh
 
-# 指定输入、线程数和次数
+# Select inputs, worker counts, and repetitions
 bash benchmark/run.sh --workloads syn10 --workers 1,32 --reps 3
 
-# 多 NUMA node 的机器：先用 numactl --hardware 确认 CPU/node 编号。
-# 此机器的 node 1 物理核为 32–63；CPU 和内存都固定到同一 node。
+# On a machine with multiple NUMA nodes, check CPU/node IDs with numactl --hardware first.
+# On the example machine, physical cores 32-63 belong to node 1; bind CPUs and memory to that node.
 numactl --physcpubind=32-63 --membind=1 bash benchmark/run.sh --workloads libz,diary --workers 1,4,8
 ```
 
-`workloads.json` 是输入清单，包含 1 个 smoke、2 个合成程序、14 个 Ubuntu 二进制、
-13 个 F-Droid APK。合成程序由固定 seed 生成；真实输入固定版本并校验提取后的二进制或
-APK 的 SHA-256。默认运行会准备选中的输入；也可以只下载：
+`workloads.json` lists the inputs: one smoke workload, two synthetic programs,
+14 Ubuntu binaries, and 13 F-Droid APKs. Synthetic programs use fixed random seeds.
+Real inputs have pinned versions, and the SHA-256 of each extracted binary or APK
+is verified. Runs prepare the selected inputs by default. You can also prepare
+inputs separately:
 
 ```bash
 python3 benchmark/prepare.py --workloads libz,diary
 python3 benchmark/prepare.py --suite realistic
 ```
 
-真实程序需要额外前端。固定使用 Ghidra 11.2、JDK 21.0.13+9 和 JADX 插件 0.6.2：
+Real programs require additional frontends. The pinned versions are Ghidra 11.2,
+JDK 21.0.13+9, and JADX plugin 0.6.2:
 
 ```bash
 bash benchmark/setup-frontends.sh
@@ -77,80 +92,103 @@ python3 benchmark/run.py --workloads libz,diary --reps 1
 python3 benchmark/run.py --suite realistic
 ```
 
-也可以使用已有的 Ghidra/JDK，在 `local.env` 配置 GHIDRA_HOME 和 JAVA_HOME。
-工具版本不同的结果不要当成同一实验。原始输入来源与校验和来自
-[原始输入清单](https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/results/realistic/inputs.txt)；固定版本若不再可下载，准备会失败，
-不会静默换用更新版本。`--offline` 要求真实输入已缓存；首次 Rust 分析编译仍可能访问 crates.io。
+To use existing Ghidra/JDK installations, set GHIDRA_HOME and JAVA_HOME in
+`local.env`. Results from different tool versions should be treated as separate
+experiments. Input sources and checksums come from the
+[original input manifest](https://github.com/flowlog-rs/ctadl-flowlog/blob/b11379f89779fc295eeeb4ef133dc285cd2678b5/flowlog-backend/results/realistic/inputs.txt).
+If a pinned version is no longer available, preparation fails rather than silently
+substituting a newer version. `--offline` requires real inputs to be cached;
+the initial Rust analysis compilation may still access crates.io.
 
-## 每轮如何执行
+## Execution workflow
 
-每个输入导入一次。每种线程数下，两种引擎各在独立的 facts 副本上执行 index/query 预热，
-然后比较数据库（以及真实程序的 SARIF）。再使用新的 facts 副本进行正式测量。
-各次运行串行；偶数次交换引擎顺序。预热记录标记为 `mode=warmup`，正式记录为 `mode=measure`。
-正式阶段若发现编译事件，样本标为 `invalid_metrics`，不能作为性能数据。
-`manifest.json` 记录 CPU affinity 和 NUMA 内存策略；NUMA 绑定由外层 `numactl`
-施加并由编译器、前端和两个引擎继承。不同轮次应保持相同绑定。
+Each input is imported once. For each worker count, both engines warm up index and
+query on separate copies of the facts. The databases are then compared, along
+with SARIF reports for real programs. Measured runs use fresh copies of the facts.
+Runs execute sequentially, reversing engine order on even-numbered repetitions.
+Warmup records use `mode=warmup`; measured records use `mode=measure`. If a
+compilation event occurs during a measured stage, the sample is marked
+`invalid_metrics` and must not be used as performance data.
 
-比较使用已有的 compare_db/compare_pcode/compare_jadx/compare_sarif 工具，保留其原始输出。
-不同的合法 choice-domain witness 可能造成差异；只报告键相同的 `WITNESS` 也进入复核，
-脚本不会把未知差异自动判定为正确。
-smoke 有差异即停止；其他输入继续测量，整轮标为 `needs_review`，退出码 4。
-若只选一个引擎，不会做跨引擎正确性比较。
+`manifest.json` records CPU affinity and NUMA memory policy. An outer `numactl`
+command applies the NUMA binding, which the compiler, frontends, and both engines
+inherit. Keep the binding consistent across runs.
 
-`needs_review` 需要进一步查原因。仅有 choice-domain 的键相同不足以证明结果正确；
-可用 `benchmark/check_choice_model.py` 让 Soufflé 按 FlowLog 的选择重新推导，
-检查选择的可推导性及所有输出（包括组件输出）。索引检查需要正常 CLI 的 `--all-outputs`，
-并先确认增加输出没有改变原始索引结果。检查结论只适用于对应的输入、程序和版本，
-不能把某次发现的差异类型加入全局忽略名单。
-`run_taintfront.py` 同样将 witness 或其他比较差异标为 `needs_review`、返回 4，
-并保留对应数据库；`--prune` 只删除比较相同且测试通过的数据库。
+Comparisons use the existing compare_db/compare_pcode/compare_jadx/compare_sarif
+tools and retain their raw output. Different valid choice-domain witnesses can
+produce differences. Even comparisons reporting only `WITNESS` differences with
+matching keys require review; scripts do not automatically accept unexplained
+differences as correct. A difference stops the smoke suite. Other workloads
+continue measuring, but the overall run is marked `needs_review` and exits with
+code 4. Selecting only one engine skips comparisons between engines.
 
-默认在记录完成后删除成功运行的工作数据库、facts 副本和报告，保留日志及生成的 Datalog。
-`--keep-work` 保留这些工作目录；失败现场及比较有差异的预热数据库始终保留。真实输入和编译缓存可复用。
-大量真实输入或保留数据库需要更多磁盘空间，脚本不自动删除其他实验的数据。
+A `needs_review` result requires investigation. Matching choice-domain keys alone
+do not establish correctness. Use `benchmark/check_choice_model.py` to have
+Soufflé derive results using FlowLog's choices, checking that the choices are
+derivable and that all outputs match, including component outputs. Index checks
+require the standard CLI's `--all-outputs` option; first verify that adding these
+outputs does not change the original index results. Findings apply only to the
+specific input, program, and version checked. Do not add a difference found in
+one run to a global ignore list.
 
-## 日志布局与字段
+`run_taintfront.py` also marks witness or other comparison differences as
+`needs_review`, returns 4, and retains the corresponding databases. `--prune`
+removes databases only when comparisons match and tests pass.
 
-每轮创建新的 `benchmark/runs/<UTC时间>-<pid>/`，不覆盖旧运行：
+By default, successful runs delete their working databases, facts copies, and
+reports after recording results, while retaining logs and generated Datalog.
+`--keep-work` preserves these working directories. Failed runs and warmup
+databases with comparison differences are always retained. Real inputs and
+compilation caches can be reused. Large collections of real inputs or retained
+databases require more disk space; scripts do not automatically delete data from
+other experiments.
+
+## Log layout and fields
+
+Each run creates a new `benchmark/runs/<UTC-timestamp>-<pid>/` directory without
+overwriting previous runs:
 
 ```text
-manifest.json                 代码版本、源码哈希、编译器哈希、环境、机器信息、输入、最终状态
-ctadl-source.tar.gz            本轮 CTADL 源码快照，包含未提交的实现
-analysis-sources.tar.gz        编译缓存中的转换程序、schema、UDF、编译日志和可用的锁文件
-events.jsonl                  命令开始/结束事件
-measurements.jsonl            每个阶段的原始测量记录
-measurements.csv              同一批原始记录的 CSV，不做聚合
+manifest.json                 Code versions, source/compiler hashes, environment, machine, inputs, final status
+ctadl-source.tar.gz            CTADL source snapshot for this run, including uncommitted implementation changes
+analysis-sources.tar.gz        Translated programs, schemas, UDFs, build logs, and available lockfiles from the build cache
+events.jsonl                  Command start/end events
+measurements.jsonl            Raw measurements for each stage
+measurements.csv              The same raw records as CSV, without aggregation
 workloads/<id>/
-  input.json                  实际使用的输入路径和 SHA-256
-  import/                     导入命令与原始日志
-  checks/workers-32/flowlog/   数据库/SARIF 比较日志和结论
+  input.json                  Actual input path and SHA-256
+  import/                     Import command and raw logs
+  checks/workers-32/flowlog/   Database/SARIF comparison logs and findings
   <engine>/workers-32/
     warmup/{index,query}/
     rep-001/{index,query}/
-      command.json            argv、cwd、UTC起止、退出码、超时、wall time、启动前负载
-      stdout.log              正常 CTADL 命令的原始 stdout
-      stderr.log              正常 CTADL 命令的原始 stderr
-      resources.txt           GNU time -v 的原始输出
-      timings.jsonl           CTADL 自身的阶段及子进程记录
-      timings.jsonl.commands/ 捕获的子进程原始 stdout/stderr
-      measurement.json        本阶段的结构化测量
-      index.dl / query.dl     实际交给分析层的 Datalog
+      command.json            argv, cwd, UTC start/end, exit code, timeout, wall time, load before launch
+      stdout.log              Raw stdout from the standard CTADL command
+      stderr.log              Raw stderr from the standard CTADL command
+      resources.txt           Raw GNU time -v output
+      timings.jsonl           CTADL's stage and subprocess records
+      timings.jsonl.commands/ Captured raw subprocess stdout/stderr
+      measurement.json        Structured measurements for this stage
+      index.dl / query.dl     Datalog actually passed to the analysis layer
 ```
 
-| 字段 | 含义 |
+| Field | Meaning |
 |---|---|
-| `wall_seconds` | 整条 CTADL 命令的时间，包括驱动、模型生成、分析和报告；预热还可能含编译 |
-| `analyze_seconds` | 分析调用；FlowLog 包括输入准备、原生引擎、输出元数据处理 |
-| `engine_seconds` | 分析二进制运行，包含引擎自身的 I/O 和 SQLite 输出；不是纯 fixpoint 时间 |
-| `process_peak_rss_mib` | GNU time 记录的 CTADL 进程及其子进程最大 RSS，单位 MiB；不是进程 RSS 总和，也不声称是单独的引擎 RSS |
-| `mode` / `repetition` | `warmup` 的 repetition 为 0；`measure` 从 1 开始 |
-| `status` | 成功、失败、超时、无法启动或无效测量；缺失数值保持 null/CSV 空单元格 |
+| `wall_seconds` | Time for the entire CTADL command, including the driver, model generation, analysis, and reporting; warmups may also include compilation |
+| `analyze_seconds` | Time for the analysis call; for FlowLog, this includes input preparation, the native engine, and output metadata handling |
+| `engine_seconds` | Time running the analysis binary, including the engine's own I/O and SQLite output; not pure fixpoint computation time |
+| `process_peak_rss_mib` | Maximum RSS recorded by GNU time for the CTADL process and its subprocesses, in MiB; not the sum of their RSS values or a measurement of the engine alone |
+| `mode` / `repetition` | `warmup` uses repetition 0; `measure` starts at 1 |
+| `status` | Success, failure, timeout, launch failure, or invalid measurement; missing values remain null or empty CSV cells |
 
-整轮退出码：0 完成、1 执行/测量失败、2 配置错误、4 比较结果需要检查、130 用户中断。
-外层命令超时会终止整个子进程组并保存日志。index 失败则不执行该样本的 query。
-机器、源码或输入不同的轮次保持分开，前端可以直接消费这些记录。
+Overall exit codes are 0 for completion, 1 for execution or measurement failure,
+2 for configuration errors, 4 for comparison results requiring review, and 130 for
+user interruption. A timeout on the outer command terminates the entire subprocess
+group and saves logs. If index fails, query is skipped for that sample. Keep runs
+with different machines, source code, or inputs separate. Frontends can consume
+these records directly.
 
-## 验证脚本
+## Validation scripts
 
 ```bash
 python3 -m unittest tests.test_timings tests.test_flowlog_runtime_cache tests.test_facts_writer tests.test_sarif_path_order tests.test_choice_model
